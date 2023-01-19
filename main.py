@@ -375,7 +375,7 @@ def getFavorites():
 
 
 def addFavorite(name, url, fav_mode, iconimage, fanart, description, cat, folder, play):
-    xbmc.log( name, xbmc.LOGWARNING )
+
     data = loadFavorites()
     data.append((name, url, fav_mode, iconimage, fanart, description, cat, folder, play))
     b = open(favorites, 'w')
@@ -562,7 +562,6 @@ def main():
     except:
         play=1
 
-    xbmc.log( str(mode), xbmc.LOGWARNING )
 
     if mode==None:
         home_menu()
