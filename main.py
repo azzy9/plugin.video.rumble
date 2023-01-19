@@ -1,22 +1,18 @@
+# -*- coding: utf-8 -*-
 import sys, re, os
 import xbmc, xbmcplugin, xbmcgui, xbmcaddon, xbmcvfs
+import six
+
+from six.moves import urllib
 
 try:
     import cookielib
 except ImportError:
     import http.cookiejar as cookielib
-try:
-    import urllib.parse as urllib
-except ImportError:
-    import urllib
-try:
-    import urllib2
-except ImportError:
-    import urllib.request as urllib2
 
 try:
     import json
-except:
+except ImportError:
     import simplejson as json
 
 BASE_URL = 'https://rumble.com'
@@ -83,8 +79,8 @@ def getRequest(url, ref=''):
             ref = url
 
         cj = cookielib.CookieJar()
-        opener = urllib2.build_opener(urllib2.HTTPCookieProcessor(cj))
-        opener.addheaders=[('Accept-Language', 'en-gb,en;q=0.5'),('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/107.0.0.0 Safari/537.36'),('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9'), ('Referer', ref)]
+        opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(cj))
+        opener.addheaders=[('Accept-Language', 'en-gb,en;q=0.5'),('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36'),('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9'), ('Referer', ref)]
         data = opener.open(url).read()
         response = data.decode('utf-8')
     except:
@@ -97,29 +93,29 @@ def getRequest(url, ref=''):
 def home_menu():
 
     # Search
-    addDir('[B]'+xbmc.getLocalizedString(137)+'[/B]','',1,MEDIA_DIR + 'search.png','','','')
+    addDir( xbmc.getLocalizedString(137), '', 1, MEDIA_DIR + 'search.png', '', '' ,'' )
     # Favorites
-    addDir('[B]'+xbmc.getLocalizedString(1036)+'[/B]','',7,MEDIA_DIR + 'favorite.png','','','')
+    addDir( xbmc.getLocalizedString(1036), '', 7, MEDIA_DIR + 'favorite.png', '', '', '' )
     # News
-    addDir('[B]'+xbmc.getLocalizedString(29916)+'[/B]',BASE_URL+'/category/news',3,MEDIA_DIR + 'news.png','','','other')
+    addDir( xbmc.getLocalizedString(29916), BASE_URL + '/category/news', 3, MEDIA_DIR + 'news.png', '', '', 'other' )
     # Viral
-    addDir('[B]'+__language__(30050)+'[/B]',BASE_URL+'/category/viral',3,MEDIA_DIR + 'viral.png','','','other')
+    addDir( __language__(30050), BASE_URL + '/category/viral',3,MEDIA_DIR + 'viral.png','','','other' )
     # Podcasts
-    addDir('[B]'+__language__(30051)+'[/B]',BASE_URL+'/category/podcasts',3,MEDIA_DIR +'podcast.png','','','other')
+    addDir( __language__(30051), BASE_URL + '/category/podcasts',3,MEDIA_DIR +'podcast.png','','','other')
     # Battle Leaderboard
-    addDir('[B]'+__language__(30052)+'[/B]',BASE_URL+'/battle-leaderboard',3,MEDIA_DIR + 'leader.png','','','top')
+    addDir( __language__(30052), BASE_URL + '/battle-leaderboard',3,MEDIA_DIR + 'leader.png','','','top')
     # Entertainment
-    addDir('[B]'+__language__(30053)+'[/B]',BASE_URL+'/category/entertainment',3,MEDIA_DIR + 'entertaiment.png','','','other')
+    addDir( __language__(30053), BASE_URL + '/category/entertainment',3,MEDIA_DIR + 'entertaiment.png','','','other')
     # Sports
-    addDir('[B]'+xbmc.getLocalizedString(19548)+'[/B]',BASE_URL+'/category/sports',3,MEDIA_DIR + 'sports.png','','','other')
+    addDir( xbmc.getLocalizedString(19548), BASE_URL + '/category/sports',3,MEDIA_DIR + 'sports.png','','','other')
     # Science
-    addDir('[B]'+xbmc.getLocalizedString(29948)+'[/B]',BASE_URL+'/category/science',3,MEDIA_DIR + 'science.png','','','other')
+    addDir( xbmc.getLocalizedString(29948), BASE_URL + '/category/science',3,MEDIA_DIR + 'science.png','','','other')
     # Technology
-    addDir('[B]'+__language__(30054)+'[/B]',BASE_URL+'/category/technology',3,MEDIA_DIR + 'technology.png','','','other')
+    addDir( __language__(30054), BASE_URL + '/category/technology', 3, MEDIA_DIR + 'technology.png', '', '', 'other' )
     # Vlogs
-    addDir('[B]'+__language__(30055)+'[/B]',BASE_URL+'/category/vlogs',3,MEDIA_DIR + 'vlog.png','','','other')
+    addDir( __language__(30055), BASE_URL + '/category/vlogs', 3, MEDIA_DIR + 'vlog.png', '', '', 'other' )
     # Settings
-    addDir('[B]'+xbmc.getLocalizedString(5)+'[/B]','',8,MEDIA_DIR + 'settings.png','','','')
+    addDir( xbmc.getLocalizedString(5), '', 8, MEDIA_DIR + 'settings.png', '', '', '' )
     SetView('WideList')
     xbmcplugin.endOfDirectory(PLUGIN_ID, cacheToDisc=False)
 
@@ -128,11 +124,11 @@ def home_menu():
 def search_menu():
 
     # Search Video
-    addDir('[B]'+__language__(30100)+'[/B]',BASE_URL+'/search/video?q=',2,MEDIA_DIR + 'search.png','','','video')
+    addDir( __language__(30100), BASE_URL + '/search/video?q=',2,MEDIA_DIR + 'search.png','','','video')
     # Search Channel
-    addDir('[B]'+__language__(30101)+'[/B]',BASE_URL+'/search/channel?q=',2,MEDIA_DIR + 'search.png','','','channel')
+    addDir( __language__(30101), BASE_URL + '/search/channel?q=',2,MEDIA_DIR + 'search.png','','','channel')
     # Search User
-    addDir('[B]'+__language__(30102)+'[/B]',BASE_URL+'/search/channel?q=',2,MEDIA_DIR + 'search.png','','','user')
+    addDir( __language__(30102), BASE_URL + '/search/channel?q=',2,MEDIA_DIR + 'search.png','','','user')
     SetView('WideList')
     xbmcplugin.endOfDirectory(PLUGIN_ID)
 
@@ -161,10 +157,10 @@ def pagination(url,page,cat,search=False):
 
             name = "[B]"+__language__(30150) + " " + str( page ) + "[/B]"
             li=xbmcgui.ListItem(name)
-            link = PLUGIN_URL + "?mode=3&name=" + urllib.quote_plus(name)+"&url=" + urllib.quote_plus(url) + "&page=" + str( page ) + "&cat=" + urllib.quote_plus(cat)
+            link = PLUGIN_URL + "?mode=3&name=" + urllib.parse.quote_plus(name)+"&url=" + urllib.parse.quote_plus(url) + "&page=" + str( page ) + "&cat=" + urllib.parse.quote_plus(cat)
 
             if search and cat == 'video':
-                link = link + "&search=" + urllib.quote_plus(search)
+                link = link + "&search=" + urllib.parse.quote_plus(search)
 
             xbmcplugin.addDirectoryItem(PLUGIN_ID, link, li, True)
 
@@ -314,7 +310,7 @@ def play_video(name, url, iconimage, play=2):
 def search_items(url,cat):
     vq = get_search_string(heading="Search")
     if ( not vq ): return False, 0
-    title = urllib.quote_plus(vq)
+    title = urllib.parse.quote_plus(vq)
     pagination(url,1,cat,title)
 
 
@@ -387,7 +383,7 @@ def rmFavorite(name):
 
 def addDir(name,url,mode,iconimage,fanart,description,cat,folder=True,favorite=False,play=False):
 
-    link = PLUGIN_URL + "?url="+urllib.quote_plus(url)+"&mode="+str(mode)+"&name="+urllib.quote_plus(name)+"&fanart="+urllib.quote_plus(fanart)+"&iconimage="+urllib.quote_plus(iconimage)+"&description="+urllib.quote_plus(description)+"&cat="+urllib.quote_plus(cat)
+    link = PLUGIN_URL + "?url="+urllib.parse.quote_plus(url)+"&mode="+str(mode)+"&name="+urllib.parse.quote_plus(name)+"&fanart="+urllib.parse.quote_plus(fanart)+"&iconimage="+urllib.parse.quote_plus(iconimage)+"&description="+urllib.parse.quote_plus(description)+"&cat="+urllib.parse.quote_plus(cat)
     if play:
         link = link + "&play="+str(play)
         
@@ -412,9 +408,9 @@ def addDir(name,url,mode,iconimage,fanart,description,cat,folder=True,favorite=F
         try:
             contextMenu = []
             if name_fav in FAV:
-                contextMenu.append((__language__(30153),'RunPlugin(%s?mode=6&name=%s)'%(sys.argv[0], urllib.quote_plus(name))))
+                contextMenu.append((__language__(30153),'RunPlugin(%s?mode=6&name=%s)'%(sys.argv[0], urllib.parse.quote_plus(name))))
             else:
-                fav_params = ('%s?mode=5&name=%s&url=%s&iconimage=%s&fanart=%s&description=%s&cat=%s&folder=%s&play=%s&fav_mode=%s'%(sys.argv[0], urllib.quote_plus(name), urllib.quote_plus(url), urllib.quote_plus(iconimage), urllib.quote_plus(fanart), urllib.quote_plus(description), urllib.quote_plus(cat), urllib.quote_plus(str(folder)), urllib.quote_plus(str(play)), str(mode)))
+                fav_params = ('%s?mode=5&name=%s&url=%s&iconimage=%s&fanart=%s&description=%s&cat=%s&folder=%s&play=%s&fav_mode=%s'%(sys.argv[0], urllib.parse.quote_plus(name), urllib.parse.quote_plus(url), urllib.parse.quote_plus(iconimage), urllib.parse.quote_plus(fanart), urllib.parse.quote_plus(description), urllib.parse.quote_plus(cat), urllib.parse.quote_plus(str(folder)), urllib.parse.quote_plus(str(play)), str(mode)))
                 contextMenu.append((__language__(30151),'RunPlugin(%s)' %fav_params))
             li.addContextMenuItems(contextMenu)
         except:
@@ -449,7 +445,7 @@ def SetView(name):
 
 
 def get_params():
-    return dict(urllib.parse_qsl(sys.argv[2][1:], keep_blank_values=True))
+    return dict(urllib.parse.parse_qsl(sys.argv[2][1:], keep_blank_values=True))
 
 
 def main():
@@ -457,15 +453,15 @@ def main():
     params=get_params()
 
     try:
-        url=urllib.unquote_plus(params["url"])
+        url=urllib.parse.unquote_plus(params["url"])
     except:
         url=None
     try:
-        name=urllib.unquote_plus(params["name"])
+        name=urllib.parse.unquote_plus(params["name"])
     except:
         name=None
     try:
-        iconimage=urllib.unquote_plus(params["iconimage"])
+        iconimage=urllib.parse.unquote_plus(params["iconimage"])
     except:
         iconimage=None
     try:
@@ -473,24 +469,24 @@ def main():
     except:
         mode=None
     try:
-        fanart=urllib.unquote_plus(params["fanart"])
+        fanart=urllib.parse.unquote_plus(params["fanart"])
     except:
         fanart=None
     try:
-        description=urllib.unquote_plus(params["description"])
+        description=urllib.parse.unquote_plus(params["description"])
     except:
         description=None
 
     try:
-        subtitle=urllib.unquote_plus(params["subtitle"])
+        subtitle=urllib.parse.unquote_plus(params["subtitle"])
     except:
         subtitle=None
     try:
-        cat=urllib.unquote_plus(params["cat"])
+        cat=urllib.parse.unquote_plus(params["cat"])
     except:
         cat=None
     try:
-        search=urllib.unquote_plus(params["search"])
+        search=urllib.parse.unquote_plus(params["search"])
     except:
         search=None
     try:
@@ -498,7 +494,7 @@ def main():
     except:
         page=1
     try:
-        folder=urllib.unquote_plus(params["folder"])
+        folder=urllib.parse.unquote_plus(params["folder"])
     except:
         folder=None
     try:
