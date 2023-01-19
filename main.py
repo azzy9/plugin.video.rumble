@@ -31,18 +31,40 @@ MEDIA_DIR = RESOURCE_DIR + 'media/'
 #language
 __language__ = ADDON.getLocalizedString
 
-try:
-    profile = xbmcvfs.translatePath(ADDON.getAddonInfo('profile').decode('utf-8'))
-except:
-    profile = xbmcvfs.translatePath(ADDON.getAddonInfo('profile'))
-
 lang = ADDON.getSetting('lang')
-favorites = os.path.join(profile, 'favorites.dat')
 
-if os.path.exists(favorites)==True:
-    FAV = open(favorites).read()
+if six.PY2:
+    favorites = xbmc.translatePath(os.path.join(ADDON.getAddonInfo('profile'), 'favorites.dat'))
 else:
-    FAV = []
+    favorites = xbmcvfs.translatePath(os.path.join(ADDON.getAddonInfo('profile'), 'favorites.dat'))
+
+
+def createFavorites():
+    addonID = ADDON.getAddonInfo('id')
+    if six.PY2:
+        addon_data_path = xbmc.translatePath(ADDON.getAddonInfo('profile'))
+    else:
+        addon_data_path = xbmcvfs.translatePath(ADDON.getAddonInfo('profile'))
+    if os.path.exists(addon_data_path)==False:
+        os.mkdir(addon_data_path)
+    xbmc.sleep(1)
+
+
+def loadFavorites( return_string = False ):
+
+    if os.path.exists(favorites):
+        fav_str = open(favorites).read()
+        if return_string:
+            return fav_str
+        if fav_str:
+            return json.loads( fav_str )
+    else:
+        createFavorites()
+
+    if return_string:
+            return ''
+    else:
+        return []
 
 
 def notify(message,name=False,iconimage=False,timeShown=5000):
@@ -56,14 +78,14 @@ def notify(message,name=False,iconimage=False,timeShown=5000):
 
 
 def to_unicode(text, encoding='utf-8', errors='strict'):
-    """Force text to unicode"""
+    # Force text to unicode
     if isinstance(text, bytes):
         return text.decode(encoding, errors=errors)
     return text
 
 
 def get_search_string(heading='', message=''):
-    """Ask the user for a search string"""
+    # Ask the user for a search string
     search_string = None
     keyboard = xbmc.Keyboard(message, heading)
     keyboard.doModal()
@@ -99,17 +121,17 @@ def home_menu():
     # News
     addDir( xbmc.getLocalizedString(29916), BASE_URL + '/category/news', 3, MEDIA_DIR + 'news.png', '', '', 'other' )
     # Viral
-    addDir( __language__(30050), BASE_URL + '/category/viral',3,MEDIA_DIR + 'viral.png','','','other' )
+    addDir( __language__(30050), BASE_URL + '/category/viral', 3, MEDIA_DIR + 'viral.png', '', '', 'other' )
     # Podcasts
-    addDir( __language__(30051), BASE_URL + '/category/podcasts',3,MEDIA_DIR +'podcast.png','','','other')
+    addDir( __language__(30051), BASE_URL + '/category/podcasts', 3, MEDIA_DIR +'podcast.png','','','other')
     # Battle Leaderboard
-    addDir( __language__(30052), BASE_URL + '/battle-leaderboard',3,MEDIA_DIR + 'leader.png','','','top')
+    addDir( __language__(30052), BASE_URL + '/battle-leaderboard', 3, MEDIA_DIR + 'leader.png', '', '', 'top' )
     # Entertainment
-    addDir( __language__(30053), BASE_URL + '/category/entertainment',3,MEDIA_DIR + 'entertaiment.png','','','other')
+    addDir( __language__(30053), BASE_URL + '/category/entertainment', 3, MEDIA_DIR + 'entertaiment.png', '', '', 'other' )
     # Sports
-    addDir( xbmc.getLocalizedString(19548), BASE_URL + '/category/sports',3,MEDIA_DIR + 'sports.png','','','other')
+    addDir( xbmc.getLocalizedString(19548), BASE_URL + '/category/sports', 3, MEDIA_DIR + 'sports.png', '', '', 'other' )
     # Science
-    addDir( xbmc.getLocalizedString(29948), BASE_URL + '/category/science',3,MEDIA_DIR + 'science.png','','','other')
+    addDir( xbmc.getLocalizedString(29948), BASE_URL + '/category/science', 3, MEDIA_DIR + 'science.png', '', '', 'other' )
     # Technology
     addDir( __language__(30054), BASE_URL + '/category/technology', 3, MEDIA_DIR + 'technology.png', '', '', 'other' )
     # Vlogs
@@ -124,11 +146,11 @@ def home_menu():
 def search_menu():
 
     # Search Video
-    addDir( __language__(30100), BASE_URL + '/search/video?q=',2,MEDIA_DIR + 'search.png','','','video')
+    addDir( __language__(30100), BASE_URL + '/search/video?q=', 2, MEDIA_DIR + 'search.png', '', '', 'video' )
     # Search Channel
-    addDir( __language__(30101), BASE_URL + '/search/channel?q=',2,MEDIA_DIR + 'search.png','','','channel')
+    addDir( __language__(30101), BASE_URL + '/search/channel?q=',2,MEDIA_DIR + 'search.png', '', '', 'channel' )
     # Search User
-    addDir( __language__(30102), BASE_URL + '/search/channel?q=',2,MEDIA_DIR + 'search.png','','','user')
+    addDir( __language__(30102), BASE_URL + '/search/channel?q=',2,MEDIA_DIR + 'search.png', '', '', 'user' )
     SetView('WideList')
     xbmcplugin.endOfDirectory(PLUGIN_ID)
 
@@ -155,9 +177,18 @@ def pagination(url,page,cat,search=False):
             # for next page
             page = page + 1
 
-            name = "[B]"+__language__(30150) + " " + str( page ) + "[/B]"
+            name = __language__(30150) + " " + str( page )
             li=xbmcgui.ListItem(name)
-            link = PLUGIN_URL + "?mode=3&name=" + urllib.parse.quote_plus(name)+"&url=" + urllib.parse.quote_plus(url) + "&page=" + str( page ) + "&cat=" + urllib.parse.quote_plus(cat)
+
+            linkParams = {
+                'url': url,
+                'mode': '3',
+                'name': name,
+                'page': str( page ),
+                'cat': cat,
+            }
+
+            link = buildURL( linkParams )
 
             if search and cat == 'video':
                 link = link + "&search=" + urllib.parse.quote_plus(search)
@@ -313,18 +344,15 @@ def search_items(url,cat):
     title = urllib.parse.quote_plus(vq)
     pagination(url,1,cat,title)
 
-
 def getFavorites():
 
-    try:
-        items = json.loads(open(favorites).read())
-    except:
-        items = ''
+    data = loadFavorites()
 
     try:
-        total = len(items)
-        if int(total) > 0:
-            for i in items:
+
+        amount = len(data)
+        if amount > 0:
+            for i in data:
                 name = i[0]
                 url = i[1]
                 mode = i[2]
@@ -332,62 +360,60 @@ def getFavorites():
                 fanArt = i[4]
                 description = i[5]
                 cat = i[6]
-                folder = i[7]
-                if folder == 'True':
-                    folder = True
-                else:
-                    folder = False
+                folder = ( i[7] == 'True' )
                 play = i[8]
 
-                addDir(name.encode('utf-8', 'ignore'),url.encode('utf-8'),mode,str(iconimage),str(fanArt),str(description).encode('utf-8', 'ignore'),cat.encode('utf-8'),folder,True,int(play))
+                addDir( name, url, mode, str(iconimage), str(fanArt), str(description), cat, folder, True, int(play) )
             SetView('WideList')
             xbmcplugin.endOfDirectory(PLUGIN_ID)
         else:
-            xbmcgui.Dialog().ok('[B]'+xbmc.getLocalizedString(14117)+'[/B]',__language__(30155))
+            xbmcgui.Dialog().ok( xbmc.getLocalizedString(14117), __language__(30155) )
+
     except:
         SetView('WideList')
         xbmcplugin.endOfDirectory(PLUGIN_ID)
 
 
-def addFavorite(name,url,fav_mode,iconimage,fanart,description,cat,folder,play):
-
-    if os.path.exists(favorites)==False:
-        addonID = xbmcaddon.Addon().getAddonInfo('id')
-        addon_data_path = xbmcvfs.translatePath(os.path.join('special://home/userdata/addon_data', addonID))
-        if os.path.exists(addon_data_path)==False:
-            os.mkdir(addon_data_path)
-        xbmc.sleep(7)
-        favList = []
-    else:
-        saved = open(favorites).read()
-        favList = json.loads(saved)
-
-    favList.append((name,url,fav_mode,iconimage,fanart,description,cat,folder,play))
-    a = open(favorites, "w")
-    a.write(json.dumps(favList))
-    a.close()
-    notify(__language__(30152),name,iconimage)
+def addFavorite(name, url, fav_mode, iconimage, fanart, description, cat, folder, play):
+    xbmc.log( name, xbmc.LOGWARNING )
+    data = loadFavorites()
+    data.append((name, url, fav_mode, iconimage, fanart, description, cat, folder, play))
+    b = open(favorites, 'w')
+    b.write(json.dumps(data))
+    b.close()
+    notify( __language__(30152), name, iconimage )
 
 
 def rmFavorite(name):
-    data = json.loads(open(favorites).read())
+    data = loadFavorites()
     for index in range(len(data)):
         if data[index][0]==name:
             del data[index]
-            b = open(favorites, "w")
+            b = open(favorites, 'w')
             b.write(json.dumps(data))
             b.close()
             break
-    notify(__language__(30154), name)
+    notify( __language__(30154), name )
 
 
-def addDir(name,url,mode,iconimage,fanart,description,cat,folder=True,favorite=False,play=False):
+def addDir(name, url, mode, iconimage, fanart, description, cat, folder=True, fav_context=False, play=False):
 
-    link = PLUGIN_URL + "?url="+urllib.parse.quote_plus(url)+"&mode="+str(mode)+"&name="+urllib.parse.quote_plus(name)+"&fanart="+urllib.parse.quote_plus(fanart)+"&iconimage="+urllib.parse.quote_plus(iconimage)+"&description="+urllib.parse.quote_plus(description)+"&cat="+urllib.parse.quote_plus(cat)
+    linkParams = {
+        'url': url,
+        'mode': str( mode ),
+        'name': name,
+        'fanart': fanart,
+        'iconimage': iconimage,
+        'description': description,
+        'cat': cat,
+    }
+
     if play:
-        link = link + "&play="+str(play)
-        
-    li=xbmcgui.ListItem(name)
+        linkParams['play'] = str( play )
+
+    link = buildURL( linkParams )
+
+    li=xbmcgui.ListItem( name )
     if folder:
         li.setArt({'icon': 'DefaultFolder.png', 'thumb': iconimage})
     else:
@@ -398,24 +424,54 @@ def addDir(name,url,mode,iconimage,fanart,description,cat,folder=True,favorite=F
     if fanart > '':
         li.setProperty('fanart_image', fanart)
     else:
-        li.setProperty('fanart_image', HOME_DIR+'fanart.jpg')
+        li.setProperty('fanart_image', HOME_DIR + 'fanart.jpg')
 
-    if favorite:
+    if fav_context:
+
+        favorites = loadFavorites( True )
+
         try:
             name_fav = json.dumps(name)
         except:
             name_fav = name
+
         try:
             contextMenu = []
-            if name_fav in FAV:
-                contextMenu.append((__language__(30153),'RunPlugin(%s?mode=6&name=%s)'%(sys.argv[0], urllib.parse.quote_plus(name))))
+
+            # checks name via string which I do not like
+            if name_fav in favorites:
+                contextMenu.append((__language__(30153),'RunPlugin(%s)' %buildURL( {'mode': '6','name': name} )))
             else:
-                fav_params = ('%s?mode=5&name=%s&url=%s&iconimage=%s&fanart=%s&description=%s&cat=%s&folder=%s&play=%s&fav_mode=%s'%(sys.argv[0], urllib.parse.quote_plus(name), urllib.parse.quote_plus(url), urllib.parse.quote_plus(iconimage), urllib.parse.quote_plus(fanart), urllib.parse.quote_plus(description), urllib.parse.quote_plus(cat), urllib.parse.quote_plus(str(folder)), urllib.parse.quote_plus(str(play)), str(mode)))
-                contextMenu.append((__language__(30151),'RunPlugin(%s)' %fav_params))
+                fav_params = {
+                    'url': url,
+                    'mode': '5',
+                    'name': name,
+                    'fanart': fanart,
+                    'iconimage': iconimage,
+                    'description': description,
+                    'cat': cat,
+                    'folder': str(folder),
+                    'fav_mode': str(mode),
+                    'play': str(play),
+                }
+
+                contextMenu.append((__language__(30151),'RunPlugin(%s)' %buildURL( fav_params )))
             li.addContextMenuItems(contextMenu)
         except:
             pass
+
     xbmcplugin.addDirectoryItem(handle=PLUGIN_ID, url=link, listitem=li, isFolder=folder)
+
+
+def buildURL(query):
+
+    # Helper function to build a Kodi xbmcgui.ListItem URL.
+    # :param query: Dictionary of url parameters to put in the URL.
+    # :returns: A formatted and urlencoded URL string.
+
+    return (PLUGIN_URL + '?' + urllib.parse.urlencode({k: v.encode('utf-8') if isinstance(v, six.text_type)
+                                         else unicode(v, errors='ignore').encode('utf-8')
+                                         for k, v in query.items()}))
 
 
 def SetView(name):
@@ -506,6 +562,8 @@ def main():
     except:
         play=1
 
+    xbmc.log( str(mode), xbmc.LOGWARNING )
+
     if mode==None:
         home_menu()
     elif mode==1:
@@ -514,9 +572,9 @@ def main():
         search_items(url,cat)
     elif mode==3:
         if search and search !=None:
-            pagination(url,page,cat,search)
+            pagination(url, page, cat, search)
         else:
-            pagination(url,page,cat)
+            pagination(url, page, cat)
     elif mode==4:
         play_video(name, url, iconimage, play)
     elif mode==5:
@@ -528,7 +586,7 @@ def main():
             name = name.split('  - ')[0]
         except:
             pass
-        addFavorite(name,url,fav_mode,iconimage,fanart,description,cat,str(folder),str(play))
+        addFavorite( name, url, fav_mode, iconimage, fanart, description, cat, str(folder), str(play) )
     elif mode==6:
         try:
             name = name.split('\\ ')[1]
@@ -538,11 +596,11 @@ def main():
             name = name.split('  - ')[0]
         except:
             pass
-        rmFavorite(name)
+        rmFavorite( name )
     elif mode==7:
         getFavorites()
     elif mode==8:
-        xbmcaddon.Addon().openSettings()
+        ADDON.openSettings()
 
 
 if __name__ == "__main__":
