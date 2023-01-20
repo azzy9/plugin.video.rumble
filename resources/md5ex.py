@@ -101,15 +101,15 @@ class MD5Ex:
 
     def binHex( self, n ):
 
-        r = ''
+        r = 0
         t = self.bshift( len(n), 5, 'l' )
         i = 0
 
         while i < t:
-            h = self.bshift( n[ self.bshift( r, 5 ) ], (31 & r), 'r', True ) & 255
+            h = self.bshift( n.get( self.bshift( r, 5 ), 0 ), (31 & r), 'r', True ) & 255
             i = self.bshift( h, 4, 'r', True ) & 15
             h &= 15
-            t += self.hex[i] + self.hex[h]
+            t += int(self.hex[i] + self.hex[h], 16)
             r += 8
 
         return t
@@ -121,7 +121,7 @@ class MD5Ex:
         i = 0
 
         while i < t:
-            h = self.bshift( n[ self.bshift( i, 5 ) ], (31 & i), 'r', True ) & 255
+            h = self.bshift( n.get( self.bshift( i, 5 ), 0 ), (31 & i), 'r', True ) & 255
             r += char(h)
             i += 8
 
@@ -135,7 +135,7 @@ class MD5Ex:
 
         while r < t:
 
-            h = self.bshift( n[ self.bshift( r, 5 ) ], (31 & r), 'r', True ) & 255
+            h = self.bshift( n.get( self.bshift( r, 5 ), 0 ), (31 & r), 'r', True ) & 255
             i = self.bshift( h, 4, 'r', True ) & 15
             h &= 15
 
@@ -155,12 +155,12 @@ class MD5Ex:
 
     def fff( self, n, h, i, r, t, f, e, g ):
 
-        o = (65535 & n) + (65535 & g) + (65535 & t) + (65535 & e);
-        g = self.bshift( self.bshift( n, 16 ) + self.bshift( g, 16, 'r') + self.bshift( t, 16 ) + self.bshift( e, 16 ) + self.bshift( o, 16 ), 16, 'l' );
-        g = g | 65535 & o;
-        g = self.bshift( g, f, 'l' ) | self.bshift( g, ( 32 - f ), 'r', True ) ;
+        o = (65535 & n) + (65535 & g) + (65535 & t) + (65535 & e)
+        g = self.bshift( self.bshift( n, 16 ) + self.bshift( g, 16, 'r') + self.bshift( t, 16 ) + self.bshift( e, 16 ) + self.bshift( o, 16 ), 16, 'l' )
+        g = g | 65535 & o
+        g = self.bshift( g, f, 'l' ) | self.bshift( g, ( 32 - f ), 'r', True )
         o = (65535 & g) + (65535 & h)
-        g = self.bshift( self.bshift( g, 16 ) + self.bshift( h, 16 ) + self.bshift( o, 16 ), 16, 'l' );
+        g = self.bshift( self.bshift( g, 16 ) + self.bshift( h, 16 ) + self.bshift( o, 16 ), 16, 'l' )
 
         return g | 65535 & o
 
@@ -281,4 +281,4 @@ class MD5Ex:
 
             r = r + 16
 
-        return [a, u, s, c]
+        return {0:a, 1:u, 2:s, 3:c}
