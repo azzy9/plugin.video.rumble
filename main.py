@@ -430,9 +430,27 @@ def importFavorites():
 
 
 def loginTest():
+
+    test_total = 0
+    test_passed = 0
+
     login_hash = MD5Ex()
-    login_hash.hash('Testing!')
-    notify( '0/0 Tests Passed' )
+
+    # Test 1
+    test1 = login_hash.hash('testing!')
+    test_total += 1
+    
+    if test1 == '64ac4af82c8c3c9d9c77a7a744b71fac':
+        test_passed+=1
+
+    # Test 2
+    #test2 = login_hash.hashUTF8('testing!')
+    #test_total += 1
+    
+    #if test2 == '64ac4af82c8c3c9d9c77a7a744b71fac':
+        #test_passed+=1
+
+    notify( str( test_passed ) + '/' + str( test_total ) + ' Tests Passed' )
 
 
 def addDir(name, url, mode, iconimage, fanart, description, cat, folder=True, fav_context=False, play=False):
