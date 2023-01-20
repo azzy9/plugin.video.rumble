@@ -5,6 +5,8 @@ import six
 
 from six.moves import urllib
 
+from resources.md5ex import *
+
 try:
     import cookielib
 except ImportError:
@@ -138,6 +140,8 @@ def home_menu():
     addDir( __language__(30055), BASE_URL + '/category/vlogs', 3, MEDIA_DIR + 'vlog.png', '', '', 'other' )
     # Settings
     addDir( xbmc.getLocalizedString(5), '', 8, MEDIA_DIR + 'settings.png', '', '', '' )
+    # Login Test
+    addDir( 'Login Test', '', 10, MEDIA_DIR + 'settings.png', '', '', '' )
     SetView('WideList')
     xbmcplugin.endOfDirectory(PLUGIN_ID, cacheToDisc=False)
 
@@ -425,6 +429,12 @@ def importFavorites():
     notify( 'Favorites Not Found' )
 
 
+def loginTest():
+    login_hash = MD5Ex()
+    login_hash.hash('Testing!')
+    notify( '0/0 Tests Passed' )
+
+
 def addDir(name, url, mode, iconimage, fanart, description, cat, folder=True, fav_context=False, play=False):
 
     linkParams = {
@@ -631,6 +641,8 @@ def main():
         ADDON.openSettings()
     elif mode==9:
         importFavorites()
+    elif mode==10:
+        loginTest()
 
 if __name__ == "__main__":
 	main()
