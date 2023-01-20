@@ -101,15 +101,15 @@ class MD5Ex:
 
     def binHex( self, n ):
 
+        t = ''
+        f = self.bshift( len(n), 5, 'l' )
         r = 0
-        t = self.bshift( len(n), 5, 'l' )
-        i = 0
 
-        while i < t:
+        while r < f:
             h = self.bshift( n.get( self.bshift( r, 5 ), 0 ), (31 & r), 'r', True ) & 255
             i = self.bshift( h, 4, 'r', True ) & 15
             h &= 15
-            t += int(self.hex[i] + self.hex[h], 16)
+            t += self.hex[i] + self.hex[h]
             r += 8
 
         return t
