@@ -439,16 +439,45 @@ def loginTest():
     # Test 1
     test1 = login_hash.hash('testing!')
     test_total += 1
-    
+
     if test1 == '64ac4af82c8c3c9d9c77a7a744b71fac':
         test_passed+=1
 
+    xbmc.log( 'Login Test 1', xbmc.LOGWARNING )
+    xbmc.log( '64ac4af82c8c3c9d9c77a7a744b71fac', xbmc.LOGWARNING )
+    xbmc.log( test1, xbmc.LOGWARNING )
+
     # Test 2
-    #test2 = login_hash.hashUTF8('testing!')
+    test2 = login_hash.hashUTF8('testing!')
+    test_total += 1
+
+    if test2 == '64ac4af82c8c3c9d9c77a7a744b71fac':
+        test_passed+=1
+
+    xbmc.log( 'Login Test 2', xbmc.LOGWARNING )
+    xbmc.log( '64ac4af82c8c3c9d9c77a7a744b71fac', xbmc.LOGWARNING )
+    xbmc.log( test2, xbmc.LOGWARNING )
+
+    # Test 3
+    test3 = login_hash.hashRaw('testing!')
+    test_total += 1
+    xbmc.log( test3, xbmc.LOGWARNING )
+    if test3 == 'd¬Jø,\x8C<\x9D\x9Cw§§D·\x1F¬':
+        test_passed+=1
+
+    # Test 4
+    test4 = login_hash.hashRawUTF8('testing!')
+    test_total += 1
+    xbmc.log( test4, xbmc.LOGWARNING )
+    if test4 == 'd¬Jø,\x8C<\x9D\x9Cw§§D·\x1F¬':
+        test_passed+=1
+
+    # Test 5
+    #test5 = login_hash.hashStretch('testing!', '10', 'test')
     #test_total += 1
-    
-    #if test2 == '64ac4af82c8c3c9d9c77a7a744b71fac':
-        #test_passed+=1
+    #xbmc.log( test5, xbmc.LOGWARNING )
+    #if test5 == '6101d34c1564e326a4067d66caa9d232':
+    #    test_passed+=1
 
     notify( str( test_passed ) + '/' + str( test_total ) + ' Tests Passed' )
 
