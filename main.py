@@ -396,6 +396,35 @@ def rmFavorite(name):
     notify( __language__(30154), name )
 
 
+def importFavorites():
+
+    if not xbmcgui.Dialog().yesno(
+        'Import Favorites',
+        'This will replace the favorites with the plugin.video.rumble.matrix version.\nProceed?',
+        nolabel = 'Cancel',
+        yeslabel = 'Ok'
+    ):
+        return
+
+    # no point trying to run this as it didn't exist for python 2
+    if six.PY2:
+        return
+
+    # make sure path exists
+    createFavorites()
+    #load matrix favourites
+    rumble_matrix_dir = xbmcvfs.translatePath(os.path.join('special://home/userdata/addon_data/plugin.video.rumble.matrix', 'favorites.dat'))
+    if os.path.exists(rumble_matrix_dir):
+        rumble_matrix = open(rumble_matrix_dir).read()
+        if rumble_matrix:
+            b = open(favorites, 'w')
+            b.write(rumble_matrix)
+            b.close()
+            notify( 'Imported Favorites' )
+            return
+    notify( 'Favorites Not Found' )
+
+
 def addDir(name, url, mode, iconimage, fanart, description, cat, folder=True, fav_context=False, play=False):
 
     linkParams = {
@@ -428,7 +457,7 @@ def addDir(name, url, mode, iconimage, fanart, description, cat, folder=True, fa
 
     if fav_context:
 
-        favorites = loadFavorites( True )
+        favorite_str = loadFavorites( True )
 
         try:
             name_fav = json.dumps(name)
@@ -439,7 +468,7 @@ def addDir(name, url, mode, iconimage, fanart, description, cat, folder=True, fa
             contextMenu = []
 
             # checks name via string which I do not like
-            if name_fav in favorites:
+            if name_fav in favorite_str:
                 contextMenu.append((__language__(30153),'RunPlugin(%s)' %buildURL( {'mode': '6','name': name} )))
             else:
                 fav_params = {
@@ -600,7 +629,8 @@ def main():
         getFavorites()
     elif mode==8:
         ADDON.openSettings()
-
+    elif mode==9:
+        importFavorites()
 
 if __name__ == "__main__":
 	main()
