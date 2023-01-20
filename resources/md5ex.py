@@ -14,7 +14,13 @@ class MD5Ex:
         return val1 >> val2
 
     def charCodeAt( self, str, pos ):
-        return ord( str[pos] )
+        if pos < len( str ):
+            return ord( str[pos] )
+        else:
+            return 0
+
+    def char( self, charcode ):
+        return chr(charcode)
 
     def hash( self, n ):
         return self.binHex( self.binHash( self.strBin(n), len(n) << 3))
@@ -57,34 +63,36 @@ class MD5Ex:
 
     def encUTF8( self, n ):
 
-        r = ''
-        t = 0
-        f = len(n) - 1
+        # return string
+        r_str = ''
+        # character pos
+        char_pos = 0
+        # string length
+        str_len = len(n) - 1
 
-        while t <= f:
+        while char_pos <= str_len:
 
-            h = self.charCodeAt(n, t)
-            t+=1
-            i = self.charCodeAt(n, t)
+            h = self.charCodeAt(n, char_pos)
+            char_pos += 1
+            i = self.charCodeAt(n, char_pos)
 
-            if t < f and 55296 <= h and h <= 56319 and 56320 <= i and i <= 57343:
+            if char_pos < str_len and 55296 <= h and h <= 56319 and 56320 <= i and i <= 57343:
                 h = 65536 + self.bshift((1023 & h), 10, 'l') + (1023 & i)
-                t+=1
+                char_pos +=1
 
             if h <= 127:
-                r += char(h)
+                r_str += self.char(h)
             else:
                 if h <= 2047:
-                    #r += char(192 | h >>> 6 & 31, 128 | 63 & h)
-                    True
+                    r_str += self.char(192 | self.bshift( h, 6, 'r', True ) & 31, 128 | 63 & h)
                 else:
                     if h <= 65535:
-                        #r += char(224 | h >>> 12 & 15, 128 | h >>> 6 & 63, 128 | 63 & h)
-                        True
-                    #else:
-                        #h <= 2097151 and (r += char(240 | h >>> 18 & 7, 128 | h >>> 12 & 63, 128 | h >>> 6 & 63, 128 | 63 & h))
+                        r_str += self.char(224 | self.bshift( h, 12, 'r', True ) & 15, 128 | self.bshift( h, 6, 'r', True ) & 63, 128 | 63 & h)
+                    else:
+                        if h <= 2097151:
+                            r_str += self.char(240 | self.bshift( h, 18, 'r', True ) & 7, 128 | self.bshift( h, 12, 'r', True ) & 63, 128 | self.bshift( h, 6, 'r', True ) & 63, 128 | 63 & h)
 
-        return r
+        return r_str
 
     def strBin( self, n ):
 
@@ -122,7 +130,7 @@ class MD5Ex:
 
         while i < t:
             h = self.bshift( n.get( self.bshift( i, 5 ), 0 ), (31 & i), 'r', True ) & 255
-            r += char(h)
+            r += self.char(h)
             i += 8
 
         return r
