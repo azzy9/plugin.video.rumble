@@ -7,5 +7,7 @@
 	</category>
     <category label="Debug">
         <setting id="importFavorites" label="Import Favorites" type="action" action="RunPlugin(plugin://plugin.video.rumble/?mode=9)"/>
+        <setting id="username" label="Username" type="text" default=""/>
+        <setting id="password" label="Password" type="text" option="hidden" default=""/>
     </category>
 </settings>
