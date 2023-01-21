@@ -473,11 +473,11 @@ def loginTest():
         test_passed+=1
 
     # Test 5
-    #test5 = login_hash.hashStretch('testing!', '10', 'test')
-    #test_total += 1
-    #xbmc.log( test5, xbmc.LOGWARNING )
-    #if test5 == '6101d34c1564e326a4067d66caa9d232':
-    #    test_passed+=1
+    test5 = login_hash.hashStretch('testing!', 'test', 10)
+    test_total += 1
+    xbmc.log( test5, xbmc.LOGWARNING )
+    if test5 == '1fc019d4c6d6a06290801de20161cc29':
+        test_passed+=1
 
     notify( str( test_passed ) + '/' + str( test_total ) + ' Tests Passed' )
 
