@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.rumble" name="Rumble" version="1.1.2" provider-name="azzy9">
+<addon id="plugin.video.rumble" name="Rumble" version="1.2.0" provider-name="azzy9">
 	<requires>
 		<import addon="script.module.simplejson"/>
+        <import addon="script.module.requests"/>
 		<import addon="script.module.six"/>
 	</requires>
 	<extension point="xbmc.python.pluginsource" library="main.py">
@@ -22,7 +23,8 @@
 			<screenshot>resources/media/screenshot02.jpg</screenshot>
 			<screenshot>resources/media/screenshot03.jpg</screenshot>
 		</assets>
-		<news>Rumble - v1.1.2 - add import favorites setting
+		<news>Rumble - v1.2.0 - add ability to login and view subscriptions
+Rumble - v1.1.2 - add import favorites setting
 Rumble - v1.1.1 - Fix python 2 compatibility errors - rework favorites 
 Rumble - v1.1.0 - make python 2 compatible</news>
 	</extension>
