@@ -479,6 +479,15 @@ def loginTest():
     if test5 == '1fc019d4c6d6a06290801de20161cc29':
         test_passed+=1
 
+    # Test 6
+    password = ''
+    salt = ["","",""]
+    test6 = login_hash.hash(login_hash.hashStretch(password, salt[0], 128) + salt[1]) + ',' + login_hash.hashStretch(password, salt[2], 128) + ',' + salt[1]
+    test_total += 1
+    xbmc.log( test6, xbmc.LOGWARNING )
+    if test6 == '????????????????????????':
+        test_passed+=1
+
     notify( str( test_passed ) + '/' + str( test_total ) + ' Tests Passed' )
 
 
