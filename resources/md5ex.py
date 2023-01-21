@@ -44,7 +44,6 @@ class MD5Ex:
         o = 32 + len(e) << 3
         a = self.strBin(e)
         u = len(a)
-
         g = self.binHash(self.strBin(g), len(g) << 3)
         if not i:
             i = 1024
@@ -57,7 +56,7 @@ class MD5Ex:
                 g[8 + t] = a[t]
                 t = t + 1
             g = self.binHash(g, o)
-            r = r + 1
+            r += 1
 
         return g
 
@@ -138,7 +137,7 @@ class MD5Ex:
     def binHexBin( self, n ):
 
         t = self.bshift( len(n), 5, 'l' )
-        f = []
+        f = {}
         r = 0
 
         while r < t:
@@ -156,7 +155,7 @@ class MD5Ex:
                 tmp3 = 87
 
             tmp = self.bshift( r, 4 )
-            f[tmp] = f[tmp] | tmp2 + i + self.bshift( self.bshift( (tmp3 + h), 8, 'l'), self.bshift((15 & r), 1, 'l'), 'l' )
+            f[tmp] = f.get(tmp, 0) | self.bshift( tmp2 + i + self.bshift( (tmp3 + h), 8, 'l'), self.bshift((15 & r), 1, 'l'), 'l' )
             r += 8
 
         return f
