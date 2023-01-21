@@ -1,9 +1,15 @@
 # -*- coding: utf-8 -*-
-import sys, re, os
+import sys, re, os, requests
 import xbmc, xbmcplugin, xbmcgui, xbmcaddon, xbmcvfs
 import six
 
 from six.moves import urllib
+
+from resources.md5ex import *
+
+# Disable urllib3's "InsecureRequestWarning: Unverified HTTPS request is being made" warnings
+from requests.packages.urllib3.exceptions import InsecureRequestWarning
+requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 try:
     import cookielib
@@ -32,6 +38,10 @@ MEDIA_DIR = RESOURCE_DIR + 'media/'
 __language__ = ADDON.getLocalizedString
 
 lang = ADDON.getSetting('lang')
+r_username = ADDON.getSetting('username')
+r_password = ADDON.getSetting('password')
+
+s = requests.session()
 
 if six.PY2:
     favorites = xbmc.translatePath(os.path.join(ADDON.getAddonInfo('profile'), 'favorites.dat'))
@@ -94,21 +104,34 @@ def get_search_string(heading='', message=''):
     return search_string
 
 
-def getRequest(url, ref=''):
+def getRequest(url, data=None, extraHeaders=None):
 
     try:
-        if ref == '':
-            ref = url
 
-        cj = cookielib.CookieJar()
-        opener = urllib.request.build_opener(urllib.request.HTTPCookieProcessor(cj))
-        opener.addheaders=[('Accept-Language', 'en-gb,en;q=0.5'),('User-Agent', 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36'),('Accept', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9'), ('Referer', ref)]
-        data = opener.open(url).read()
-        response = data.decode('utf-8')
+        myHeaders = {
+            'Accept-Language': 'en-gb,en;q=0.5',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+            'Referer': url,
+            'Cache-Control': 'no-cache',
+            'Pragma': 'no-cache',
+            'DNT': '1'
+        }
+
+        if extraHeaders:
+            myHeaders.update(extraHeaders)
+
+        cookieDict = cookielib.CookieJar()
+
+        if data:
+            response = s.post(url, data=data, headers=myHeaders, verify=False, cookies=None, timeout=10)
+        else:
+            response = s.get(url, headers=myHeaders, verify=False, cookies=None, timeout=10)
+
     except:
         response = ''
 
-    return response
+    return response.text
 
 
 # main menu
@@ -118,6 +141,11 @@ def home_menu():
     addDir( xbmc.getLocalizedString(137), '', 1, MEDIA_DIR + 'search.png', '', '' ,'' )
     # Favorites
     addDir( xbmc.getLocalizedString(1036), '', 7, MEDIA_DIR + 'favorite.png', '', '', '' )
+
+    if r_username and r_password:
+        # subscriptions
+        addDir( 'Subscriptions', BASE_URL + '/subscriptions', 3, MEDIA_DIR + 'favorite.png', '', '', 'other' )
+
     # News
     addDir( xbmc.getLocalizedString(29916), BASE_URL + '/category/news', 3, MEDIA_DIR + 'news.png', '', '', 'other' )
     # Viral
@@ -138,6 +166,7 @@ def home_menu():
     addDir( __language__(30055), BASE_URL + '/category/vlogs', 3, MEDIA_DIR + 'vlog.png', '', '', 'other' )
     # Settings
     addDir( xbmc.getLocalizedString(5), '', 8, MEDIA_DIR + 'settings.png', '', '', '' )
+
     SetView('WideList')
     xbmcplugin.endOfDirectory(PLUGIN_ID, cacheToDisc=False)
 
@@ -211,7 +240,14 @@ def get_image(data,id):
 def list_rumble(url, cat):
 
     amount = 0
-    data = getRequest(url)
+    headers = None
+
+    if 'subscriptions' in url:
+        if not ADDON.getSetting('session'):
+            login()
+        headers = { 'cookie': 'u_s=' + ADDON.getSetting('session')}
+
+    data = getRequest(url, None, headers)
 
     if 'search' in url:
         if cat == 'video':
@@ -425,6 +461,25 @@ def importFavorites():
     notify( 'Favorites Not Found' )
 
 
+def login():
+
+    login_hash = MD5Ex()
+
+    # gets salts
+    data = getRequest( BASE_URL + '/service.php?name=user.get_salts', {'username': r_username}, [ ( 'Referer', BASE_URL ), ( 'Content-type', 'application/x-www-form-urlencoded' ) ] )
+    salt = json.loads(data)['data']['salts']
+    # generate hashes
+    hashes = login_hash.hash(login_hash.hashStretch(r_password, salt[0], 128) + salt[1]) + ',' + login_hash.hashStretch(r_password, salt[2], 128) + ',' + salt[1]
+
+    # login
+    data = getRequest( BASE_URL + '/service.php?name=user.login', {'username': r_username, 'password_hashes':hashes}, [ ( 'Referer', BASE_URL ), ( 'Content-type', 'application/x-www-form-urlencoded' ) ] )
+
+    if data:
+        session = json.loads(data)['data']['session']
+        if session:
+            ADDON.setSetting('session', session)
+
+
 def addDir(name, url, mode, iconimage, fanart, description, cat, folder=True, fav_context=False, play=False):
 
     linkParams = {
@@ -631,6 +686,7 @@ def main():
         ADDON.openSettings()
     elif mode==9:
         importFavorites()
+
 
 if __name__ == "__main__":
 	main()
