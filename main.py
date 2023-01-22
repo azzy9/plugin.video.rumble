@@ -493,6 +493,10 @@ def login():
         if session:
             ADDON.setSetting('session', session)
 
+def resetLoginSession():
+
+    ADDON.setSetting('session', '')
+    notify( 'Session has been reset' )
 
 def addDir(name, url, mode, iconimage, fanart, description, cat, folder=True, fav_context=False, play=False):
 
@@ -695,7 +699,8 @@ def main():
         ADDON.openSettings()
     elif mode==9:
         importFavorites()
-
+    elif mode==10:
+        resetLoginSession()
 
 if __name__ == "__main__":
 	main()
