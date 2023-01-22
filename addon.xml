@@ -20,9 +20,6 @@
 		<assets>
 			<icon>icon.png</icon>
 			<fanart>fanart.jpg</fanart>
-			<screenshot>resources/media/screenshot01.jpg</screenshot>
-			<screenshot>resources/media/screenshot02.jpg</screenshot>
-			<screenshot>resources/media/screenshot03.jpg</screenshot>
 		</assets>
 		<news>Rumble - v1.2.1 - add following section, fix leaderboard
 Rumble - v1.2.0 - add ability to login and view subscriptions
