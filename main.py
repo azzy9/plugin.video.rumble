@@ -5,6 +5,7 @@ import six
 
 from six.moves import urllib
 
+from resources.general import *
 from resources.md5ex import *
 
 # Disable urllib3's "InsecureRequestWarning: Unverified HTTPS request is being made" warnings
@@ -128,10 +129,10 @@ def getRequest(url, data=None, extraHeaders=None):
         else:
             response = s.get(url, headers=myHeaders, verify=False, cookies=None, timeout=10)
 
-    except:
-        response = ''
+        return response.text
 
-    return response.text
+    except:
+        return ''
 
 
 # main menu
@@ -563,42 +564,6 @@ def addDir(name, url, mode, iconimage, fanart, description, cat, folder=True, fa
             pass
 
     xbmcplugin.addDirectoryItem(handle=PLUGIN_ID, url=link, listitem=li, isFolder=folder)
-
-
-def buildURL(query):
-
-    # Helper function to build a Kodi xbmcgui.ListItem URL.
-    # :param query: Dictionary of url parameters to put in the URL.
-    # :returns: A formatted and urlencoded URL string.
-
-    return (PLUGIN_URL + '?' + urllib.parse.urlencode({k: v.encode('utf-8') if isinstance(v, six.text_type)
-                                         else unicode(v, errors='ignore').encode('utf-8')
-                                         for k, v in query.items()}))
-
-
-def SetView(name):
-
-    views = {
-        'fanart': 502,
-        'wall': 500,
-        'widelist': 55,
-        'infowall': 54,
-        'shift': 53,
-        'poster': 51,
-        'list': 50,
-    }
-
-    view_num = views.get( name.lower(), 0 )
-
-    if view_num > 0:
-        try:
-            xbmc.executebuiltin('Container.SetViewMode(' + str( view_num ) + ')')
-        except:
-            pass
-
-
-def get_params():
-    return dict(urllib.parse.parse_qsl(sys.argv[2][1:], keep_blank_values=True))
 
 
 def main():
