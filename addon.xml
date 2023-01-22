@@ -15,7 +15,7 @@
 		<description lang="pt_br">Asssista videos sem censura com o rumble.</description>
 		<disclaimer lang="en">We are not associated with rumble.com or the Kodi Team</disclaimer>
 		<disclaimer lang="pt_br">Não somos associados à rumble.com nem com o Kodi Team</disclaimer>
-        <website>https://github.com/azzy9/plugin.video.rumble</website>
+		<website>https://github.com/azzy9/plugin.video.rumble</website>
 		<platform>all</platform>
 		<assets>
 			<icon>icon.png</icon>
