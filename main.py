@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import sys, re, os, requests
+import sys, re, os
 import xbmc, xbmcplugin, xbmcgui, xbmcaddon, xbmcvfs
 import six
 
@@ -8,14 +8,6 @@ from six.moves import urllib
 from resources.general import *
 from resources.md5ex import *
 
-# Disable urllib3's "InsecureRequestWarning: Unverified HTTPS request is being made" warnings
-from requests.packages.urllib3.exceptions import InsecureRequestWarning
-requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
-
-try:
-    import cookielib
-except ImportError:
-    import http.cookiejar as cookielib
 
 try:
     import json
@@ -41,8 +33,6 @@ __language__ = ADDON.getLocalizedString
 lang = ADDON.getSetting('lang')
 r_username = ADDON.getSetting('username')
 r_password = ADDON.getSetting('password')
-
-s = requests.session()
 
 if six.PY2:
     favorites = xbmc.translatePath(os.path.join(ADDON.getAddonInfo('profile'), 'favorites.dat'))
@@ -78,16 +68,6 @@ def loadFavorites( return_string = False ):
         return []
 
 
-def notify(message,name=False,iconimage=False,timeShown=5000):
-
-    if not name:
-        name = ADDON_NAME
-    if not iconimage:
-        iconimage = ADDON_ICON
-
-    xbmc.executebuiltin('Notification(%s, %s, %d, %s)' % (name, message, timeShown, iconimage))
-
-
 def to_unicode(text, encoding='utf-8', errors='strict'):
     # Force text to unicode
     if isinstance(text, bytes):
@@ -103,36 +83,6 @@ def get_search_string(heading='', message=''):
     if keyboard.isConfirmed():
         search_string = to_unicode(keyboard.getText())
     return search_string
-
-
-def getRequest(url, data=None, extraHeaders=None):
-
-    try:
-
-        myHeaders = {
-            'Accept-Language': 'en-gb,en;q=0.5',
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36',
-            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
-            'Referer': url,
-            'Cache-Control': 'no-cache',
-            'Pragma': 'no-cache',
-            'DNT': '1'
-        }
-
-        if extraHeaders:
-            myHeaders.update(extraHeaders)
-
-        cookieDict = cookielib.CookieJar()
-
-        if data:
-            response = s.post(url, data=data, headers=myHeaders, verify=False, cookies=None, timeout=10)
-        else:
-            response = s.get(url, headers=myHeaders, verify=False, cookies=None, timeout=10)
-
-        return response.text
-
-    except:
-        return ''
 
 
 # main menu
