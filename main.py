@@ -145,6 +145,8 @@ def home_menu():
     if r_username and r_password:
         # subscriptions
         addDir( 'Subscriptions', BASE_URL + '/subscriptions', 3, MEDIA_DIR + 'favorite.png', '', '', 'other' )
+        # subscriptions
+        addDir( 'Following', BASE_URL + '/', 3, MEDIA_DIR + 'favorite.png', '', '', 'following' )
 
     # News
     addDir( xbmc.getLocalizedString(29916), BASE_URL + '/category/news', 3, MEDIA_DIR + 'news.png', '', '', 'other' )
@@ -242,7 +244,7 @@ def list_rumble(url, cat):
     amount = 0
     headers = None
 
-    if 'subscriptions' in url:
+    if 'subscriptions' in url or cat == 'following':
         if not ADDON.getSetting('session'):
             login()
         headers = { 'cookie': 'u_s=' + ADDON.getSetting('session')}
@@ -255,7 +257,9 @@ def list_rumble(url, cat):
         else:
             amount = create_dir_list( data, cat, 'channel', True )
     elif cat in { 'channel', 'user', 'top', 'other' }:
-            amount = create_dir_list( data, cat, 'video', False, 2 )
+        amount = create_dir_list( data, cat, 'video', False, 2 )
+    elif cat == 'following':
+        amount = create_dir_list( data, cat, 'following', False, 2 )
 
     return amount
 
@@ -281,6 +285,16 @@ def create_dir_list( data, cat, type='video', search = False, play=False ):
                 #open get url and open player
                 addDir( video_title, BASE_URL + link, 4, str(img), str(img), '', cat, False, True, play )
 
+    elif type == 'following':
+        following = re.compile('<a class=\"main-menu-item main-menu-item-channel\" title=\"?(?:[^\"]+)\"? href=([^>]+)>\s*<i class=\'user-image user-image--img user-image--img--id-([^\']+)\'></i>\s*<span class=\"main-menu-item-label main-menu-item-channel-label\">([^<]+)</span>', re.MULTILINE|re.DOTALL|re.IGNORECASE).findall(data)
+        if following:
+            amount = len(following)
+            for link, img_id, channel_name in following:
+
+                img = str( get_image( data, img_id ) )
+                video_title = '[B]' + channel_name + '[/B]'
+                #open get url and open player
+                addDir( video_title, BASE_URL + link, 3, img, img, '', 'other', True, True, play )
     else:
         channels = re.compile('a href=(.+?)>\s*<div class=\"channel-item--img\">\s*<i class=\'user-image user-image--img user-image--img--id-(.+?)\'></i>\s*</div>\s*<h3 class=channel-item--title>(.+?)</h3>\s*<span class=channel-item--subscribers>(.+?) subscribers</span>',re.DOTALL).findall(data)
         if channels:
@@ -522,7 +536,7 @@ def addDir(name, url, mode, iconimage, fanart, description, cat, folder=True, fa
         try:
             contextMenu = []
 
-            # checks name via string which I do not like
+            # checks fave name via string ( I do not like how this is done )
             if name_fav in favorite_str:
                 contextMenu.append((__language__(30153),'RunPlugin(%s)' %buildURL( {'mode': '6','name': name} )))
             else:
@@ -560,22 +574,17 @@ def buildURL(query):
 
 def SetView(name):
 
-    if name == 'Fanart':
-        view_num = 502
-    elif name == 'Wall':
-        view_num = 500
-    elif name == 'WideList':
-        view_num = 55
-    elif name == 'InfoWall':
-        view_num = 54
-    elif name == 'Shift':
-        view_num = 53
-    elif name == 'Poster':
-        view_num = 51
-    elif name == 'List':
-        view_num = 50
-    else:
-        view_num = 0
+    views = {
+        'fanart': 502,
+        'wall': 500,
+        'widelist': 55,
+        'infowall': 54,
+        'shift': 53,
+        'poster': 51,
+        'list': 50,
+    }
+
+    view_num = views.get( name.lower(), 0 )
 
     if view_num > 0:
         try:
