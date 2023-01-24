@@ -456,6 +456,10 @@ def resetLoginSession():
 
 def subscribe(name, action):
 
+    # make sure we have a session
+    if not ADDON.getSetting('session'):
+        login()
+
     type = False
     if '/user/' in name:
         name = name.replace( '/user/', '' )
@@ -519,11 +523,12 @@ def addDir(name, url, mode, iconimage, fanart, description, cat, folder=True, fa
 
     contextMenu = []
 
-    if subscribe_context:
-        if subscribe_context['subscribe']:
-            contextMenu.append(('Subscribe to ' + subscribe_context['name'],'RunPlugin(%s)' % buildURL( {'mode': '11','name': subscribe_context['name'], 'cat': 'subscribe'} )))
-        else:
-            contextMenu.append(('Unsubscribe to ' + subscribe_context['name'],'RunPlugin(%s)' % buildURL( {'mode': '11','name': subscribe_context['name'], 'cat': 'unsubscribe'} )))
+    if r_username and r_password:
+        if subscribe_context:
+            if subscribe_context['subscribe']:
+                contextMenu.append(('Subscribe to ' + subscribe_context['name'],'RunPlugin(%s)' % buildURL( {'mode': '11','name': subscribe_context['name'], 'cat': 'subscribe'} )))
+            else:
+                contextMenu.append(('Unsubscribe to ' + subscribe_context['name'],'RunPlugin(%s)' % buildURL( {'mode': '11','name': subscribe_context['name'], 'cat': 'unsubscribe'} )))
 
     if fav_context:
 
