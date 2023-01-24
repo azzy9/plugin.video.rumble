@@ -589,24 +589,16 @@ def main():
     elif mode==4:
         play_video(name, url, iconimage, play)
     elif mode==5:
-        try:
+        if '\\ ' in name:
             name = name.split('\\ ')[1]
-        except:
-            pass
-        try:
+        if '  - ' in name:
             name = name.split('  - ')[0]
-        except:
-            pass
         addFavorite( name, url, fav_mode, iconimage, fanart, description, cat, str(folder), str(play) )
     elif mode==6:
-        try:
+        if '\\ ' in name:
             name = name.split('\\ ')[1]
-        except:
-            pass
-        try:
+        if '  - ' in name:
             name = name.split('  - ')[0]
-        except:
-            pass
         rmFavorite( name )
     elif mode==7:
         getFavorites()
