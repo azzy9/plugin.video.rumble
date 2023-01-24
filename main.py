@@ -234,18 +234,21 @@ def create_dir_list( data, cat, type='video', search = False, play=False ):
 
                 video_title = '[B]' + title + '[/B]\n[COLOR gold]' + channel_name + ' - [COLOR lime]' + video_date + '[/COLOR]'
                 #open get url and open player
-                addDir( video_title, BASE_URL + link, 4, str(img), str(img), '', cat, False, True, play )
+                addDir( video_title, BASE_URL + link, 4, str(img), str(img), '', cat, False, True, play, { 'name' : channel_link, 'subscribe': True }  )
 
     elif type == 'following':
-        following = re.compile('<a class=\"main-menu-item main-menu-item-channel\" title=\"?(?:[^\"]+)\"? href=([^>]+)>\s*<i class=\'user-image user-image--img user-image--img--id-([^\']+)\'></i>\s*<span class=\"main-menu-item-label main-menu-item-channel-label\">([^<]+)</span>', re.MULTILINE|re.DOTALL|re.IGNORECASE).findall(data)
+        following = re.compile('<a class=\"main-menu-item main-menu-item-channel\" title=\"?(?:[^\"]+)\"? href=([^>]+)>\s*<i class=\'user-image (?:user-image--img user-image--img--id-([^\']+)\')?(?:user-image--letter\' data-letter=([a-zA-Z]))?></i>\s*<span class=\"main-menu-item-label main-menu-item-channel-label\">([^<]+)</span>', re.MULTILINE|re.DOTALL|re.IGNORECASE).findall(data)
         if following:
             amount = len(following)
-            for link, img_id, channel_name in following:
+            for link, img_id, img_letter, channel_name in following:
 
-                img = str( get_image( data, img_id ) )
+                if img_id:
+                    img = str( get_image( data, img_id ) )
+                else:
+                    img = MEDIA_DIR + 'letters/' + img_letter + '.png'
                 video_title = '[B]' + channel_name + '[/B]'
                 #open get url and open player
-                addDir( video_title, BASE_URL + link, 3, img, img, '', 'other', True, True, play )
+                addDir( video_title, BASE_URL + link, 3, img, img, '', 'other', True, True, play, { 'name' : link, 'subscribe': False } )
     else:
         channels = re.compile('a href=(.+?)>\s*<div class=\"channel-item--img\">\s*<i class=\'user-image user-image--img user-image--img--id-(.+?)\'></i>\s*</div>\s*<h3 class=channel-item--title>(.+?)</h3>\s*<span class=channel-item--subscribers>(.+?) subscribers</span>',re.DOTALL).findall(data)
         if channels:
@@ -266,7 +269,7 @@ def create_dir_list( data, cat, type='video', search = False, play=False ):
                 img = str( get_image( data, img_id ) )
                 video_title = '[B]' + channel_name + '[/B]\n[COLOR palegreen]' + subscribers + ' [COLOR yellow]' + __language__(30155) + '[/COLOR]'
                 #open get url and open player
-                addDir( video_title, BASE_URL + link, 3, img, img, '', cat, True, True, play )
+                addDir( video_title, BASE_URL + link, 3, img, img, '', cat, True, True, play, { 'name' : link, 'subscribe': True } )
 
     return amount
 
@@ -444,12 +447,47 @@ def login():
         if session:
             ADDON.setSetting('session', session)
 
+
 def resetLoginSession():
 
     ADDON.setSetting('session', '')
     notify( 'Session has been reset' )
 
-def addDir(name, url, mode, iconimage, fanart, description, cat, folder=True, fav_context=False, play=False):
+
+def subscribe(name, action):
+
+    type = False
+    if '/user/' in name:
+        name = name.replace( '/user/', '' )
+        type = 'user'
+    elif '/c/' in name:
+        name = name.replace( '/c/', '' )
+        type = 'channel'
+
+    if type:
+        post_content = {
+            'slug': name,
+            'type': type,
+            'action': action,
+        }
+
+        headers = {
+            'Referer': BASE_URL + name,
+            'Content-type': 'application/x-www-form-urlencoded',
+            'cookie': 'u_s=' + ADDON.getSetting('session')
+        }
+
+        data = getRequest( BASE_URL + '/service.php?api=2&name=user.subscribe', post_content, headers )
+        xbmc.log( data, xbmc.LOGWARNING )
+        if action == 'subscribe':
+            notify( 'Subscribed to ' + name )
+        else:
+            notify( 'Unubscribed to ' + name )
+    else:
+        notify( 'Unable to to perform action' )
+
+
+def addDir(name, url, mode, iconimage, fanart, description, cat, folder=True, fav_context=False, play=False, subscribe_context=False):
 
     linkParams = {
         'url': url,
@@ -479,6 +517,14 @@ def addDir(name, url, mode, iconimage, fanart, description, cat, folder=True, fa
     else:
         li.setProperty('fanart_image', HOME_DIR + 'fanart.jpg')
 
+    contextMenu = []
+
+    if subscribe_context:
+        if subscribe_context['subscribe']:
+            contextMenu.append(('Subscribe to ' + subscribe_context['name'],'RunPlugin(%s)' % buildURL( {'mode': '11','name': subscribe_context['name'], 'cat': 'subscribe'} )))
+        else:
+            contextMenu.append(('Unsubscribe to ' + subscribe_context['name'],'RunPlugin(%s)' % buildURL( {'mode': '11','name': subscribe_context['name'], 'cat': 'unsubscribe'} )))
+
     if fav_context:
 
         favorite_str = loadFavorites( True )
@@ -489,11 +535,10 @@ def addDir(name, url, mode, iconimage, fanart, description, cat, folder=True, fa
             name_fav = name
 
         try:
-            contextMenu = []
 
             # checks fave name via string ( I do not like how this is done )
             if name_fav in favorite_str:
-                contextMenu.append((__language__(30153),'RunPlugin(%s)' %buildURL( {'mode': '6','name': name} )))
+                contextMenu.append((__language__(30153),'RunPlugin(%s)' % buildURL( {'mode': '6','name': name} )))
             else:
                 fav_params = {
                     'url': url,
@@ -509,9 +554,11 @@ def addDir(name, url, mode, iconimage, fanart, description, cat, folder=True, fa
                 }
 
                 contextMenu.append((__language__(30151),'RunPlugin(%s)' %buildURL( fav_params )))
-            li.addContextMenuItems(contextMenu)
         except:
             pass
+
+    if contextMenu:
+        li.addContextMenuItems(contextMenu)
 
     xbmcplugin.addDirectoryItem(handle=PLUGIN_ID, url=link, listitem=li, isFolder=folder)
 
@@ -608,6 +655,8 @@ def main():
         importFavorites()
     elif mode==10:
         resetLoginSession()
+    elif mode==11:
+        subscribe(name, cat)
 
 if __name__ == "__main__":
 	main()
