@@ -26,9 +26,6 @@ HOME_DIR = 'special://home/addons/{0}'.format(PLUGIN_NAME)
 RESOURCE_DIR = HOME_DIR + 'resources/'
 MEDIA_DIR = RESOURCE_DIR + 'media/'
 
-#language
-__language__ = ADDON.getLocalizedString
-
 lang = ADDON.getSetting('lang')
 
 rumbleUser = rumbleUser()
@@ -88,9 +85,9 @@ def get_search_string(heading='', message=''):
 def home_menu():
 
     # Search
-    addDir( xbmc.getLocalizedString(137), '', 1, MEDIA_DIR + 'search.png', '', '' ,'' )
+    addDir( get_string(137), '', 1, MEDIA_DIR + 'search.png', '', '' ,'' )
     # Favorites
-    addDir( xbmc.getLocalizedString(1036), '', 7, MEDIA_DIR + 'favorite.png', '', '', '' )
+    addDir( get_string(1036), '', 7, MEDIA_DIR + 'favorite.png', '', '', '' )
 
     if rumbleUser.hasLoginDetails():
         # subscriptions
@@ -99,25 +96,25 @@ def home_menu():
         addDir( 'Following', BASE_URL + '/', 3, MEDIA_DIR + 'favorite.png', '', '', 'following' )
 
     # News
-    addDir( xbmc.getLocalizedString(29916), BASE_URL + '/category/news', 3, MEDIA_DIR + 'news.png', '', '', 'other' )
+    addDir( get_string(29916), BASE_URL + '/category/news', 3, MEDIA_DIR + 'news.png', '', '', 'other' )
     # Viral
-    addDir( __language__(30050), BASE_URL + '/category/viral', 3, MEDIA_DIR + 'viral.png', '', '', 'other' )
+    addDir( get_string(30050), BASE_URL + '/category/viral', 3, MEDIA_DIR + 'viral.png', '', '', 'other' )
     # Podcasts
-    addDir( __language__(30051), BASE_URL + '/category/podcasts', 3, MEDIA_DIR +'podcast.png','','','other')
+    addDir( get_string(30051), BASE_URL + '/category/podcasts', 3, MEDIA_DIR +'podcast.png','','','other')
     # Battle Leaderboard
-    addDir( __language__(30052), BASE_URL + '/battle-leaderboard', 3, MEDIA_DIR + 'leader.png', '', '', 'top' )
+    addDir( get_string(30052), BASE_URL + '/battle-leaderboard', 3, MEDIA_DIR + 'leader.png', '', '', 'top' )
     # Entertainment
-    addDir( __language__(30053), BASE_URL + '/category/entertainment', 3, MEDIA_DIR + 'entertaiment.png', '', '', 'other' )
+    addDir( get_string(30053), BASE_URL + '/category/entertainment', 3, MEDIA_DIR + 'entertaiment.png', '', '', 'other' )
     # Sports
-    addDir( xbmc.getLocalizedString(19548), BASE_URL + '/category/sports', 3, MEDIA_DIR + 'sports.png', '', '', 'other' )
+    addDir( get_string(19548), BASE_URL + '/category/sports', 3, MEDIA_DIR + 'sports.png', '', '', 'other' )
     # Science
-    addDir( xbmc.getLocalizedString(29948), BASE_URL + '/category/science', 3, MEDIA_DIR + 'science.png', '', '', 'other' )
+    addDir( get_string(29948), BASE_URL + '/category/science', 3, MEDIA_DIR + 'science.png', '', '', 'other' )
     # Technology
-    addDir( __language__(30054), BASE_URL + '/category/technology', 3, MEDIA_DIR + 'technology.png', '', '', 'other' )
+    addDir( get_string(30054), BASE_URL + '/category/technology', 3, MEDIA_DIR + 'technology.png', '', '', 'other' )
     # Vlogs
-    addDir( __language__(30055), BASE_URL + '/category/vlogs', 3, MEDIA_DIR + 'vlog.png', '', '', 'other' )
+    addDir( get_string(30055), BASE_URL + '/category/vlogs', 3, MEDIA_DIR + 'vlog.png', '', '', 'other' )
     # Settings
-    addDir( xbmc.getLocalizedString(5), '', 8, MEDIA_DIR + 'settings.png', '', '', '' )
+    addDir( get_string(5), '', 8, MEDIA_DIR + 'settings.png', '', '', '' )
 
     SetView('WideList')
     xbmcplugin.endOfDirectory(PLUGIN_ID, cacheToDisc=False)
@@ -127,11 +124,11 @@ def home_menu():
 def search_menu():
 
     # Search Video
-    addDir( __language__(30100), BASE_URL + '/search/video?q=', 2, MEDIA_DIR + 'search.png', '', '', 'video' )
+    addDir( get_string(30100), BASE_URL + '/search/video?q=', 2, MEDIA_DIR + 'search.png', '', '', 'video' )
     # Search Channel
-    addDir( __language__(30101), BASE_URL + '/search/channel?q=',2,MEDIA_DIR + 'search.png', '', '', 'channel' )
+    addDir( get_string(30101), BASE_URL + '/search/channel?q=',2,MEDIA_DIR + 'search.png', '', '', 'channel' )
     # Search User
-    addDir( __language__(30102), BASE_URL + '/search/channel?q=',2,MEDIA_DIR + 'search.png', '', '', 'user' )
+    addDir( get_string(30102), BASE_URL + '/search/channel?q=',2,MEDIA_DIR + 'search.png', '', '', 'user' )
     SetView('WideList')
     xbmcplugin.endOfDirectory(PLUGIN_ID)
 
@@ -158,7 +155,7 @@ def pagination(url,page,cat,search=False):
             # for next page
             page = page + 1
 
-            name = __language__(30150) + " " + str( page )
+            name = get_string(30150) + " " + str( page )
             li=xbmcgui.ListItem(name)
 
             linkParams = {
@@ -265,7 +262,7 @@ def create_dir_list( data, cat, type='video', search = False, play=False ):
                 if '<svg' in channel_name:
                     channel_name = channel_name.split('<svg')[0] + " (Verified)"
                 img = str( get_image( data, img_id ) )
-                video_title = '[B]' + channel_name + '[/B]\n[COLOR palegreen]' + subscribers + ' [COLOR yellow]' + __language__(30155) + '[/COLOR]'
+                video_title = '[B]' + channel_name + '[/B]\n[COLOR palegreen]' + subscribers + ' [COLOR yellow]' + get_string(30155) + '[/COLOR]'
                 #open get url and open player
                 addDir( video_title, BASE_URL + link, 3, img, img, '', cat, True, True, play, { 'name' : link, 'subscribe': True } )
 
@@ -369,7 +366,7 @@ def getFavorites():
             SetView('WideList')
             xbmcplugin.endOfDirectory(PLUGIN_ID)
         else:
-            xbmcgui.Dialog().ok( xbmc.getLocalizedString(14117), __language__(30155) )
+            xbmcgui.Dialog().ok( get_string(14117), get_string(30155) )
 
     except:
         SetView('WideList')
@@ -383,7 +380,7 @@ def addFavorite(name, url, fav_mode, iconimage, fanart, description, cat, folder
     b = open(favorites, 'w')
     b.write(json.dumps(data))
     b.close()
-    notify( __language__(30152), name, iconimage )
+    notify( get_string(30152), name, iconimage )
 
 
 def rmFavorite(name):
@@ -395,7 +392,7 @@ def rmFavorite(name):
             b.write(json.dumps(data))
             b.close()
             break
-    notify( __language__(30154), name )
+    notify( get_string(30154), name )
 
 
 def importFavorites():
@@ -510,7 +507,7 @@ def addDir(name, url, mode, iconimage, fanart, description, cat, folder=True, fa
 
             # checks fave name via string ( I do not like how this is done )
             if name_fav in favorite_str:
-                contextMenu.append((__language__(30153),'RunPlugin(%s)' % buildURL( {'mode': '6','name': name} )))
+                contextMenu.append((get_string(30153),'RunPlugin(%s)' % buildURL( {'mode': '6','name': name} )))
             else:
                 fav_params = {
                     'url': url,
@@ -525,7 +522,7 @@ def addDir(name, url, mode, iconimage, fanart, description, cat, folder=True, fa
                     'play': str(play),
                 }
 
-                contextMenu.append((__language__(30151),'RunPlugin(%s)' %buildURL( fav_params )))
+                contextMenu.append((get_string(30151),'RunPlugin(%s)' %buildURL( fav_params )))
         except:
             pass
 
