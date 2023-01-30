@@ -98,5 +98,14 @@ def get_string( string_id ):
         return xbmc.getLocalizedString( string_id )
 
 
+def get_date_formatted( format_id, year, month, day ):
+
+    if format_id == '1':
+        return month + '/' + day + '/' + year
+    if format_id == '2':
+        return day + '/' + month + '/' + year
+    else:
+        return year + '/' + month + '/' + day
+
 def get_params():
     return dict(urllib.parse.parse_qsl(sys.argv[2][1:], keep_blank_values=True))
