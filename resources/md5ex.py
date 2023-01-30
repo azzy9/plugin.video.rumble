@@ -1,8 +1,16 @@
+#
+# MD5Ex class
+#
+# Converted from JS to python by Azzy9
+#
+# This method is a class to generate hashes that is used by the Rumble platform
+#
 
 class MD5Ex:
 
     hex = [ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' ]
 
+    # bitshift method to allow zer filled bitshift which is not supported by python
     def bshift( self, val1, val2, dir = 'r', zero_fill = False ):
 
         if dir == 'l':
@@ -13,14 +21,12 @@ class MD5Ex:
 
         return val1 >> val2
 
+    # essentially the ord method but with validation that is required
     def charCodeAt( self, str, pos ):
         if pos < len( str ):
             return ord( str[pos] )
         else:
             return 0
-
-    def char( self, charcode ):
-        return chr(charcode)
 
     def hash( self, n ):
         return self.binHex( self.binHash( self.strBin(n), len(n) << 3))
@@ -80,19 +86,20 @@ class MD5Ex:
                 char_pos +=1
 
             if h <= 127:
-                r_str += self.char(h)
+                r_str += chr(h)
             else:
                 if h <= 2047:
-                    r_str += self.char(192 | self.bshift( h, 6, 'r', True ) & 31, 128 | 63 & h)
+                    r_str += chr(192 | self.bshift( h, 6, 'r', True ) & 31, 128 | 63 & h)
                 else:
                     if h <= 65535:
-                        r_str += self.char(224 | self.bshift( h, 12, 'r', True ) & 15, 128 | self.bshift( h, 6, 'r', True ) & 63, 128 | 63 & h)
+                        r_str += chr(224 | self.bshift( h, 12, 'r', True ) & 15, 128 | self.bshift( h, 6, 'r', True ) & 63, 128 | 63 & h)
                     else:
                         if h <= 2097151:
-                            r_str += self.char(240 | self.bshift( h, 18, 'r', True ) & 7, 128 | self.bshift( h, 12, 'r', True ) & 63, 128 | self.bshift( h, 6, 'r', True ) & 63, 128 | 63 & h)
+                            r_str += chr(240 | self.bshift( h, 18, 'r', True ) & 7, 128 | self.bshift( h, 12, 'r', True ) & 63, 128 | self.bshift( h, 6, 'r', True ) & 63, 128 | 63 & h)
 
         return r_str
 
+    # String to Binary
     def strBin( self, n ):
 
         i = self.bshift( len(n), 3, 'l' )
@@ -106,6 +113,7 @@ class MD5Ex:
 
         return r
 
+    # Binary to Hex
     def binHex( self, n ):
 
         t = ''
@@ -121,6 +129,7 @@ class MD5Ex:
 
         return t
 
+    # Binary to String
     def binStr( self, n ):
 
         r = ''
@@ -129,7 +138,7 @@ class MD5Ex:
 
         while i < t:
             h = self.bshift( n.get( self.bshift( i, 5 ), 0 ), (31 & i), 'r', True ) & 255
-            r += self.char(h)
+            r += chr(h)
             i += 8
 
         return r
@@ -160,7 +169,10 @@ class MD5Ex:
 
         return f
 
-    def fff( self, n, h, i, r, t, f, e, g ):
+    # method that is used by ff,gg,hh,ii
+    # This was originally duplicated code in each method
+    # reduced code by creating a n ew method for it
+    def fghi( self, n, h, i, r, t, f, e, g ):
 
         o = (65535 & n) + (65535 & g) + (65535 & t) + (65535 & e)
         g = self.bshift( self.bshift( n, 16 ) + self.bshift( g, 16, 'r') + self.bshift( t, 16 ) + self.bshift( e, 16 ) + self.bshift( o, 16 ), 16, 'l' )
@@ -174,23 +186,24 @@ class MD5Ex:
     def ff( self, n, h, i, r, t, f, e ):
 
         g = h & i | ~h & r
-        return self.fff(n, h, i, r, t, f, e, g)
+        return self.fghi(n, h, i, r, t, f, e, g)
 
     def gg( self, n, h, i, r, t, f, e ):
 
         g = h & r | i & ~r
-        return self.fff(n, h, i, r, t, f, e, g)
+        return self.fghi(n, h, i, r, t, f, e, g)
 
     def hh( self, n, h, i, r, t, f, e ):
 
         g = h ^ i ^ r
-        return self.fff(n, h, i, r, t, f, e, g)
+        return self.fghi(n, h, i, r, t, f, e, g)
 
     def ii( self, n, h, i, r, t, f, e ):
 
         g = i ^ (h | ~r)
-        return self.fff(n, h, i, r, t, f, e, g)
+        return self.fghi(n, h, i, r, t, f, e, g)
 
+    # Binary to Hash
     def binHash( self, n, h ):
 
         a = 1732584193
@@ -286,6 +299,6 @@ class MD5Ex:
             o = (65535 & c) + (65535 & g)
             c = self.bshift( ( self.bshift( c, 16 ) + self.bshift( g, 16 ) + self.bshift( o, 16 ) ), 16, 'l' ) | 65535 & o
 
-            r = r + 16
+            r += 16
 
         return {0:a, 1:u, 2:s, 3:c}
