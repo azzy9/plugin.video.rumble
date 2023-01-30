@@ -26,7 +26,7 @@ HOME_DIR = 'special://home/addons/{0}'.format(PLUGIN_NAME)
 RESOURCE_DIR = HOME_DIR + 'resources/'
 MEDIA_DIR = RESOURCE_DIR + 'media/'
 
-lang = ADDON.getSetting('lang')
+date_format = ADDON.getSetting('date_format')
 
 rumbleUser = rumbleUser()
 
@@ -222,12 +222,7 @@ def create_dir_list( data, cat, type='video', search = False, play=False ):
                 if '<svg' in channel_name:
                     channel_name = channel_name.split('<svg')[0] + " (Verified)"
 
-                if int(lang) == 0:
-                    video_date = month+'/'+day+'/'+year
-                else:
-                    video_date = day+'/'+month+'/'+year
-
-                video_title = '[B]' + title + '[/B]\n[COLOR gold]' + channel_name + ' - [COLOR lime]' + video_date + '[/COLOR]'
+                video_title = '[B]' + title + '[/B]\n[COLOR gold]' + channel_name + ' - [COLOR lime]' + get_date_formatted( date_format, year, month, day ) + '[/COLOR]'
                 #open get url and open player
                 addDir( video_title, BASE_URL + link, 4, str(img), str(img), '', cat, False, True, play, { 'name' : channel_link, 'subscribe': True }  )
 
