@@ -1,14 +1,12 @@
 <settings>
 	<category label="14206">
 		<setting id="playbackMethod" label="30000" type="enum" default="0" values="Auto Play Highest Quality|Auto Play Lowest Quality|Select Quality Via Dialog"/>
+		<setting label="Date Format" id="date_format" type="enum" values="Y/M/D|M/D/Y|D/M/Y" default="0" />
 	</category>
 	<category label="Login">
         <setting id="username" label="Username" type="text" default=""/>
         <setting id="password" label="Password" type="text" option="hidden" default=""/>
         <setting id="resetSession" label="Reset Session" type="action" action="RunPlugin(plugin://plugin.video.rumble/?mode=10)"/>
-	</category>
-	<category label="Language">
-		<setting label="Language" id="lang" type="enum" values="English|Português" default="0" />
 	</category>
     <category label="Debug">
         <setting id="importFavorites" label="Import Favorites" type="action" action="RunPlugin(plugin://plugin.video.rumble/?mode=9)"/>
