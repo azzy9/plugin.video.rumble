@@ -6,8 +6,7 @@ import six
 from six.moves import urllib
 
 from resources.general import *
-from resources.md5ex import *
-
+from resources.rumbleUser import *
 
 try:
     import json
@@ -31,8 +30,8 @@ MEDIA_DIR = RESOURCE_DIR + 'media/'
 __language__ = ADDON.getLocalizedString
 
 lang = ADDON.getSetting('lang')
-r_username = ADDON.getSetting('username')
-r_password = ADDON.getSetting('password')
+
+rumbleUser = rumbleUser()
 
 if six.PY2:
     favorites = xbmc.translatePath(os.path.join(ADDON.getAddonInfo('profile'), 'favorites.dat'))
@@ -93,7 +92,7 @@ def home_menu():
     # Favorites
     addDir( xbmc.getLocalizedString(1036), '', 7, MEDIA_DIR + 'favorite.png', '', '', '' )
 
-    if r_username and r_password:
+    if rumbleUser.hasLoginDetails():
         # subscriptions
         addDir( 'Subscriptions', BASE_URL + '/subscriptions', 3, MEDIA_DIR + 'favorite.png', '', '', 'other' )
         # subscriptions
@@ -196,9 +195,8 @@ def list_rumble(url, cat):
     headers = None
 
     if 'subscriptions' in url or cat == 'following':
-        if not ADDON.getSetting('session'):
-            login()
-        headers = { 'cookie': 'u_s=' + ADDON.getSetting('session')}
+        if rumbleUser.hasSession():
+            headers = { 'cookie': 'u_s=' + ADDON.getSetting('session')}
 
     data = getRequest(url, None, headers)
 
@@ -429,66 +427,35 @@ def importFavorites():
     notify( 'Favorites Not Found' )
 
 
-def login():
-
-    login_hash = MD5Ex()
-
-    # gets salts
-    data = getRequest( BASE_URL + '/service.php?name=user.get_salts', {'username': r_username}, [ ( 'Referer', BASE_URL ), ( 'Content-type', 'application/x-www-form-urlencoded' ) ] )
-    salt = json.loads(data)['data']['salts']
-    # generate hashes
-    hashes = login_hash.hash(login_hash.hashStretch(r_password, salt[0], 128) + salt[1]) + ',' + login_hash.hashStretch(r_password, salt[2], 128) + ',' + salt[1]
-
-    # login
-    data = getRequest( BASE_URL + '/service.php?name=user.login', {'username': r_username, 'password_hashes':hashes}, [ ( 'Referer', BASE_URL ), ( 'Content-type', 'application/x-www-form-urlencoded' ) ] )
-
-    if data:
-        session = json.loads(data)['data']['session']
-        if session:
-            ADDON.setSetting('session', session)
-
-
 def resetLoginSession():
 
-    ADDON.setSetting('session', '')
+    rumbleUser.resetSessionDetails()
     notify( 'Session has been reset' )
 
 
 def subscribe(name, action):
 
     # make sure we have a session
-    if not ADDON.getSetting('session'):
-        login()
+    if rumbleUser.hasSession():
 
-    type = False
-    if '/user/' in name:
-        name = name.replace( '/user/', '' )
-        type = 'user'
-    elif '/c/' in name:
-        name = name.replace( '/c/', '' )
-        type = 'channel'
+        type = False
+        if '/user/' in name:
+            name = name.replace( '/user/', '' )
+            type = 'user'
+        elif '/c/' in name:
+            name = name.replace( '/c/', '' )
+            type = 'channel'
 
-    if type:
-        post_content = {
-            'slug': name,
-            'type': type,
-            'action': action,
-        }
+        if type:
+            data = rumbleUser.subscribe( action, type, name )
+            xbmc.log( data, xbmc.LOGWARNING )
+            if action == 'subscribe':
+                notify( 'Subscribed to ' + name )
+            else:
+                notify( 'Unubscribed to ' + name )
+            return True
 
-        headers = {
-            'Referer': BASE_URL + name,
-            'Content-type': 'application/x-www-form-urlencoded',
-            'cookie': 'u_s=' + ADDON.getSetting('session')
-        }
-
-        data = getRequest( BASE_URL + '/service.php?api=2&name=user.subscribe', post_content, headers )
-        xbmc.log( data, xbmc.LOGWARNING )
-        if action == 'subscribe':
-            notify( 'Subscribed to ' + name )
-        else:
-            notify( 'Unubscribed to ' + name )
-    else:
-        notify( 'Unable to to perform action' )
+    notify( 'Unable to to perform action' )
 
 
 def addDir(name, url, mode, iconimage, fanart, description, cat, folder=True, fav_context=False, play=False, subscribe_context=False):
@@ -523,7 +490,7 @@ def addDir(name, url, mode, iconimage, fanart, description, cat, folder=True, fa
 
     contextMenu = []
 
-    if r_username and r_password:
+    if rumbleUser.hasLoginDetails():
         if subscribe_context:
             if subscribe_context['subscribe']:
                 contextMenu.append(('Subscribe to ' + subscribe_context['name'],'RunPlugin(%s)' % buildURL( {'mode': '11','name': subscribe_context['name'], 'cat': 'subscribe'} )))
