@@ -11,6 +11,9 @@ ADDON = xbmcaddon.Addon()
 ADDON_ICON = ADDON.getAddonInfo('icon')
 ADDON_NAME = ADDON.getAddonInfo('name')
 
+#language
+__language__ = ADDON.getLocalizedString
+
 # Disable urllib3's "InsecureRequestWarning: Unverified HTTPS request is being made" warnings
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
@@ -86,6 +89,13 @@ def SetView(name):
             xbmc.executebuiltin('Container.SetViewMode(' + str( view_num ) + ')')
         except:
             pass
+
+
+def get_string( string_id ):
+    if string_id >= 30000:
+        return __language__( string_id )
+    else:
+        return xbmc.getLocalizedString( string_id )
 
 
 def get_params():
