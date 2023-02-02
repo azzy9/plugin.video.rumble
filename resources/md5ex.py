@@ -3,7 +3,7 @@
 #
 # Converted from JS to python by Azzy9
 #
-# This method is a class to generate hashes that is used by the Rumble platform
+# This is a class to generate hashes that is used by the Rumble platform
 #
 
 class MD5Ex:
