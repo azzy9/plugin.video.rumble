@@ -2,7 +2,7 @@
 # Rumble User Class
 # Created by Azzy9
 #
-# Method to handle all the rumble subscription methods
+# Class to handle all the rumble subscription methods
 #
 
 import xbmcaddon
