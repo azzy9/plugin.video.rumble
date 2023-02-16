@@ -5,6 +5,11 @@ import six
 
 from six.moves import urllib
 
+try:
+    import json
+except ImportError:
+    import simplejson as json
+
 PLUGIN_URL = sys.argv[0]
 
 ADDON = xbmcaddon.Addon()
@@ -18,13 +23,14 @@ __language__ = ADDON.getLocalizedString
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
-s = requests.session()
+reqs = requests.session()
 
 
 def getRequest(url, data=None, extraHeaders=None):
 
-    try:
+    #try:
 
+        # headers
         myHeaders = {
             'Accept-Language': 'en-gb,en;q=0.5',
             'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36',
@@ -35,25 +41,43 @@ def getRequest(url, data=None, extraHeaders=None):
             'DNT': '1'
         }
 
+        # add extra headers
         if extraHeaders:
             myHeaders.update(extraHeaders)
 
-        if data:
-            response = s.post(url, data=data, headers=myHeaders, verify=False, cookies=None, timeout=10)
+        # get stored cookie string
+        cookies = ADDON.getSetting('cookies')
+
+        # split cookies into dictionary
+        if cookies:
+            cookieDict = json.loads( cookies )
         else:
-            response = s.get(url, headers=myHeaders, verify=False, cookies=None, timeout=10)
+            cookieDict = None
+
+        # make request
+        if data:
+            response = reqs.post(url, data=data, headers=myHeaders, verify=False, cookies=cookieDict, timeout=10)
+        else:
+            response = reqs.get(url, headers=myHeaders, verify=False, cookies=cookieDict, timeout=10)
+
+        if response.cookies.get_dict():
+            if cookieDict:
+                cookieDict.update( response.cookies.get_dict() )
+            else:
+                cookieDict = response.cookies.get_dict()
+            # store cookies
+            ADDON.setSetting('cookies', json.dumps(cookieDict))
 
         return response.text
 
-    except:
-        return ''
+    #except:
+    #    return ''
 
 
+# Helper function to build a Kodi xbmcgui.ListItem URL
+# :param query: Dictionary of url parameters to put in the URL
+# :returns: A formatted and urlencoded URL string
 def buildURL(query):
-
-    # Helper function to build a Kodi xbmcgui.ListItem URL.
-    # :param query: Dictionary of url parameters to put in the URL.
-    # :returns: A formatted and urlencoded URL string.
 
     return (PLUGIN_URL + '?' + urllib.parse.urlencode({k: v.encode('utf-8') if isinstance(v, six.text_type)
                                          else unicode(v, errors='ignore').encode('utf-8')
@@ -70,6 +94,7 @@ def notify(message,name=False,iconimage=False,timeShown=5000):
     xbmc.executebuiltin('Notification(%s, %s, %d, %s)' % (name, message, timeShown, iconimage))
 
 
+# set view
 def SetView(name):
 
     views = {
@@ -91,6 +116,7 @@ def SetView(name):
             pass
 
 
+# gets language string based upon id
 def get_string( string_id ):
     if string_id >= 30000:
         return __language__( string_id )
@@ -98,6 +124,7 @@ def get_string( string_id ):
         return xbmc.getLocalizedString( string_id )
 
 
+# puts date into format based upon setting
 def get_date_formatted( format_id, year, month, day ):
 
     if format_id == '1':
@@ -107,5 +134,7 @@ def get_date_formatted( format_id, year, month, day ):
     else:
         return year + '/' + month + '/' + day
 
+
+# gets params from request
 def get_params():
     return dict(urllib.parse.parse_qsl(sys.argv[2][1:], keep_blank_values=True))
