@@ -28,7 +28,7 @@ reqs = requests.session()
 
 def getRequest(url, data=None, extraHeaders=None):
 
-    #try:
+    try:
 
         # headers
         myHeaders = {
@@ -70,8 +70,8 @@ def getRequest(url, data=None, extraHeaders=None):
 
         return response.text
 
-    #except:
-    #    return ''
+    except:
+        return ''
 
 
 # Helper function to build a Kodi xbmcgui.ListItem URL
