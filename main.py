@@ -16,7 +16,7 @@ except ImportError:
 BASE_URL = 'https://rumble.com'
 PLUGIN_URL = sys.argv[0]
 PLUGIN_ID = int(sys.argv[1])
-PLUGIN_NAME = PLUGIN_URL.replace("plugin://","")
+PLUGIN_NAME = PLUGIN_URL.replace('plugin://','')
 
 ADDON = xbmcaddon.Addon()
 ADDON_ICON = ADDON.getAddonInfo('icon')
@@ -26,6 +26,7 @@ HOME_DIR = 'special://home/addons/{0}'.format(PLUGIN_NAME)
 RESOURCE_DIR = HOME_DIR + 'resources/'
 MEDIA_DIR = RESOURCE_DIR + 'media/'
 
+kodi_version = float(xbmcaddon.Addon('xbmc.addon').getAddonInfo('version')[:4])
 date_format = ADDON.getSetting('date_format')
 
 rumbleUser = rumbleUser()
@@ -192,8 +193,10 @@ def list_rumble(url, cat):
     headers = None
 
     if 'subscriptions' in url or cat == 'following':
-        if rumbleUser.hasSession():
-            headers = { 'cookie': 'u_s=' + ADDON.getSetting('session')}
+        # make sure there is a session
+        # result is stored in a cookie
+        rumbleUser.hasSession()
+        #{ 'cookie': 'u_s=' + ADDON.getSetting('session')}
 
     data = getRequest(url, None, headers)
 
@@ -313,15 +316,22 @@ def resolver(url):
     return mediaURL
 
 
+# method to play video
 def play_video(name, url, iconimage, play=2):
 
+    # get video link
     url = resolver(url)
 
     if url:
 
         li = xbmcgui.ListItem(name, path=url)
-        li.setArt({"icon": iconimage, "thumb": iconimage})
-        li.setInfo(type='video', infoLabels={'Title': name, 'plot': ''})
+        li.setArt({'icon': iconimage, 'thumb': iconimage})
+
+        if kodi_version > 19.8:
+            vidtag = li.getVideoInfoTag()
+            vidtag.setTitle(name)
+        else:
+            li.setInfo(type='video', infoLabels={'Title': name, 'plot': ''})
 
         if play == 1:
             xbmc.Player().play(item=url, listitem=li)
@@ -337,6 +347,7 @@ def search_items(url,cat):
     if ( not vq ): return False, 0
     title = urllib.parse.quote_plus(vq)
     pagination(url,1,cat,title)
+
 
 def getFavorites():
 
@@ -474,7 +485,15 @@ def addDir(name, url, mode, iconimage, fanart, description, cat, folder=True, fa
         li.setArt({'icon': 'DefaultVideo.png', 'thumb': iconimage})
     if play == 2 and mode == 4:
         li.setProperty('IsPlayable', 'true')
-    li.setInfo(type='Video', infoLabels={'Title': name, 'Plot': description})
+
+    if kodi_version > 19.8:
+        vidtag = li.getVideoInfoTag()
+        vidtag.setMediaType('video')
+        vidtag.setTitle(name)
+        vidtag.setPlot(description)
+    else:
+        li.setInfo(type='Video', infoLabels={'Title': name, 'Plot': description})
+
     if fanart > '':
         li.setProperty('fanart_image', fanart)
     else:
@@ -531,62 +550,53 @@ def main():
 
     params=get_params()
 
-    try:
-        url=urllib.parse.unquote_plus(params["url"])
-    except:
-        url=None
-    try:
-        name=urllib.parse.unquote_plus(params["name"])
-    except:
-        name=None
-    try:
-        iconimage=urllib.parse.unquote_plus(params["iconimage"])
-    except:
-        iconimage=None
-    try:
-        mode=int(params["mode"])
-    except:
-        mode=None
-    try:
-        fanart=urllib.parse.unquote_plus(params["fanart"])
-    except:
-        fanart=None
-    try:
-        description=urllib.parse.unquote_plus(params["description"])
-    except:
-        description=None
+    mode=int(params.get( 'mode', 0 ))
+    page=int(params.get( 'page', 1 ))
+    play=int(params.get( 'play', 1 ))
+    fav_mode=int(params.get( 'fav_mode', 0 ))
 
-    try:
-        subtitle=urllib.parse.unquote_plus(params["subtitle"])
-    except:
-        subtitle=None
-    try:
-        cat=urllib.parse.unquote_plus(params["cat"])
-    except:
-        cat=None
-    try:
-        search=urllib.parse.unquote_plus(params["search"])
-    except:
-        search=None
-    try:
-        page=int(params["page"])
-    except:
-        page=1
-    try:
-        folder=urllib.parse.unquote_plus(params["folder"])
-    except:
-        folder=None
-    try:
-        fav_mode=int(params["fav_mode"])
-    except:
-        fav_mode=None
-    try:
-        play=int(params["play"])
-    except:
-        play=1
+    url = params.get( 'url', None )
+    if url:
+        url=urllib.parse.unquote_plus(url)
+ 
+    name = params.get( 'name', None )
+    if name:
+        name = urllib.parse.unquote_plus(name)
+
+    iconimage=params.get( 'iconimage', None )
+    if iconimage:
+        iconimage=urllib.parse.unquote_plus(iconimage)
+
+    fanart=params.get( 'fanart', None )
+    if fanart:
+        fanart=urllib.parse.unquote_plus(fanart)
+
+    description=params.get( 'description', None )
+    if description:
+        description=urllib.parse.unquote_plus(description)
+
+    subtitle=params.get( 'subtitle', None )
+    if subtitle:
+        subtitle=urllib.parse.unquote_plus(subtitle)
+
+    cat=params.get( 'cat', None )
+    if cat:
+        cat=urllib.parse.unquote_plus(cat)
+
+    search=params.get( 'search', None )
+    if search:
+        search=urllib.parse.unquote_plus(search)
+
+    folder=params.get( 'folder', None )
+    if folder:
+        folder=urllib.parse.unquote_plus(folder)
+
+    folder=params.get( 'folder', None )
+    if folder:
+        folder=urllib.parse.unquote_plus(folder)
 
 
-    if mode==None:
+    if mode==0:
         home_menu()
     elif mode==1:
         search_menu()
@@ -599,18 +609,15 @@ def main():
             pagination(url, page, cat)
     elif mode==4:
         play_video(name, url, iconimage, play)
-    elif mode==5:
+    elif mode in [5,6]:
         if '\\ ' in name:
             name = name.split('\\ ')[1]
         if '  - ' in name:
             name = name.split('  - ')[0]
-        addFavorite( name, url, fav_mode, iconimage, fanart, description, cat, str(folder), str(play) )
-    elif mode==6:
-        if '\\ ' in name:
-            name = name.split('\\ ')[1]
-        if '  - ' in name:
-            name = name.split('  - ')[0]
-        rmFavorite( name )
+        if mode == 5:
+            addFavorite( name, url, fav_mode, iconimage, fanart, description, cat, str(folder), str(play) )
+        else:
+            rmFavorite( name )
     elif mode==7:
         getFavorites()
     elif mode==8:
