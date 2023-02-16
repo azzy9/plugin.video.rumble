@@ -39,7 +39,6 @@ class rumbleUser:
 
         if self.expiry:
             self.expiry = float( self.expiry )
-        
 
     # if there is login details
     def hasLoginDetails( self ):
@@ -50,6 +49,7 @@ class rumbleUser:
     def setSessionDetails( self ):
         ADDON.setSetting( 'session', self.session )
         ADDON.setSetting( 'expiry', str( self.expiry ) )
+        self.setSessionCookie()
 
     # resets the session details to force a login
     def resetSessionDetails( self ):
@@ -76,9 +76,10 @@ class rumbleUser:
                 {'username': self.username},
                 [ ( 'Referer', self.baseUrl ), ( 'Content-type', 'application/x-www-form-urlencoded' ) ]
             )
-            salts = json.loads(data)['data']['salts']
-            if salts:
-                return salts
+            if data:
+                salts = json.loads(data)['data']['salts']
+                if salts:
+                    return salts
         return False
 
     # method to generate the hashes and login
@@ -103,8 +104,29 @@ class rumbleUser:
 
         return False
 
+
+    def setSessionCookie( self ):
+
+        if self.session:
+            # get stored cookie string
+            cookies = ADDON.getSetting('cookies')
+
+            # split cookies into dictionary
+            if cookies:
+                cookieDict = json.loads( cookies )
+            else:
+                cookieDict = {}
+
+            cookieDict[ 'u_s' ] = self.session
+
+            # store cookies
+            ADDON.setSetting('cookies', json.dumps(cookieDict))
+        else:
+            ADDON.setSetting('cookies', '')
+
+
     #method to subscribe and unsubscribe to a channel or user
-    def subscribe(  self, action, type, name ):
+    def subscribe( self, action, type, name ):
 
         if self.hasSession():
 
@@ -116,8 +138,7 @@ class rumbleUser:
 
             headers = {
                 'Referer': self.baseUrl + name,
-                'Content-type': 'application/x-www-form-urlencoded',
-                'cookie': 'u_s=' + ADDON.getSetting('session')
+                'Content-type': 'application/x-www-form-urlencoded'
             }
 
             data = getRequest( self.baseUrl + '/service.php?api=2&name=user.subscribe', post_content, headers )
