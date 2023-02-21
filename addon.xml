@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.rumble" name="Rumble" version="1.2.2" provider-name="azzy9">
+<addon id="plugin.video.rumble" name="Rumble" version="1.3.0" provider-name="azzy9">
 	<requires>
 		<import addon="script.module.simplejson"/>
-        <import addon="script.module.requests"/>
+		<import addon="script.module.requests"/>
 		<import addon="script.module.six"/>
 	</requires>
 	<extension point="xbmc.python.pluginsource" library="main.py">
@@ -21,11 +21,14 @@
 			<icon>icon.png</icon>
 			<fanart>fanart.jpg</fanart>
 		</assets>
-		<news>Rumble - v1.2.2 - add ability to subscribe and unsubscribe
-Rumble - v1.2.1 - add following section, fix leaderboard
-Rumble - v1.2.0 - add ability to login and view subscriptions
-Rumble - v1.1.2 - add import favorites setting
-Rumble - v1.1.1 - Fix python 2 compatibility errors - rework favorites 
-Rumble - v1.1.0 - make python 2 compatible</news>
+		<news>v1.3.0 - fix listitem deprecated warnings
+	- Clean up code some more
+	- Move login features into own class
+	- change how cookie are handled
+	- remove language option
+	- add date format option
+v1.2.2 - add ability to subscribe and unsubscribe
+v1.2.1 - add following section, fix leaderboard
+v1.2.0 - add ability to login and view subscriptions
 	</extension>
 </addon>
