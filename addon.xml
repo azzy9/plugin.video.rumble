@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.rumble" name="Rumble" version="1.3.0" provider-name="azzy9">
+<addon id="plugin.video.rumble" name="Rumble" version="1.3.1" provider-name="azzy9">
 	<requires>
 		<import addon="script.module.simplejson"/>
 		<import addon="script.module.requests"/>
@@ -21,14 +21,12 @@
 			<icon>icon.png</icon>
 			<fanart>fanart.jpg</fanart>
 		</assets>
-		<news>v1.3.0 - fix listitem deprecated warnings
+		<news>v1.3.1 - add ability to use HTTP for streams
+	- v1.3.0 - fix listitem deprecated warnings
 	- Clean up code some more
 	- Move login features into own class
 	- change how cookie are handled
 	- remove language option
-	- add date format option
-v1.2.2 - add ability to subscribe and unsubscribe
-v1.2.1 - add following section, fix leaderboard
-v1.2.0 - add ability to login and view subscriptions</news>
+	- add date format option</news>
 	</extension>
 </addon>
