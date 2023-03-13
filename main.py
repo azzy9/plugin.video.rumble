@@ -324,19 +324,23 @@ def play_video(name, url, iconimage, play=2):
 
     if url:
 
-        li = xbmcgui.ListItem(name, path=url)
-        li.setArt({'icon': iconimage, 'thumb': iconimage})
+        # Use HTTP
+        if ADDON.getSetting('useHTTP') == 'true':
+            url = url.replace('https://', 'http://', 1)
+
+        list_item = xbmcgui.ListItem(name, path=url)
+        list_item.setArt({'icon': iconimage, 'thumb': iconimage})
 
         if kodi_version > 19.8:
-            vidtag = li.getVideoInfoTag()
+            vidtag = list_item.getVideoInfoTag()
             vidtag.setTitle(name)
         else:
-            li.setInfo(type='video', infoLabels={'Title': name, 'plot': ''})
+            list_item.setInfo(type='video', infoLabels={'Title': name, 'plot': ''})
 
         if play == 1:
-            xbmc.Player().play(item=url, listitem=li)
+            xbmc.Player().play(item=url, listitem=list_item)
         elif play == 2:
-            xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, li)
+            xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, list_item)
 
     else:
         xbmcgui.Dialog().ok( 'Error', 'Video not found' )
@@ -374,7 +378,7 @@ def getFavorites():
         else:
             xbmcgui.Dialog().ok( get_string(14117), get_string(30155) )
 
-    except:
+    except Exception:
         SetView('WideList')
         xbmcplugin.endOfDirectory(PLUGIN_ID)
 
@@ -514,7 +518,7 @@ def addDir(name, url, mode, iconimage, fanart, description, cat, folder=True, fa
 
         try:
             name_fav = json.dumps(name)
-        except:
+        except Exception:
             name_fav = name
 
         try:
@@ -537,7 +541,7 @@ def addDir(name, url, mode, iconimage, fanart, description, cat, folder=True, fa
                 }
 
                 contextMenu.append((get_string(30151),'RunPlugin(%s)' %buildURL( fav_params )))
-        except:
+        except Exception:
             pass
 
     if contextMenu:
@@ -630,4 +634,4 @@ def main():
         subscribe(name, cat)
 
 if __name__ == "__main__":
-	main()
+    main()
