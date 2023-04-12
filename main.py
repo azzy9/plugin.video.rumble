@@ -477,6 +477,8 @@ def addDir(name, url, mode, iconimage, fanart, description, cat, folder=True, fa
         'cat': cat,
     }
 
+    contextMenu = []
+
     if play:
         linkParams['play'] = str( play )
 
@@ -489,6 +491,7 @@ def addDir(name, url, mode, iconimage, fanart, description, cat, folder=True, fa
         li.setArt({'icon': 'DefaultVideo.png', 'thumb': iconimage})
     if play == 2 and mode == 4:
         li.setProperty('IsPlayable', 'true')
+        contextMenu.append(('Add to queue', 'Action(Queue)'))
 
     if kodi_version > 19.8:
         vidtag = li.getVideoInfoTag()
@@ -502,8 +505,6 @@ def addDir(name, url, mode, iconimage, fanart, description, cat, folder=True, fa
         li.setProperty('fanart_image', fanart)
     else:
         li.setProperty('fanart_image', HOME_DIR + 'fanart.jpg')
-
-    contextMenu = []
 
     if rumbleUser.hasLoginDetails():
         if subscribe_context:
@@ -523,7 +524,7 @@ def addDir(name, url, mode, iconimage, fanart, description, cat, folder=True, fa
 
         try:
 
-            # checks fave name via string ( I do not like how this is done )
+            # checks fav name via string ( I do not like how this is done, so will try redo in future )
             if name_fav in favorite_str:
                 contextMenu.append((get_string(30153),'RunPlugin(%s)' % buildURL( {'mode': '6','name': name} )))
             else:
