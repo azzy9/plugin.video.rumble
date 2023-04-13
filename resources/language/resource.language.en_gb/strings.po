@@ -54,19 +54,19 @@ msgid "Page"
 msgstr ""
 
 msgctxt "#30151"
-msgid "Add to favourites"
+msgid "Add to Rumble favourites"
 msgstr ""
 
 msgctxt "#30152"
-msgid "Added to favourites"
+msgid "Added to Rumble favourites"
 msgstr ""
 
 msgctxt "#30153"
-msgid "Remove from favourites"
+msgid "Remove from Rumble favourites"
 msgstr ""
 
 msgctxt "#30154"
-msgid "Removed from favourites"
+msgid "Removed from Rumble favourites"
 msgstr ""
 
 msgctxt "#30155"
@@ -79,4 +79,8 @@ msgstr ""
 
 msgctxt "#30157"
 msgid "Type something to search"
+msgstr ""
+
+msgctxt "#30158"
+msgid "Add to queue"
 msgstr ""
