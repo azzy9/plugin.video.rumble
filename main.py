@@ -491,7 +491,7 @@ def addDir(name, url, mode, iconimage, fanart, description, cat, folder=True, fa
         li.setArt({'icon': 'DefaultVideo.png', 'thumb': iconimage})
     if play == 2 and mode == 4:
         li.setProperty('IsPlayable', 'true')
-        contextMenu.append(('Add to queue', 'Action(Queue)'))
+        contextMenu.append((get_string(30158), 'Action(Queue)'))
 
     if kodi_version > 19.8:
         vidtag = li.getVideoInfoTag()
