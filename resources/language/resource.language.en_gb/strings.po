@@ -70,7 +70,7 @@ msgid "Removed from Rumble favourites"
 msgstr ""
 
 msgctxt "#30155"
-msgid "No videos or channels added to favorites"
+msgid "No videos or channels added to favourites"
 msgstr ""
 
 msgctxt "#30156"
