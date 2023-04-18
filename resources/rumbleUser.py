@@ -1,15 +1,16 @@
-#
-# Rumble User Class
-# Created by Azzy9
-#
-# Class to handle all the rumble subscription methods
-#
+"""
+Rumble User Class
+Created by Azzy9
+Class to handle all the rumble subscription methods
+"""
+
+import math
+import time
 
 import xbmcaddon
-import math, time
 
 from resources.general import *
-from resources.md5ex import *
+from resources.md5ex import MD5Ex
 
 try:
     import json
@@ -20,18 +21,24 @@ ADDON = xbmcaddon.Addon()
 
 class rumbleUser:
 
+    """ main rumble user class """
+
     baseUrl = 'https://rumble.com'
     username = ''
     password = ''
     session = ''
     expiry = ''
 
-    # Construct to get the saved details
     def __init__( self ):
+
+        """ Construct to get the saved details """
+
         self.getLoginDetails()
 
-    # get the saved login details
     def getLoginDetails( self ):
+
+        """ get the saved login details """
+
         self.username = ADDON.getSetting( 'username' )
         self.password = ADDON.getSetting( 'password' )
         self.session = ADDON.getSetting( 'session' )
@@ -40,38 +47,51 @@ class rumbleUser:
         if self.expiry:
             self.expiry = float( self.expiry )
 
-    # if there is login details
     def hasLoginDetails( self ):
+
+        """ if there is login details """
+
         return ( self.username and self.password )
 
-    # sets the session details
-    # Used for login in & when token is expired
     def setSessionDetails( self ):
+
+        """
+        sets the session details
+        Used for login in & when token is expired
+        """
+
         ADDON.setSetting( 'session', self.session )
         ADDON.setSetting( 'expiry', str( self.expiry ) )
         self.setSessionCookie()
 
-    # resets the session details to force a login
     def resetSessionDetails( self ):
+
+        """ resets the session details to force a login """
+
         self.session = ''
         self.expiry = ''
         self.setSessionDetails()
 
-    # checks if there is a valid session
-    # if not attempt to login
     def hasSession( self, login=True ):
-        hasSession = self.session and self.expiry and self.expiry > time.time()
-        if not hasSession and login and self.hasLoginDetails():
+
+        """ resets the session details to force a login """
+
+        has_session = self.session and self.expiry and self.expiry > time.time()
+        if not has_session and login and self.hasLoginDetails():
             self.login()
             return self.hasSession(False)
-        return hasSession
+        return has_session
 
-    # method to get the salts from rumble
-    # these are used to generate the login hashes
     def getSalts( self ):
+
+        """
+        method to get the salts from rumble
+        these are used to generate the login hashes
+        """
+
         if self.hasLoginDetails():
             # gets salts
-            data = getRequest(
+            data = request_get(
                 self.baseUrl + '/service.php?name=user.get_salts',
                 {'username': self.username},
                 [ ( 'Referer', self.baseUrl ), ( 'Content-type', 'application/x-www-form-urlencoded' ) ]
@@ -82,8 +102,9 @@ class rumbleUser:
                     return salts
         return False
 
-    # method to generate the hashes and login
     def login( self ):
+
+        """ method to generate the hashes and login """
 
         salts = self.getSalts()
         if salts:
@@ -91,14 +112,18 @@ class rumbleUser:
             hashes = login_hash.hash( login_hash.hashStretch( self.password, salts[0], 128) + salts[1] ) + ',' + login_hash.hashStretch( self.password, salts[2], 128 ) + ',' + salts[1]
 
             # login
-            data = getRequest( self.baseUrl + '/service.php?name=user.login', {'username': self.username, 'password_hashes': hashes}, [ ( 'Referer', self.baseUrl ), ( 'Content-type', 'application/x-www-form-urlencoded' ) ] )
+            data = request_get(
+                self.baseUrl + '/service.php?name=user.login',
+                {'username': self.username, 'password_hashes': hashes},
+                [ ( 'Referer', self.baseUrl ), ( 'Content-type', 'application/x-www-form-urlencoded' ) ]
+            )
 
             if data:
                 session = json.loads(data)['data']['session']
                 if session:
                     self.session = session
                     # Expiry is 30 Days
-                    self.expiry = ( math.floor( time.time() ) + 2592000 )
+                    self.expiry = math.floor( time.time() ) + 2592000
                     self.setSessionDetails()
                     return session
 
@@ -124,15 +149,15 @@ class rumbleUser:
         else:
             ADDON.setSetting('cookies', '')
 
+    def subscribe( self, action, action_type, name ):
 
-    #method to subscribe and unsubscribe to a channel or user
-    def subscribe( self, action, type, name ):
+        """ method to subscribe and unsubscribe to a channel or user """
 
         if self.hasSession():
 
             post_content = {
                 'slug': name,
-                'type': type,
+                'type': action_type,
                 'action': action,
             }
 
@@ -141,7 +166,7 @@ class rumbleUser:
                 'Content-type': 'application/x-www-form-urlencoded'
             }
 
-            data = getRequest( self.baseUrl + '/service.php?api=2&name=user.subscribe', post_content, headers )
+            data = request_get( self.baseUrl + '/service.php?api=2&name=user.subscribe', post_content, headers )
             return data
 
         return False

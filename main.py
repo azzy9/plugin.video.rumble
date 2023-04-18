@@ -1,12 +1,19 @@
 # -*- coding: utf-8 -*-
-import sys, re, os
-import xbmc, xbmcplugin, xbmcgui, xbmcaddon, xbmcvfs
-import six
+import sys
+import re
+import os
 
+import xbmc
+import xbmcplugin
+import xbmcgui
+import xbmcaddon
+import xbmcvfs
+
+import six
 from six.moves import urllib
 
 from resources.general import *
-from resources.rumbleUser import *
+from resources.rumbleUser import rumbleUser
 
 try:
     import json
@@ -37,87 +44,103 @@ else:
     favorites = xbmcvfs.translatePath(os.path.join(ADDON.getAddonInfo('profile'), 'favorites.dat'))
 
 
-def createFavorites():
-    addonID = ADDON.getAddonInfo('id')
+def favorites_create():
+
+    """ creates favorite directory if doesn't exist """
+
     if six.PY2:
         addon_data_path = xbmc.translatePath(ADDON.getAddonInfo('profile'))
     else:
         addon_data_path = xbmcvfs.translatePath(ADDON.getAddonInfo('profile'))
-    if os.path.exists(addon_data_path)==False:
+
+    if os.path.exists(addon_data_path) is False:
         os.mkdir(addon_data_path)
+
     xbmc.sleep(1)
 
 
-def loadFavorites( return_string = False ):
+def favorites_load( return_string = False ):
 
-    if os.path.exists(favorites):
-        fav_str = open(favorites).read()
+    """ load favourites from file into variable """
+
+    if os.path.exists( favorites ):
+        fav_str = open( favorites ).read()
         if return_string:
             return fav_str
         if fav_str:
             return json.loads( fav_str )
     else:
-        createFavorites()
+        favorites_create()
 
+    # nothing to load, return type necessary
     if return_string:
-            return ''
-    else:
-        return []
+        return ''
+
+    return []
 
 
-def to_unicode(text, encoding='utf-8', errors='strict'):
-    # Force text to unicode
+def to_unicode( text, encoding='utf-8', errors='strict' ):
+
+    """ Forces text to unicode """
+
     if isinstance(text, bytes):
         return text.decode(encoding, errors=errors)
+
     return text
 
 
-def get_search_string(heading='', message=''):
-    # Ask the user for a search string
+def get_search_string( heading='', message='' ):
+
+    """ Ask the user for a search string """
+
     search_string = None
+
     keyboard = xbmc.Keyboard(message, heading)
     keyboard.doModal()
+
     if keyboard.isConfirmed():
         search_string = to_unicode(keyboard.getText())
+
     return search_string
 
 
-# main menu
 def home_menu():
 
+    """ Creates home menu """
+
     # Search
-    addDir( get_string(137), '', 1, MEDIA_DIR + 'search.png', '', '' ,'' )
+    add_dir( get_string(137), '', 1, MEDIA_DIR + 'search.png', '', '' ,'' )
     # Favorites
-    addDir( get_string(1036), '', 7, MEDIA_DIR + 'favorite.png', '', '', '' )
+    add_dir( get_string(1036), '', 7, MEDIA_DIR + 'favorite.png', '', '', '' )
 
     if rumbleUser.hasLoginDetails():
         # subscriptions
-        addDir( 'Subscriptions', BASE_URL + '/subscriptions', 3, MEDIA_DIR + 'favorite.png', '', '', 'other' )
+        add_dir( 'Subscriptions', BASE_URL + '/subscriptions', 3, MEDIA_DIR + 'favorite.png', '', '', 'other' )
         # subscriptions
-        addDir( 'Following', BASE_URL + '/', 3, MEDIA_DIR + 'favorite.png', '', '', 'following' )
+        add_dir( 'Following', BASE_URL + '/', 3, MEDIA_DIR + 'favorite.png', '', '', 'following' )
 
     # News
-    addDir( get_string(29916), BASE_URL + '/category/news', 3, MEDIA_DIR + 'news.png', '', '', 'other' )
+    add_dir( get_string(29916), BASE_URL + '/category/news', 3, MEDIA_DIR + 'news.png', '', '', 'other' )
     # Viral
-    addDir( get_string(30050), BASE_URL + '/category/viral', 3, MEDIA_DIR + 'viral.png', '', '', 'other' )
+    add_dir( get_string(30050), BASE_URL + '/category/viral', 3, MEDIA_DIR + 'viral.png', '', '', 'other' )
     # Podcasts
-    addDir( get_string(30051), BASE_URL + '/category/podcasts', 3, MEDIA_DIR +'podcast.png','','','other')
+    add_dir( get_string(30051), BASE_URL + '/category/podcasts', 3, MEDIA_DIR +'podcast.png','','','other')
     # Battle Leaderboard
-    addDir( get_string(30052), BASE_URL + '/battle-leaderboard', 3, MEDIA_DIR + 'leader.png', '', '', 'top' )
+    add_dir( get_string(30052), BASE_URL + '/battle-leaderboard', 3, MEDIA_DIR + 'leader.png', '', '', 'top' )
     # Entertainment
-    addDir( get_string(30053), BASE_URL + '/category/entertainment', 3, MEDIA_DIR + 'entertaiment.png', '', '', 'other' )
+    add_dir( get_string(30053), BASE_URL + '/category/entertainment', 3, MEDIA_DIR + 'entertaiment.png', '', '', 'other' )
     # Sports
-    addDir( get_string(19548), BASE_URL + '/category/sports', 3, MEDIA_DIR + 'sports.png', '', '', 'other' )
+    add_dir( get_string(19548), BASE_URL + '/category/sports', 3, MEDIA_DIR + 'sports.png', '', '', 'other' )
     # Science
-    addDir( get_string(29948), BASE_URL + '/category/science', 3, MEDIA_DIR + 'science.png', '', '', 'other' )
+    add_dir( get_string(29948), BASE_URL + '/category/science', 3, MEDIA_DIR + 'science.png', '', '', 'other' )
     # Technology
-    addDir( get_string(30054), BASE_URL + '/category/technology', 3, MEDIA_DIR + 'technology.png', '', '', 'other' )
+    add_dir( get_string(30054), BASE_URL + '/category/technology', 3, MEDIA_DIR + 'technology.png', '', '', 'other' )
     # Vlogs
-    addDir( get_string(30055), BASE_URL + '/category/vlogs', 3, MEDIA_DIR + 'vlog.png', '', '', 'other' )
+    add_dir( get_string(30055), BASE_URL + '/category/vlogs', 3, MEDIA_DIR + 'vlog.png', '', '', 'other' )
     # Settings
-    addDir( get_string(5), '', 8, MEDIA_DIR + 'settings.png', '', '', '' )
+    add_dir( get_string(5), '', 8, MEDIA_DIR + 'settings.png', '', '', '' )
 
-    SetView('WideList')
+    view_set('WideList')
     xbmcplugin.endOfDirectory(PLUGIN_ID, cacheToDisc=False)
 
 
@@ -125,31 +148,31 @@ def home_menu():
 def search_menu():
 
     # Search Video
-    addDir( get_string(30100), BASE_URL + '/search/video?q=', 2, MEDIA_DIR + 'search.png', '', '', 'video' )
+    add_dir( get_string(30100), BASE_URL + '/search/video?q=', 2, MEDIA_DIR + 'search.png', '', '', 'video' )
     # Search Channel
-    addDir( get_string(30101), BASE_URL + '/search/channel?q=',2,MEDIA_DIR + 'search.png', '', '', 'channel' )
+    add_dir( get_string(30101), BASE_URL + '/search/channel?q=',2,MEDIA_DIR + 'search.png', '', '', 'channel' )
     # Search User
-    addDir( get_string(30102), BASE_URL + '/search/channel?q=',2,MEDIA_DIR + 'search.png', '', '', 'user' )
-    SetView('WideList')
+    add_dir( get_string(30102), BASE_URL + '/search/channel?q=',2,MEDIA_DIR + 'search.png', '', '', 'user' )
+    view_set('WideList')
     xbmcplugin.endOfDirectory(PLUGIN_ID)
 
 
-def pagination(url,page,cat,search=False):
+def pagination( url, page, cat, search=False ):
 
     if url > '':
 
         page = int(page)
-        pageUrl = url
+        page_url = url
 
         if page == 1:
             if search:
-                pageUrl = url + search
+                page_url = url + search
         elif search and cat == 'video':
-            pageUrl = url + search + "&page=" + str( page )
+            page_url = url + search + "&page=" + str( page )
         elif cat in {'channel', 'user', 'other' }:
-            pageUrl = url + "?page=" + str( page )
+            page_url = url + "?page=" + str( page )
 
-        amount = list_rumble( pageUrl, cat )
+        amount = list_rumble( page_url, cat )
 
         if amount > 15 and page < 10:
 
@@ -157,9 +180,9 @@ def pagination(url,page,cat,search=False):
             page = page + 1
 
             name = get_string(30150) + " " + str( page )
-            li=xbmcgui.ListItem(name)
+            list_item = xbmcgui.ListItem(name)
 
-            linkParams = {
+            link_params = {
                 'url': url,
                 'mode': '3',
                 'name': name,
@@ -167,27 +190,35 @@ def pagination(url,page,cat,search=False):
                 'cat': cat,
             }
 
-            link = buildURL( linkParams )
+            link = build_url( link_params )
 
             if search and cat == 'video':
                 link = link + "&search=" + urllib.parse.quote_plus(search)
 
-            xbmcplugin.addDirectoryItem(PLUGIN_ID, link, li, True)
+            xbmcplugin.addDirectoryItem(PLUGIN_ID, link, list_item, True)
 
-    SetView('WideList')
+    view_set('WideList')
     xbmcplugin.endOfDirectory(PLUGIN_ID)
 
 
-def get_image(data,id):
-    image_re = re.compile("i.user-image--img--id-"+str(id)+".+?{ background-image: url(.+?);", re.MULTILINE|re.DOTALL|re.IGNORECASE).findall(data)
-    if image_re !=[]:
+def get_image( data, image_id ):
+
+    """ method to get an image from scraped page's CSS from the image ID """
+
+    image_re = re.compile(
+        "i.user-image--img--id-" + str( image_id ) + ".+?{ background-image: url(.+?);",
+        re.MULTILINE|re.DOTALL|re.IGNORECASE
+    ).findall(data)
+
+    if image_re != []:
         image = str(image_re[0]).replace('(', '').replace(')', '')
     else:
         image = ''
+
     return image
 
 
-def list_rumble(url, cat):
+def list_rumble( url, cat ):
 
     amount = 0
     headers = None
@@ -198,27 +229,29 @@ def list_rumble(url, cat):
         rumbleUser.hasSession()
         #{ 'cookie': 'u_s=' + ADDON.getSetting('session')}
 
-    data = getRequest(url, None, headers)
+    data = request_get(url, None, headers)
 
     if 'search' in url:
         if cat == 'video':
-            amount = create_dir_list( data, cat, 'video', True, 1 )
+            amount = dir_list_create( data, cat, 'video', True, 1 )
         else:
-            amount = create_dir_list( data, cat, 'channel', True )
+            amount = dir_list_create( data, cat, 'channel', True )
     elif cat in { 'channel', 'user', 'top', 'other' }:
-        amount = create_dir_list( data, cat, 'video', False, 2 )
+        amount = dir_list_create( data, cat, 'video', False, 2 )
     elif cat == 'following':
-        amount = create_dir_list( data, cat, 'following', False, 2 )
+        amount = dir_list_create( data, cat, 'following', False, 2 )
 
     return amount
 
 
-def create_dir_list( data, cat, type='video', search = False, play=False ):
+def dir_list_create( data, cat, video_type='video', search = False, play=False ):
+
+    """ create and display dir list based upon type """
 
     amount = 0
 
-    if type == 'video':
-        videos = re.compile('a href=([^\>]+)><div class=\"(?:[^\"]+)\"><img class=\"video-item--img\" src=(https:\/\/.+?) alt=(?:[^\>]+)>(?:<span class=\"video-item--watching\">[^\<]+</span>)?(?:<div class=video-item--overlay-rank>(?:[0-9]+)</div>)?</div><(?:[^\>]+)></span></a><div class=\"video-item--info\"><time class=\"video-item--meta video-item--time\" datetime=(.+?)-(.+?)-(.+?)T(?:.+?) title\=\"(?:[^\"]+)\">(?:[^\<]+)</time><h3 class=video-item--title>(.+?)</h3><address(?:[^\>]+)><a rel=author class=\"(?:[^\=]+)=(.+?)><div class=ellipsis-1>(.+?)</div>', re.MULTILINE|re.DOTALL|re.IGNORECASE).findall(data)
+    if video_type == 'video':
+        videos = re.compile(r'a href=([^\>]+)><div class=\"(?:[^\"]+)\"><img class=\"video-item--img\" src=(https:\/\/.+?) alt=(?:[^\>]+)>(?:<span class=\"video-item--watching\">[^\<]+</span>)?(?:<div class=video-item--overlay-rank>(?:[0-9]+)</div>)?</div><(?:[^\>]+)></span></a><div class=\"video-item--info\"><time class=\"video-item--meta video-item--time\" datetime=(.+?)-(.+?)-(.+?)T(?:.+?) title\=\"(?:[^\"]+)\">(?:[^\<]+)</time><h3 class=video-item--title>(.+?)</h3><address(?:[^\>]+)><a rel=author class=\"(?:[^\=]+)=(.+?)><div class=ellipsis-1>(.+?)</div>', re.MULTILINE|re.DOTALL|re.IGNORECASE).findall(data)
         if videos:
             amount = len(videos)
             for link, img, year, month, day, title, channel_link, channel_name in videos:
@@ -227,10 +260,10 @@ def create_dir_list( data, cat, type='video', search = False, play=False ):
 
                 video_title = '[B]' + title + '[/B]\n[COLOR gold]' + channel_name + ' - [COLOR lime]' + get_date_formatted( date_format, year, month, day ) + '[/COLOR]'
                 #open get url and open player
-                addDir( video_title, BASE_URL + link, 4, str(img), str(img), '', cat, False, True, play, { 'name' : channel_link, 'subscribe': True }  )
+                add_dir( video_title, BASE_URL + link, 4, str(img), str(img), '', cat, False, True, play, { 'name' : channel_link, 'subscribe': True }  )
 
-    elif type == 'following':
-        following = re.compile('<a class=\"main-menu-item main-menu-item-channel\" title=\"?(?:[^\"]+)\"? href=([^>]+)>\s*<i class=\'user-image (?:user-image--img user-image--img--id-([^\']+)\')?(?:user-image--letter\' data-letter=([a-zA-Z]))?></i>\s*<span class=\"main-menu-item-label main-menu-item-channel-label\">([^<]+)</span>', re.MULTILINE|re.DOTALL|re.IGNORECASE).findall(data)
+    elif video_type == 'following':
+        following = re.compile(r'<a class=\"main-menu-item main-menu-item-channel\" title=\"?(?:[^\"]+)\"? href=([^>]+)>\s*<i class=\'user-image (?:user-image--img user-image--img--id-([^\']+)\')?(?:user-image--letter\' data-letter=([a-zA-Z]))?></i>\s*<span class=\"main-menu-item-label main-menu-item-channel-label\">([^<]+)</span>', re.MULTILINE|re.DOTALL|re.IGNORECASE).findall(data)
         if following:
             amount = len(following)
             for link, img_id, img_letter, channel_name in following:
@@ -241,9 +274,10 @@ def create_dir_list( data, cat, type='video', search = False, play=False ):
                     img = MEDIA_DIR + 'letters/' + img_letter + '.png'
                 video_title = '[B]' + channel_name + '[/B]'
                 #open get url and open player
-                addDir( video_title, BASE_URL + link, 3, img, img, '', 'other', True, True, play, { 'name' : link, 'subscribe': False } )
+                add_dir( video_title, BASE_URL + link, 3, img, img, '', 'other', True, True, play, { 'name' : link, 'subscribe': False } )
+
     else:
-        channels = re.compile('a href=(.+?)>\s*<div class=\"channel-item--img\">\s*<i class=\'user-image user-image--img user-image--img--id-(.+?)\'></i>\s*</div>\s*<h3 class=channel-item--title>(.+?)</h3>\s*<span class=channel-item--subscribers>(.+?) subscribers</span>',re.DOTALL).findall(data)
+        channels = re.compile(r'a href=(.+?)>\s*<div class=\"channel-item--img\">\s*<i class=\'user-image user-image--img user-image--img--id-(.+?)\'></i>\s*</div>\s*<h3 class=channel-item--title>(.+?)</h3>\s*<span class=channel-item--subscribers>(.+?) subscribers</span>',re.DOTALL).findall(data)
         if channels:
             amount = len(channels)
             for link, img_id, channel_name, subscribers in channels:
@@ -262,62 +296,75 @@ def create_dir_list( data, cat, type='video', search = False, play=False ):
                 img = str( get_image( data, img_id ) )
                 video_title = '[B]' + channel_name + '[/B]\n[COLOR palegreen]' + subscribers + ' [COLOR yellow]' + get_string(30155) + '[/COLOR]'
                 #open get url and open player
-                addDir( video_title, BASE_URL + link, 3, img, img, '', cat, True, True, play, { 'name' : link, 'subscribe': True } )
+                add_dir( video_title, BASE_URL + link, 3, img, img, '', cat, True, True, play, { 'name' : link, 'subscribe': True } )
 
     return amount
 
 
-def resolver(url):
+def resolver( url ):
+
+    """ Resolves a URL for rumble & returns resolved link to video """
 
     # playback options - 0: large to small, 1: small to large, 2: quality select
-    playbackMethod = ADDON.getSetting('playbackMethod')
+    playback_method = ADDON.getSetting('playbackMethod')
 
-    mediaURL = False
+    media_url = False
 
-    if playbackMethod == '2':
-       urls = []
+    if playback_method == '2':
+        urls = []
 
-    data = getRequest(url)
+    data = request_get(url)
 
     # gets embed id from embed url
-    embed_id = re.compile(',\"embedUrl\":\"' + BASE_URL + '/embed/(.*?)\/\",', re.MULTILINE|re.DOTALL|re.IGNORECASE).findall(data)
+    embed_id = re.compile(
+        ',\"embedUrl\":\"' + BASE_URL + '/embed/(.*?)\/\",',
+        re.MULTILINE|re.DOTALL|re.IGNORECASE
+    ).findall(data)
+
     if embed_id:
+
         # use site api to get video urls
-        data = getRequest(BASE_URL + '/embedJS/u3/?request=video&ver=2&v=' + embed_id[0])
+        # TODO: use as dict / array instead of using regex to get URLs
+        data = request_get(BASE_URL + '/embedJS/u3/?request=video&ver=2&v=' + embed_id[0])
         sizes = [ '1080', '720', '480', '360', 'hls' ]
 
         # reverses array - small to large
-        if playbackMethod == '1':
+        if playback_method == '1':
             sizes = sizes[::-1]
 
         for quality in sizes:
 
-            matches = re.compile( '"' + quality + '".+?url.+?:"(.*?)"', re.MULTILINE|re.DOTALL|re.IGNORECASE).findall(data)
+            # get urls for quality
+            matches = re.compile(
+                '"' + quality + '".+?url.+?:"(.*?)"',
+                re.MULTILINE|re.DOTALL|re.IGNORECASE
+            ).findall(data)
 
             if matches:
-                if playbackMethod == '2':
+                if playback_method == '2':
                     urls.append(( quality, matches[0] ))
                 else:
-                    mediaURL = matches[0]
+                    media_url = matches[0]
                     break
 
         # quality select
-        if playbackMethod == '2':
+        if playback_method == '2':
             if len(urls) > 0:
-                selectedIndex = xbmcgui.Dialog().select(
+                selected_index = xbmcgui.Dialog().select(
                     'Select Quality', [(sourceItem[0] or '?') for sourceItem in urls]
                 )
-                if selectedIndex != -1:
-                    mediaURL = urls[selectedIndex][1]
+                if selected_index != -1:
+                    media_url = urls[selected_index][1]
 
-    if mediaURL:
-        mediaURL = mediaURL.replace('\/', '/')
+    if media_url:
+        media_url = media_url.replace('\/', '/')
 
-    return mediaURL
+    return media_url
 
 
-# method to play video
-def play_video(name, url, iconimage, play=2):
+def play_video( name, url, iconimage, play=2 ):
+
+    """ method to play video """
 
     # get video link
     url = resolver(url)
@@ -346,16 +393,25 @@ def play_video(name, url, iconimage, play=2):
         xbmcgui.Dialog().ok( 'Error', 'Video not found' )
 
 
-def search_items(url,cat):
-    vq = get_search_string(heading="Search")
-    if ( not vq ): return False, 0
-    title = urllib.parse.quote_plus(vq)
-    pagination(url,1,cat,title)
+def search_items( url, cat ):
+
+    """ Searches rumble  """
+
+    search_str = get_search_string(heading="Search")
+
+    if not search_str:
+        return False, 0
+
+    title = urllib.parse.quote_plus(search_str)
+
+    pagination( url, 1, cat, title )
 
 
-def getFavorites():
+def favorites_show():
 
-    data = loadFavorites()
+    """  Displays favorites """
+
+    data = favorites_load()
 
     try:
 
@@ -366,46 +422,61 @@ def getFavorites():
                 url = i[1]
                 mode = i[2]
                 iconimage = i[3]
-                fanArt = i[4]
+                fan_art = i[4]
                 description = i[5]
                 cat = i[6]
                 folder = ( i[7] == 'True' )
                 play = i[8]
 
-                addDir( name, url, mode, str(iconimage), str(fanArt), str(description), cat, folder, True, int(play) )
-            SetView('WideList')
+                add_dir( name, url, mode, str(iconimage), str(fan_art), str(description), cat, folder, True, int(play) )
+            view_set('WideList')
             xbmcplugin.endOfDirectory(PLUGIN_ID)
         else:
             xbmcgui.Dialog().ok( get_string(14117), get_string(30155) )
 
     except Exception:
-        SetView('WideList')
+        view_set('WideList')
         xbmcplugin.endOfDirectory(PLUGIN_ID)
 
 
-def addFavorite(name, url, fav_mode, iconimage, fanart, description, cat, folder, play):
+def favorite_add(name, url, fav_mode, iconimage, fanart, description, cat, folder, play):
 
-    data = loadFavorites()
+    """ add favorite from name """
+
+    data = favorites_load()
     data.append((name, url, fav_mode, iconimage, fanart, description, cat, folder, play))
-    b = open(favorites, 'w')
-    b.write(json.dumps(data))
-    b.close()
+    fav_file = open( favorites, 'w' )
+    fav_file.write(json.dumps(data))
+    fav_file.close()
+
     notify( get_string(30152), name, iconimage )
 
 
-def rmFavorite(name):
-    data = loadFavorites()
-    for index in range(len(data)):
-        if data[index][0]==name:
-            del data[index]
-            b = open(favorites, 'w')
-            b.write(json.dumps(data))
-            b.close()
-            break
+def favorite_remove( name ):
+
+    """ remove favorite from name """
+
+    # TODO: remove via something more unique instead
+    # TODO: remove via a method that doesn't require to loop through all favorites
+
+    data = favorites_load()
+
+    if data:
+        for index in range(len(data)):
+            if data[index][0] == name:
+                del data[index]
+                fav_file = open( favorites, 'w' )
+                fav_file.write(json.dumps(data))
+                fav_file.close()
+                break
+
     notify( get_string(30154), name )
 
 
-def importFavorites():
+
+def favorites_import():
+
+    """ Due to plugin name change from original fork, the favorites will need to be imported """
 
     if not xbmcgui.Dialog().yesno(
         'Import Favorites',
@@ -417,57 +488,71 @@ def importFavorites():
 
     # no point trying to run this as it didn't exist for python 2
     if six.PY2:
+        notify( 'Favorites Not Found' )
         return
 
     # make sure path exists
-    createFavorites()
+    favorites_create()
+
     #load matrix favourites
     rumble_matrix_dir = xbmcvfs.translatePath(os.path.join('special://home/userdata/addon_data/plugin.video.rumble.matrix', 'favorites.dat'))
+
     if os.path.exists(rumble_matrix_dir):
-        rumble_matrix = open(rumble_matrix_dir).read()
+        rumble_matrix = open( rumble_matrix_dir ).read()
+
         if rumble_matrix:
-            b = open(favorites, 'w')
-            b.write(rumble_matrix)
-            b.close()
+            fav_file = open( favorites, 'w' )
+            fav_file.write(rumble_matrix)
+            fav_file.close()
             notify( 'Imported Favorites' )
             return
+
     notify( 'Favorites Not Found' )
 
 
-def resetLoginSession():
+def login_session_reset():
+
+    """ Forces a rumble session reset """
 
     rumbleUser.resetSessionDetails()
     notify( 'Session has been reset' )
 
 
-def subscribe(name, action):
+def subscribe( name, action ):
+
+    """ Attempts to (un)subscribe to rumble channel """
 
     # make sure we have a session
     if rumbleUser.hasSession():
 
-        type = False
+        action_type = False
         if '/user/' in name:
             name = name.replace( '/user/', '' )
-            type = 'user'
+            action_type = 'user'
         elif '/c/' in name:
             name = name.replace( '/c/', '' )
-            type = 'channel'
+            action_type = 'channel'
 
-        if type:
-            data = rumbleUser.subscribe( action, type, name )
-            xbmc.log( data, xbmc.LOGWARNING )
+        if action_type:
+
+            # subscribe to action
+            data = rumbleUser.subscribe( action, action_type, name )
+            # TODO: use data for sanity check
+
             if action == 'subscribe':
                 notify( 'Subscribed to ' + name )
             else:
                 notify( 'Unubscribed to ' + name )
+
             return True
 
     notify( 'Unable to to perform action' )
+    return False
 
 
-def addDir(name, url, mode, iconimage, fanart, description, cat, folder=True, fav_context=False, play=False, subscribe_context=False):
+def add_dir(name, url, mode, iconimage, fanart, description, cat, folder=True, fav_context=False, play=False, subscribe_context=False):
 
-    linkParams = {
+    link_params = {
         'url': url,
         'mode': str( mode ),
         'name': name,
@@ -477,45 +562,45 @@ def addDir(name, url, mode, iconimage, fanart, description, cat, folder=True, fa
         'cat': cat,
     }
 
-    contextMenu = []
+    context_menu = []
 
     if play:
-        linkParams['play'] = str( play )
+        link_params['play'] = str( play )
 
-    link = buildURL( linkParams )
+    link = build_url( link_params )
 
-    li=xbmcgui.ListItem( name )
+    list_item = xbmcgui.ListItem( name )
     if folder:
-        li.setArt({'icon': 'DefaultFolder.png', 'thumb': iconimage})
+        list_item.setArt({'icon': 'DefaultFolder.png', 'thumb': iconimage})
     else:
-        li.setArt({'icon': 'DefaultVideo.png', 'thumb': iconimage})
+        list_item.setArt({'icon': 'DefaultVideo.png', 'thumb': iconimage})
     if play == 2 and mode == 4:
-        li.setProperty('IsPlayable', 'true')
-        contextMenu.append((get_string(30158), 'Action(Queue)'))
+        list_item.setProperty('IsPlayable', 'true')
+        context_menu.append((get_string(30158), 'Action(Queue)'))
 
     if kodi_version > 19.8:
-        vidtag = li.getVideoInfoTag()
+        vidtag = list_item.getVideoInfoTag()
         vidtag.setMediaType('video')
         vidtag.setTitle(name)
         vidtag.setPlot(description)
     else:
-        li.setInfo(type='Video', infoLabels={'Title': name, 'Plot': description})
+        list_item.setInfo(type='Video', infoLabels={'Title': name, 'Plot': description})
 
     if fanart > '':
-        li.setProperty('fanart_image', fanart)
+        list_item.setProperty('fanart_image', fanart)
     else:
-        li.setProperty('fanart_image', HOME_DIR + 'fanart.jpg')
+        list_item.setProperty('fanart_image', HOME_DIR + 'fanart.jpg')
 
     if rumbleUser.hasLoginDetails():
         if subscribe_context:
             if subscribe_context['subscribe']:
-                contextMenu.append(('Subscribe to ' + subscribe_context['name'],'RunPlugin(%s)' % buildURL( {'mode': '11','name': subscribe_context['name'], 'cat': 'subscribe'} )))
+                context_menu.append(('Subscribe to ' + subscribe_context['name'],'RunPlugin(%s)' % build_url( {'mode': '11','name': subscribe_context['name'], 'cat': 'subscribe'} )))
             else:
-                contextMenu.append(('Unsubscribe to ' + subscribe_context['name'],'RunPlugin(%s)' % buildURL( {'mode': '11','name': subscribe_context['name'], 'cat': 'unsubscribe'} )))
+                context_menu.append(('Unsubscribe to ' + subscribe_context['name'],'RunPlugin(%s)' % build_url( {'mode': '11','name': subscribe_context['name'], 'cat': 'unsubscribe'} )))
 
     if fav_context:
 
-        favorite_str = loadFavorites( True )
+        favorite_str = favorites_load( True )
 
         try:
             name_fav = json.dumps(name)
@@ -526,7 +611,7 @@ def addDir(name, url, mode, iconimage, fanart, description, cat, folder=True, fa
 
             # checks fav name via string ( I do not like how this is done, so will try redo in future )
             if name_fav in favorite_str:
-                contextMenu.append((get_string(30153),'RunPlugin(%s)' % buildURL( {'mode': '6','name': name} )))
+                context_menu.append((get_string(30153),'RunPlugin(%s)' % build_url( {'mode': '6','name': name} )))
             else:
                 fav_params = {
                     'url': url,
@@ -541,17 +626,19 @@ def addDir(name, url, mode, iconimage, fanart, description, cat, folder=True, fa
                     'play': str(play),
                 }
 
-                contextMenu.append((get_string(30151),'RunPlugin(%s)' %buildURL( fav_params )))
+                context_menu.append((get_string(30151),'RunPlugin(%s)' %build_url( fav_params )))
         except Exception:
             pass
 
-    if contextMenu:
-        li.addContextMenuItems(contextMenu)
+    if context_menu:
+        list_item.addContextMenuItems(context_menu)
 
-    xbmcplugin.addDirectoryItem(handle=PLUGIN_ID, url=link, listitem=li, isFolder=folder)
+    xbmcplugin.addDirectoryItem(handle=PLUGIN_ID, url=link, listitem=list_item, isFolder=folder)
 
 
 def main():
+
+    """ main method to start plugin """
 
     params=get_params()
 
@@ -563,7 +650,7 @@ def main():
     url = params.get( 'url', None )
     if url:
         url=urllib.parse.unquote_plus(url)
- 
+
     name = params.get( 'name', None )
     if name:
         name = urllib.parse.unquote_plus(name)
@@ -608,7 +695,7 @@ def main():
     elif mode==2:
         search_items(url,cat)
     elif mode==3:
-        if search and search !=None:
+        if search and search is not None:
             pagination(url, page, cat, search)
         else:
             pagination(url, page, cat)
@@ -620,17 +707,17 @@ def main():
         if '  - ' in name:
             name = name.split('  - ')[0]
         if mode == 5:
-            addFavorite( name, url, fav_mode, iconimage, fanart, description, cat, str(folder), str(play) )
+            favorite_add( name, url, fav_mode, iconimage, fanart, description, cat, str(folder), str(play) )
         else:
-            rmFavorite( name )
+            favorite_remove( name )
     elif mode==7:
-        getFavorites()
+        favorites_show()
     elif mode==8:
         ADDON.openSettings()
     elif mode==9:
-        importFavorites()
+        favorites_import()
     elif mode==10:
-        resetLoginSession()
+        login_session_reset()
     elif mode==11:
         subscribe(name, cat)
 
