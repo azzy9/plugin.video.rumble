@@ -537,14 +537,22 @@ def subscribe( name, action ):
 
             # subscribe to action
             data = rumbleUser.subscribe( action, action_type, name )
-            # TODO: use data for sanity check
 
-            if action == 'subscribe':
-                notify( 'Subscribed to ' + name )
-            else:
-                notify( 'Unubscribed to ' + name )
+            if data:
 
-            return True
+                # Load data from JSON
+                data = json.loads(data)
+
+                # make sure everything looks fine
+                if data.get( 'user', False ) and data.get( 'data', False ) \
+                    and data[ 'user' ][ 'logged_in' ] and data[ 'data' ][ 'thumb' ]:
+
+                    if action == 'subscribe':
+                        notify( 'Subscribed to ' + name, None, data[ 'data' ][ 'thumb' ] )
+                    else:
+                        notify( 'Unubscribed to ' + name, None, data[ 'data' ][ 'thumb' ] )
+
+                    return True
 
     notify( 'Unable to to perform action' )
     return False
