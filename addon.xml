@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.rumble" name="Rumble" version="1.3.3" provider-name="azzy9">
+<addon id="plugin.video.rumble" name="Rumble" version="1.3.4" provider-name="azzy9">
 	<requires>
 		<import addon="script.module.simplejson"/>
 		<import addon="script.module.requests"/>
@@ -21,7 +21,8 @@
 			<icon>icon.png</icon>
 			<fanart>fanart.jpg</fanart>
 		</assets>
-		<news>- v1.3.3 - validate return data for subscribe method
+		<news>- v1.3.4 - Clean videos title text
+- v1.3.3 - validate return data for subscribe method
   - Move strings to language files
   - Add en_US language
   - Correct en_GB spellings
