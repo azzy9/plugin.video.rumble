@@ -153,3 +153,9 @@ def get_params():
     """ gets params from request """
 
     return dict(urllib.parse.parse_qsl(sys.argv[2][1:], keep_blank_values=True))
+
+def clean_text( text ):
+
+    """ Removes characters that can cause trouble """
+
+    return text.encode('ascii', 'ignore').decode('ascii').strip()
