@@ -12,8 +12,8 @@ import xbmcvfs
 import six
 from six.moves import urllib
 
-from resources.general import *
-from resources.rumbleUser import rumbleUser
+from lib.general import *
+from lib.rumble_user import rumbleUser
 
 try:
     import json
