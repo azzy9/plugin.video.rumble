@@ -9,8 +9,15 @@ To login go to "Settings" -> "Login"<br />
 Then enter your username & password.<br />
 Save the settings.<br />
 
-<b>Subscription functionality </b><br />
+<b>Subscription functionality</b><br />
 - See your feeds from subscriptions<br />
 - See your followed channels & users<br />
 - Subscribe to channel & users<br />
 - Unsubscribe to channels & users<br />
+<br />
+<b>Issues</b><br />
+If an issue occures where the stream freezes after start,<br />
+you can try to enable http streams:<br />
+- Go to settings<br />
+- Debug<br />
+- Use HTTP
