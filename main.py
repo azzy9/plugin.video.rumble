@@ -29,12 +29,12 @@ ADDON = xbmcaddon.Addon()
 ADDON_ICON = ADDON.getAddonInfo('icon')
 ADDON_NAME = ADDON.getAddonInfo('name')
 
-HOME_DIR = 'special://home/addons/{0}'.format(PLUGIN_NAME)
+HOME_DIR = 'special://home/addons/' + PLUGIN_NAME
 RESOURCE_DIR = HOME_DIR + 'resources/'
 MEDIA_DIR = RESOURCE_DIR + 'media/'
 
-kodi_version = float(xbmcaddon.Addon('xbmc.addon').getAddonInfo('version')[:4])
-date_format = ADDON.getSetting('date_format')
+KODI_VERSION = float(xbmcaddon.Addon('xbmc.addon').getAddonInfo('version')[:4])
+DATE_FORMAT = ADDON.getSetting('date_format')
 
 RUMBLE_USER = RumbleUser()
 
@@ -258,7 +258,7 @@ def dir_list_create( data, cat, video_type='video', search = False, play=False )
                 if '<svg' in channel_name:
                     channel_name = channel_name.split('<svg')[0] + " (Verified)"
 
-                video_title = '[B]' + clean_text( title ) + '[/B]\n[COLOR gold]' + channel_name + ' - [COLOR lime]' + get_date_formatted( date_format, year, month, day ) + '[/COLOR]'
+                video_title = '[B]' + clean_text( title ) + '[/B]\n[COLOR gold]' + channel_name + ' - [COLOR lime]' + get_date_formatted( DATE_FORMAT, year, month, day ) + '[/COLOR]'
                 #open get url and open player
                 add_dir( video_title, BASE_URL + link, 4, str(img), str(img), '', cat, False, True, play, { 'name' : channel_link, 'subscribe': True }  )
 
@@ -378,7 +378,7 @@ def play_video( name, url, iconimage, play=2 ):
         list_item = xbmcgui.ListItem(name, path=url)
         list_item.setArt({'icon': iconimage, 'thumb': iconimage})
 
-        if kodi_version > 19.8:
+        if KODI_VERSION > 19.8:
             vidtag = list_item.getVideoInfoTag()
             vidtag.setTitle(name)
         else:
@@ -586,7 +586,7 @@ def add_dir(name, url, mode, iconimage, fanart, description, cat, folder=True, f
         list_item.setProperty('IsPlayable', 'true')
         context_menu.append((get_string(30158), 'Action(Queue)'))
 
-    if kodi_version > 19.8:
+    if KODI_VERSION > 19.8:
         vidtag = list_item.getVideoInfoTag()
         vidtag.setMediaType('video')
         vidtag.setTitle(name)

@@ -9,7 +9,7 @@ import time
 
 import xbmcaddon
 
-from lib.general import *
+from lib.general import request_get
 from lib.md5ex import MD5Ex
 
 try:
@@ -94,7 +94,7 @@ class RumbleUser:
             data = request_get(
                 self.base_url + '/service.php?name=user.get_salts',
                 {'username': self.username},
-                [ ( 'Referer', self.base_url ), ( 'Content-type', 'application/x-www-form-urlencoded' ) ]
+                [('Referer', self.base_url), ('Content-type', 'application/x-www-form-urlencoded')]
             )
             if data:
                 salts = json.loads(data)['data']['salts']
@@ -118,7 +118,7 @@ class RumbleUser:
             data = request_get(
                 self.base_url + '/service.php?name=user.login',
                 {'username': self.username, 'password_hashes': hashes},
-                [( 'Referer', self.base_url ), ( 'Content-type', 'application/x-www-form-urlencoded' )]
+                [('Referer', self.base_url), ('Content-type', 'application/x-www-form-urlencoded')]
             )
 
             if data:
@@ -132,6 +132,28 @@ class RumbleUser:
 
         return False
 
+    def get_comments( self, video_id ):
+
+        """ method to get comments for video """
+
+        if video_id and self.has_session():
+
+            headers = {
+                'Referer': self.base_url + video_id,
+                'Content-type': 'application/x-www-form-urlencoded'
+            }
+
+            data = request_get(
+                self.base_url + '/service.php?name=comment.list&video=' + video_id,
+                None,
+                headers
+            )
+
+            if data:
+                comments = json.loads(data)['js_code']
+                #<a\sclass=\\\"comments-meta-author\\\"\shref=\\\"([^\"]+)\\\">([^\<]+)</a>(?:[\s|\n||\\n|\\t]+)<a\sclass='comments-meta-post-time'\shref='#comment-([0-9]+)' title='([A-Z][^\,]+),\s([A-Z][^\s]+)\s([0-9]+),\s([0-9]+)\s([0-9]{2}):([0-9]{2})\sAM\s-04'>([^\<]+)</a>(?:[\s|\n||\\n|\\t]+)</div>(?:[\s|\n||\\n|\\t]+)<p class=\\\"comment-text\\\">([^\<]+)</p>
+
+        return {}
 
     def set_session_cookie( self ):
 
