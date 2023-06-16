@@ -14,6 +14,7 @@ from six.moves import urllib
 
 from lib.general import *
 from lib.rumble_user import RumbleUser
+from lib.comments import CommentWindow
 
 try:
     import json
@@ -300,6 +301,21 @@ def dir_list_create( data, cat, video_type='video', search = False, play=False )
 
     return amount
 
+def get_video_id( url ):
+
+    """ gets a video id from a URL, helps in resolving """
+
+    data = request_get(url)
+
+    # gets embed id from embed url
+    video_id = re.compile(
+        ',\"embedUrl\":\"' + BASE_URL + '/embed/(.*?)\/\",',
+        re.MULTILINE|re.DOTALL|re.IGNORECASE
+    ).findall(data)
+
+    if video_id:
+        return video_id[0]
+    return False
 
 def resolver( url ):
 
@@ -313,19 +329,13 @@ def resolver( url ):
     if playback_method == '2':
         urls = []
 
-    data = request_get(url)
+    video_id = get_video_id( url )
 
-    # gets embed id from embed url
-    embed_id = re.compile(
-        ',\"embedUrl\":\"' + BASE_URL + '/embed/(.*?)\/\",',
-        re.MULTILINE|re.DOTALL|re.IGNORECASE
-    ).findall(data)
-
-    if embed_id:
+    if video_id:
 
         # use site api to get video urls
         # TODO: use as dict / array instead of using regex to get URLs
-        data = request_get(BASE_URL + '/embedJS/u3/?request=video&ver=2&v=' + embed_id[0])
+        data = request_get(BASE_URL + '/embedJS/u3/?request=video&ver=2&v=' + video_id)
         sizes = [ '1080', '720', '480', '360', 'hls' ]
 
         # reverses array - small to large
@@ -582,6 +592,7 @@ def add_dir(name, url, mode, iconimage, fanart, description, cat, folder=True, f
         list_item.setArt({'icon': 'DefaultFolder.png', 'thumb': iconimage})
     else:
         list_item.setArt({'icon': 'DefaultVideo.png', 'thumb': iconimage})
+
     if play == 2 and mode == 4:
         list_item.setProperty('IsPlayable', 'true')
         context_menu.append((get_string(30158), 'Action(Queue)'))
@@ -600,11 +611,15 @@ def add_dir(name, url, mode, iconimage, fanart, description, cat, folder=True, f
         list_item.setProperty('fanart_image', HOME_DIR + 'fanart.jpg')
 
     if RUMBLE_USER.has_login_details():
+
         if subscribe_context:
             if subscribe_context['subscribe']:
                 context_menu.append(('Subscribe to ' + subscribe_context['name'],'RunPlugin(%s)' % build_url( {'mode': '11','name': subscribe_context['name'], 'cat': 'subscribe'} )))
             else:
                 context_menu.append(('Unsubscribe to ' + subscribe_context['name'],'RunPlugin(%s)' % build_url( {'mode': '11','name': subscribe_context['name'], 'cat': 'unsubscribe'} )))
+
+        if play == 2 and mode == 4:
+            context_menu.append(('Comments','RunPlugin(%s)' % build_url( {'mode': '12','url': url} )))
 
     if fav_context:
 
@@ -617,7 +632,7 @@ def add_dir(name, url, mode, iconimage, fanart, description, cat, folder=True, f
 
         try:
 
-            # checks fav name via string ( I do not like how this is done, so will try redo in future )
+            # checks fav name via string (I do not like how this is done, so will redo in future)
             if name_fav in favorite_str:
                 context_menu.append((get_string(30153),'RunPlugin(%s)' % build_url( {'mode': '6','name': name} )))
             else:
@@ -643,6 +658,23 @@ def add_dir(name, url, mode, iconimage, fanart, description, cat, folder=True, f
 
     xbmcplugin.addDirectoryItem(handle=PLUGIN_ID, url=link, listitem=list_item, isFolder=folder)
 
+def comments_show( url ):
+
+    """ Retrieves and shows video's comments in a modal """
+
+    video_id = get_video_id( url )
+
+    if video_id:
+        win = CommentWindow(
+            'addon-rumble-comments.xml',
+            ADDON.getAddonInfo('path'),
+            'default',
+            video_id=video_id
+        )
+        win.doModal()
+        del win
+    else:
+        notify( "Cannot find comments", "Comments" )
 
 def main():
 
@@ -728,6 +760,8 @@ def main():
         login_session_reset()
     elif mode==11:
         subscribe(name, cat)
+    elif mode==12:
+        comments_show(url)
 
 if __name__ == "__main__":
     main()

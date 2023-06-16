@@ -6,6 +6,7 @@ Class to handle all the rumble subscription methods
 
 import math
 import time
+import re
 
 import xbmcaddon
 
@@ -143,16 +144,20 @@ class RumbleUser:
                 'Content-type': 'application/x-www-form-urlencoded'
             }
 
+            # for some strange reason the first letter needs to be removed
             data = request_get(
-                self.base_url + '/service.php?name=comment.list&video=' + video_id,
+                self.base_url + '/service.php?name=comment.list&video=' + video_id[1:],
                 None,
                 headers
             )
 
             if data:
-                comments = json.loads(data)['js_code']
-                #<a\sclass=\\\"comments-meta-author\\\"\shref=\\\"([^\"]+)\\\">([^\<]+)</a>(?:[\s|\n||\\n|\\t]+)<a\sclass='comments-meta-post-time'\shref='#comment-([0-9]+)' title='([A-Z][^\,]+),\s([A-Z][^\s]+)\s([0-9]+),\s([0-9]+)\s([0-9]{2}):([0-9]{2})\sAM\s-04'>([^\<]+)</a>(?:[\s|\n||\\n|\\t]+)</div>(?:[\s|\n||\\n|\\t]+)<p class=\\\"comment-text\\\">([^\<]+)</p>
-
+                comment_data = json.loads(data)
+                if comment_data.get('html'):
+                    return re.compile(
+                        r"<a\sclass=\"comments-meta-author\"\shref=\"([^\"]+)\">([^\<]+)</a>(?:[\s|\n||\\n|\\t]+)<a\sclass='comments-meta-post-time'\shref='#comment-([0-9]+)' title='([A-Z][^\,]+),\s([A-Z][^\s]+)\s([0-9]+),\s([0-9]+)\s([0-9]{2}):([0-9]{2})\s(AM|PM)\s-(?:[0-9]+)'>([^\<]+)</a>(?:[\s|\n||\\n|\\t]+)</div>(?:[\s|\n||\\n|\\t]+)<p class=\"comment-text\">([^\<]+)</p>",
+                        re.MULTILINE|re.DOTALL|re.IGNORECASE
+                    ).findall(comment_data.get('html',''))
         return {}
 
     def set_session_cookie( self ):
