@@ -29,7 +29,7 @@ requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 reqs = requests.session()
 
 
-def request_get( url, data=None, extraHeaders=None ):
+def request_get( url, data=None, extra_headers=None ):
 
     """ makes a request """
 
@@ -47,8 +47,8 @@ def request_get( url, data=None, extraHeaders=None ):
         }
 
         # add extra headers
-        if extraHeaders:
-            my_headers.update(extraHeaders)
+        if extra_headers:
+            my_headers.update(extra_headers)
 
         # get stored cookie string
         cookies = ADDON.getSetting('cookies')

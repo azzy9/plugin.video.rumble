@@ -13,7 +13,7 @@ import six
 from six.moves import urllib
 
 from lib.general import *
-from lib.rumble_user import rumbleUser
+from lib.rumble_user import RumbleUser
 
 try:
     import json
@@ -36,7 +36,7 @@ MEDIA_DIR = RESOURCE_DIR + 'media/'
 kodi_version = float(xbmcaddon.Addon('xbmc.addon').getAddonInfo('version')[:4])
 date_format = ADDON.getSetting('date_format')
 
-rumbleUser = rumbleUser()
+RUMBLE_USER = RumbleUser()
 
 if six.PY2:
     favorites = xbmc.translatePath(os.path.join(ADDON.getAddonInfo('profile'), 'favorites.dat'))
@@ -113,7 +113,7 @@ def home_menu():
     # Favorites
     add_dir( get_string(1036), '', 7, MEDIA_DIR + 'favorite.png', '', '', '' )
 
-    if rumbleUser.hasLoginDetails():
+    if RUMBLE_USER.has_login_details():
         # subscriptions
         add_dir( 'Subscriptions', BASE_URL + '/subscriptions', 3, MEDIA_DIR + 'favorite.png', '', '', 'other' )
         # subscriptions
@@ -226,7 +226,7 @@ def list_rumble( url, cat ):
     if 'subscriptions' in url or cat == 'following':
         # make sure there is a session
         # result is stored in a cookie
-        rumbleUser.hasSession()
+        RUMBLE_USER.has_session()
         #{ 'cookie': 'u_s=' + ADDON.getSetting('session')}
 
     data = request_get(url, None, headers)
@@ -514,7 +514,7 @@ def login_session_reset():
 
     """ Forces a rumble session reset """
 
-    rumbleUser.resetSessionDetails()
+    RUMBLE_USER.reset_session_details()
     notify( 'Session has been reset' )
 
 
@@ -523,7 +523,7 @@ def subscribe( name, action ):
     """ Attempts to (un)subscribe to rumble channel """
 
     # make sure we have a session
-    if rumbleUser.hasSession():
+    if RUMBLE_USER.has_session():
 
         action_type = False
         if '/user/' in name:
@@ -536,7 +536,7 @@ def subscribe( name, action ):
         if action_type:
 
             # subscribe to action
-            data = rumbleUser.subscribe( action, action_type, name )
+            data = RUMBLE_USER.subscribe( action, action_type, name )
 
             if data:
 
@@ -599,7 +599,7 @@ def add_dir(name, url, mode, iconimage, fanart, description, cat, folder=True, f
     else:
         list_item.setProperty('fanart_image', HOME_DIR + 'fanart.jpg')
 
-    if rumbleUser.hasLoginDetails():
+    if RUMBLE_USER.has_login_details():
         if subscribe_context:
             if subscribe_context['subscribe']:
                 context_menu.append(('Subscribe to ' + subscribe_context['name'],'RunPlugin(%s)' % build_url( {'mode': '11','name': subscribe_context['name'], 'cat': 'subscribe'} )))
