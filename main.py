@@ -121,23 +121,23 @@ def home_menu():
         add_dir( 'Following', BASE_URL + '/', 3, MEDIA_DIR + 'favorite.png', '', '', 'following' )
 
     # News
-    add_dir( get_string(29916), BASE_URL + '/category/news', 3, MEDIA_DIR + 'news.png', '', '', 'other' )
+    add_dir( get_string(29916), BASE_URL + '/category/news/recorded', 3, MEDIA_DIR + 'news.png', '', '', 'other' )
     # Viral
-    add_dir( get_string(30050), BASE_URL + '/category/viral', 3, MEDIA_DIR + 'viral.png', '', '', 'other' )
+    add_dir( get_string(30050), BASE_URL + '/category/viral/recorded', 3, MEDIA_DIR + 'viral.png', '', '', 'other' )
     # Podcasts
-    add_dir( get_string(30051), BASE_URL + '/category/podcasts', 3, MEDIA_DIR +'podcast.png','','','other')
+    add_dir( get_string(30051), BASE_URL + '/category/podcasts/recorded', 3, MEDIA_DIR +'podcast.png','','','other')
     # Battle Leaderboard
-    add_dir( get_string(30052), BASE_URL + '/battle-leaderboard', 3, MEDIA_DIR + 'leader.png', '', '', 'top' )
+    add_dir( get_string(30052), BASE_URL + '/battle-leaderboard/recorded', 3, MEDIA_DIR + 'leader.png', '', '', 'top' )
     # Entertainment
-    add_dir( get_string(30053), BASE_URL + '/category/entertainment', 3, MEDIA_DIR + 'entertaiment.png', '', '', 'other' )
+    add_dir( get_string(30053), BASE_URL + '/category/entertainment/recorded', 3, MEDIA_DIR + 'entertaiment.png', '', '', 'other' )
     # Sports
-    add_dir( get_string(19548), BASE_URL + '/category/sports', 3, MEDIA_DIR + 'sports.png', '', '', 'other' )
+    add_dir( get_string(19548), BASE_URL + '/category/sports/recorded', 3, MEDIA_DIR + 'sports.png', '', '', 'other' )
     # Science
-    add_dir( get_string(29948), BASE_URL + '/category/science', 3, MEDIA_DIR + 'science.png', '', '', 'other' )
+    add_dir( get_string(29948), BASE_URL + '/category/science/recorded', 3, MEDIA_DIR + 'science.png', '', '', 'other' )
     # Technology
-    add_dir( get_string(30054), BASE_URL + '/category/technology', 3, MEDIA_DIR + 'technology.png', '', '', 'other' )
+    add_dir( get_string(30054), BASE_URL + '/category/technology/recorded', 3, MEDIA_DIR + 'technology.png', '', '', 'other' )
     # Vlogs
-    add_dir( get_string(30055), BASE_URL + '/category/vlogs', 3, MEDIA_DIR + 'vlog.png', '', '', 'other' )
+    add_dir( get_string(30055), BASE_URL + '/category/vlogs/recorded', 3, MEDIA_DIR + 'vlog.png', '', '', 'other' )
     # Settings
     add_dir( get_string(5), '', 8, MEDIA_DIR + 'settings.png', '', '', '' )
 
@@ -237,7 +237,9 @@ def list_rumble( url, cat ):
             amount = dir_list_create( data, cat, 'video', True, 1 )
         else:
             amount = dir_list_create( data, cat, 'channel', True )
-    elif cat in { 'channel', 'user', 'top', 'other' }:
+    elif cat in { 'other' }:
+        amount = dir_list_create( data, cat, 'cat_video', False, 2 )
+    elif cat in { 'channel', 'user', 'top' }:
         amount = dir_list_create( data, cat, 'video', False, 2 )
     elif cat == 'following':
         amount = dir_list_create( data, cat, 'following', False, 2 )
@@ -259,9 +261,22 @@ def dir_list_create( data, cat, video_type='video', search = False, play=False )
                 if '<svg' in channel_name:
                     channel_name = channel_name.split('<svg')[0] + " (Verified)"
 
-                video_title = '[B]' + clean_text( title ) + '[/B]\n[COLOR gold]' + channel_name + ' - [COLOR lime]' + get_date_formatted( DATE_FORMAT, year, month, day ) + '[/COLOR]'
+                video_title = '[B]' + clean_text( title ) + '[/B]\n[COLOR gold]' + channel_name + '[/COLOR] - [COLOR lime]' + get_date_formatted( DATE_FORMAT, year, month, day ) + '[/COLOR]'
                 #open get url and open player
                 add_dir( video_title, BASE_URL + link, 4, str(img), str(img), '', cat, False, True, play, { 'name' : channel_link, 'subscribe': True }  )
+
+    if video_type == 'cat_video':
+        videos = re.compile(r'<a\s*class=\"videostream__link link\"\s*href=(.+?)>\s*<div class=\"videostream__thumb\">\s*<img\s*class=\"videostream__image\"\s*src=(.+?)alt=\"([^\"]+)\"\s*(?:[^\>]+)>\s*<div class=\"videostream__info\">\s*<div class=\"videostream__views\">\s*<img (?:[^\>]+)>\s*<span class=\"videostream__number\">([^\<]+)</span>\s*</div>\s*<div class=\"videostream__status\">([^\<]+)</div>\s*</div>\s*</div>\s*<h3 class=\"videostream__title clamp clamp-2\">([^\<]+)</h3>\s*<address class=\"channel\">\s*<a\s*rel=\"author\"\s*class=\"channel__link link ([^\"]+)\"\s*href=([^\>]+)>\s*<img\s*class=\"channel__avatar\"\s*src=\"([^\"]+)\"\s*alt\=([^\>]+)>', re.MULTILINE|re.DOTALL|re.IGNORECASE).findall(data)
+        if videos:
+            amount = len(videos)
+            for link, img, title, stream_count, stream_status, alt_title, img_id, channel_link, channel_img, channel_name in videos:
+                if '<svg' in channel_name:
+                    channel_name = channel_name.split('<svg')[0] + " (Verified)"
+
+                video_title = '[B]' + clean_text( title.strip() ) + '[/B]\n[COLOR gold]' + channel_name.strip() + '[/COLOR]'
+                xbmc.log( BASE_URL + link.strip(), xbmc.LOGWARNING )
+                #open get url and open player
+                add_dir( video_title, BASE_URL + link.strip(), 4, str(img.strip()), str(img.strip()), '', cat, False, True, play, { 'name' : channel_link.strip(), 'subscribe': True }  )
 
     elif video_type == 'following':
         following = re.compile(r'<a class=\"main-menu-item main-menu-item-channel\" title=\"?(?:[^\"]+)\"? href=([^>]+)>\s*<i class=\'user-image (?:user-image--img user-image--img--id-([^\']+)\')?(?:user-image--letter\' data-letter=([a-zA-Z]))?></i>\s*<span class=\"main-menu-item-label main-menu-item-channel-label\">([^<]+)</span>', re.MULTILINE|re.DOTALL|re.IGNORECASE).findall(data)
@@ -295,7 +310,7 @@ def dir_list_create( data, cat, video_type='video', search = False, play=False )
                 if '<svg' in channel_name:
                     channel_name = channel_name.split('<svg')[0] + " (Verified)"
                 img = str( get_image( data, img_id ) )
-                video_title = '[B]' + channel_name + '[/B]\n[COLOR palegreen]' + subscribers + ' [COLOR yellow]' + get_string(30155) + '[/COLOR]'
+                video_title = '[B]' + channel_name + '[/B]\n[COLOR palegreen]' + subscribers + '[/COLOR] [COLOR yellow]' + get_string(30155) + '[/COLOR]'
                 #open get url and open player
                 add_dir( video_title, BASE_URL + link, 3, img, img, '', cat, True, True, play, { 'name' : link, 'subscribe': True } )
 
