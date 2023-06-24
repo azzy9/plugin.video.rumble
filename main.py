@@ -274,7 +274,6 @@ def dir_list_create( data, cat, video_type='video', search = False, play=False )
                     channel_name = channel_name.split('<svg')[0] + " (Verified)"
 
                 video_title = '[B]' + clean_text( title.strip() ) + '[/B]\n[COLOR gold]' + channel_name.strip() + '[/COLOR]'
-                xbmc.log( BASE_URL + link.strip(), xbmc.LOGWARNING )
                 #open get url and open player
                 add_dir( video_title, BASE_URL + link.strip(), 4, str(img.strip()), str(img.strip()), '', cat, False, True, play, { 'name' : channel_link.strip(), 'subscribe': True }  )
 
