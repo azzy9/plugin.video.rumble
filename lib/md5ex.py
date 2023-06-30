@@ -6,6 +6,8 @@ This is a class to generate hashes that is used by the Rumble platform
 
 class MD5Ex:
 
+    """ MD5Ex class to create MD5 hashes """
+
     hex = [ '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'a', 'b', 'c', 'd', 'e', 'f' ]
 
     def bit_shift( self, val1, val2, direction = 'r', zero_fill = False ):
@@ -30,18 +32,33 @@ class MD5Ex:
         return 0
 
     def hash( self, n ):
+
+        """ hash method """
+
         return self.binHex( self.binHash( self.strBin(n), len(n) << 3))
 
     def hashUTF8( self, n ):
+
+        """ hashUTF8 method """
+
         return self.hash(self.encUTF8(n))
 
     def hashRaw( self, n ):
+
+        """ hashRaw method """
+
         return self.binStr(self.binHash(self.strBin(n), len(n) << 3))
 
     def hashRawUTF8( self, n ):
+
+        """ hashRawUTF8 method """
+
         return self.hashRaw(self.encUTF8(n))
 
     def hashStretch( self, n, h, i ):
+
+        """ hashStretch method """
+
         return self.binHex(self.binHashStretch(n, h, i))
 
     def binHashStretch( self, n, h, i ):

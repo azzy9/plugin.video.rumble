@@ -28,7 +28,6 @@ requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
 reqs = requests.session()
 
-
 def request_get( url, data=None, extra_headers=None ):
 
     """ makes a request """
@@ -38,7 +37,7 @@ def request_get( url, data=None, extra_headers=None ):
         # headers
         my_headers = {
             'Accept-Language': 'en-gb,en;q=0.5',
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/114.0.0.0 Safari/537.36',
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
             'Referer': url,
             'Cache-Control': 'no-cache',
@@ -94,9 +93,9 @@ def build_url(query):
     }))
 
 
-def notify( message, name=False, iconimage=False, timeShown=5000 ):
+def notify( message, name=False, iconimage=False, time_shown=5000 ):
 
-    """ Show notfication to user """
+    """ Show notification to user """
 
     if not name:
         name = ADDON_NAME
@@ -104,7 +103,7 @@ def notify( message, name=False, iconimage=False, timeShown=5000 ):
     if not iconimage:
         iconimage = ADDON_ICON
 
-    xbmc.executebuiltin('Notification(%s, %s, %d, %s)' % (name, message, timeShown, iconimage))
+    xbmc.executebuiltin('Notification(%s, %s, %d, %s)' % (name, message, time_shown, iconimage))
 
 def view_set( name ):
 
@@ -134,8 +133,7 @@ def get_string( string_id ):
 
     if string_id >= 30000:
         return __language__( string_id )
-    else:
-        return xbmc.getLocalizedString( string_id )
+    return xbmc.getLocalizedString( string_id )
 
 def get_date_formatted( format_id, year, month, day ):
 
@@ -145,8 +143,7 @@ def get_date_formatted( format_id, year, month, day ):
         return month + '/' + day + '/' + year
     if format_id == '2':
         return day + '/' + month + '/' + year
-    else:
-        return year + '/' + month + '/' + day
+    return year + '/' + month + '/' + day
 
 def get_params():
 
