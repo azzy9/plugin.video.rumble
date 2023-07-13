@@ -16,7 +16,7 @@ Save the settings.<br />
 - View video comments<br />
 <br />
 <b>Issues</b><br />
-If an issue occures where the stream freezes after start,<br />
+If an issue occurs where the stream freezes after start,<br />
 you can try to enable http streams:<br />
 - Go to settings<br />
 - Debug<br />
