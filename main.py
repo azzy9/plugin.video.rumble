@@ -274,7 +274,7 @@ def dir_list_create( data, cat, video_type='video', search = False, play=False )
                 if '<svg' in channel_name:
                     channel_name = channel_name.split('<svg')[0] + " (Verified)"
 
-                video_title = '[B]' + clean_text( title.strip() ) + '[/B]\n[COLOR gold]' + channel_name.strip() + '[/COLOR]'
+                video_title = '[B]' + clean_text( title.strip() ) + '[/B]\n[COLOR gold]' + channel_name.strip().strip('"') + '[/COLOR]'
                 #open get url and open player
                 add_dir( video_title, BASE_URL + link.strip(), 4, str(img.strip()), str(img.strip()), '', cat, False, True, play, { 'name' : channel_link.strip(), 'subscribe': True }  )
 
@@ -290,7 +290,7 @@ def dir_list_create( data, cat, video_type='video', search = False, play=False )
                     img = MEDIA_DIR + 'letters/' + img_letter + '.png'
                 video_title = '[B]' + channel_name + '[/B]'
                 #open get url and open player
-                add_dir( video_title, BASE_URL + link, 3, img, img, '', 'other', True, True, play, { 'name' : link, 'subscribe': False } )
+                add_dir( video_title, BASE_URL + link.strip(), 3, img, img, '', 'other', True, True, play, { 'name' : link, 'subscribe': False } )
 
     else:
         channels = re.compile(r'a href=(.+?)>\s*<div class=\"channel-item--img\">\s*<i class=\'user-image user-image--img user-image--img--id-(.+?)\'></i>\s*</div>\s*<h3 class=channel-item--title>(.+?)</h3>\s*<span class=channel-item--subscribers>(.+?) subscribers</span>',re.DOTALL).findall(data)
