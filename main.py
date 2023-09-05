@@ -171,7 +171,7 @@ def pagination( url, page, cat, search=False ):
                 page_url = url + search
         elif search and cat == 'video':
             page_url = url + search + "&page=" + str( page )
-        elif cat in {'channel', 'user', 'other', 'subscriptions' }:
+        elif cat in {'channel', 'cat_video', 'user', 'other', 'subscriptions' }:
             page_url = url + "?page=" + str( page )
 
         if cat == 'following':
