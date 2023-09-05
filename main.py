@@ -164,6 +164,7 @@ def pagination( url, page, cat, search=False ):
 
         page = int(page)
         page_url = url
+        paginated = True
 
         if page == 1:
             if search:
@@ -173,9 +174,12 @@ def pagination( url, page, cat, search=False ):
         elif cat in {'channel', 'user', 'other', 'subscriptions' }:
             page_url = url + "?page=" + str( page )
 
+        if cat == 'following':
+            paginated = False
+
         amount = list_rumble( page_url, cat )
 
-        if amount > 15 and page < 10:
+        if paginated and amount > 15 and page < 10:
 
             # for next page
             page = page + 1
