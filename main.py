@@ -144,9 +144,9 @@ def home_menu():
     view_set('WideList')
     xbmcplugin.endOfDirectory(PLUGIN_ID, cacheToDisc=False)
 
-
-# search menu
 def search_menu():
+
+    """ Creates search menu """
 
     # Search Video
     add_dir( get_string(30100), BASE_URL + '/search/video?q=', 2, MEDIA_DIR + 'search.png', '', '', 'video' )
@@ -159,6 +159,8 @@ def search_menu():
 
 
 def pagination( url, page, cat, search=False ):
+
+    """ list directory items then show pagination """
 
     if url > '':
 
@@ -283,7 +285,7 @@ def dir_list_create( data, cat, video_type='video', search = False, play=False )
                 add_dir( video_title, BASE_URL + link.strip(), 4, str(img.strip()), str(img.strip()), '', cat, False, True, play, { 'name' : channel_link.strip(), 'subscribe': True }  )
 
     elif video_type == 'following':
-        following = re.compile(r'<a\s+class=\"main-menu-item-channel\s*(?:main-menu-item-channel-is-live)?\"\s+title=(?:\"[^\"]+\"|[^\s]+)\s+href=([^>]+)>\s*<div class=\"main-menu-item-channel-label-wrapper\">\s*<i class=\'user-image (?:user-image--img user-image--img--id-([^\']+)\')?(?:user-image--letter\' data-letter=([a-zA-Z]))?></i>\s*<span class=\"main-menu-item-label main-menu-item-channel-label\">([^<]+)</span>', re.MULTILINE|re.DOTALL|re.IGNORECASE).findall(data)
+        following = re.compile(r'<a\s+class=\"main-menu-item-channel\s*(?:main-menu-item-channel-is-live)?\"\s+title=(?:\"[^\"]+\"|[^\s]+)\s+href=([^>]+)>\s*<div class=\"main-menu-item-channel-label-wrapper\">\s*<i class=\'user-image (?:user-image--img user-image--img--id-([^\'\s]+)\s*(?:channel-live)?\')?(?:user-image--letter\' data-letter=([a-zA-Z]))?></i>\s*<span class=\"main-menu-item-label main-menu-item-channel-label\">([^<]+)</span>', re.MULTILINE|re.DOTALL|re.IGNORECASE).findall(data)
         if following:
             amount = len(following)
             for link, img_id, img_letter, channel_name in following:
@@ -294,7 +296,7 @@ def dir_list_create( data, cat, video_type='video', search = False, play=False )
                     img = MEDIA_DIR + 'letters/' + img_letter + '.png'
                 video_title = '[B]' + channel_name + '[/B]'
                 #open get url and open player
-                add_dir( video_title, BASE_URL + link.strip(), 3, img, img, '', 'other', True, True, play, { 'name' : link, 'subscribe': False } )
+                add_dir( video_title, BASE_URL + link.strip(), 3, img, img, '', 'other', True, True, play, { 'name' : link.strip(), 'subscribe': False } )
 
     else:
         channels = re.compile(r'a href=(.+?)>\s*<div class=\"channel-item--img\">\s*<i class=\'user-image user-image--img user-image--img--id-(.+?)\'></i>\s*</div>\s*<h3 class=channel-item--title>(.+?)</h3>\s*<span class=channel-item--subscribers>(.+?) subscribers</span>',re.DOTALL).findall(data)
