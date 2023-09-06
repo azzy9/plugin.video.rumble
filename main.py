@@ -213,7 +213,7 @@ def get_image( data, image_id ):
     """ method to get an image from scraped page's CSS from the image ID """
 
     image_re = re.compile(
-        "i.user-image--img--id-" + str( image_id ) + ".+?{ background-image: url(.+?);",
+        "i.user-image--img--id-" + str( image_id ) + ".+?{\s*background-image: url(.+?);",
         re.MULTILINE|re.DOTALL|re.IGNORECASE
     ).findall(data)
 
