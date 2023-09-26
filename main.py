@@ -319,7 +319,7 @@ def dir_list_create( data, cat, video_type='video', search = False, play=0 ):
                     img = str( get_image( data, img_id ) )
                 else:
                     img = MEDIA_DIR + 'letters/' + img_letter + '.png'
-                video_title = '[B]' + channel_name + '[/B]\n[COLOR palegreen]' + subscribers + '[/COLOR] [COLOR yellow]' + get_string(30155) + '[/COLOR]'
+                video_title = '[B]' + channel_name + '[/B]\n[COLOR palegreen]' + subscribers + '[/COLOR] [COLOR yellow]' + get_string(30156) + '[/COLOR]'
                 #open get url and open player
                 add_dir( video_title, BASE_URL + link, 3, img, img, '', cat, True, True, play, { 'name' : link, 'subscribe': True } )
 
