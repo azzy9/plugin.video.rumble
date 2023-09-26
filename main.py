@@ -151,9 +151,9 @@ def search_menu():
     # Search Video
     add_dir( get_string(30100), BASE_URL + '/search/video?q=', 2, MEDIA_DIR + 'search.png', '', '', 'video' )
     # Search Channel
-    add_dir( get_string(30101), BASE_URL + '/search/channel?q=',2,MEDIA_DIR + 'search.png', '', '', 'channel' )
+    add_dir( get_string(30101), BASE_URL + '/search/channel?q=', 2, MEDIA_DIR + 'search.png', '', '', 'channel' )
     # Search User
-    add_dir( get_string(30102), BASE_URL + '/search/channel?q=',2,MEDIA_DIR + 'search.png', '', '', 'user' )
+    add_dir( get_string(30102), BASE_URL + '/search/channel?q=', 2, MEDIA_DIR + 'search.png', '', '', 'user' )
     view_set('WideList')
     xbmcplugin.endOfDirectory(PLUGIN_ID)
 
@@ -254,7 +254,7 @@ def list_rumble( url, cat ):
     return amount
 
 
-def dir_list_create( data, cat, video_type='video', search = False, play=False ):
+def dir_list_create( data, cat, video_type='video', search = False, play=0 ):
 
     """ create and display dir list based upon type """
 
@@ -593,7 +593,7 @@ def subscribe( name, action ):
     return False
 
 
-def add_dir(name, url, mode, iconimage, fanart, description, cat, folder=True, fav_context=False, play=False, subscribe_context=False):
+def add_dir(name, url, mode, iconimage, fanart, description, cat, folder=True, fav_context=False, play=0, subscribe_context=False):
 
     """ Adds directory items """
 
@@ -711,7 +711,7 @@ def main():
 
     mode=int(params.get( 'mode', 0 ))
     page=int(params.get( 'page', 1 ))
-    play=int(params.get( 'play', 1 ))
+    play=int(params.get( 'play', 0 ))
     fav_mode=int(params.get( 'fav_mode', 0 ))
 
     url = params.get( 'url', None )
