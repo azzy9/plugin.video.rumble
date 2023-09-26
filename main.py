@@ -273,10 +273,10 @@ def dir_list_create( data, cat, video_type='video', search = False, play=False )
                 add_dir( video_title, BASE_URL + link, 4, str(img), str(img), '', cat, False, True, play, { 'name' : channel_link, 'subscribe': True }  )
 
     elif video_type == 'cat_video':
-        videos = re.compile(r'<img\s*class=\"videostream__image\"\s*src=(.+?)alt=\"([^\"]+)\"\s*(?:[^\>]+)>\s*<div class=\"videostream__info\">\s*<div class=\"videostream__badge videostream__status videostream__status--duration\">\s*(.+?)\s*</div>\s*</div>\s*</div>\s*</a>\s*<div class=\"videostream__footer\">\s*<a\s*class=\"link\"\s*href=([^\>]+)>\s*<h3 class=\"videostream__title clamp clamp-2\">\s*([^\<]+)</h3>\s*</a>\s*<address class=\"channel\">\s*<a\s*rel=\"author\"\s*class=\"channel__link link ([^\"]+)\"\s*href=([^\>]+)>\s*<div class=\"channel__avatar channel__border\">\s*<div\s*(?:[^>]+)>\s*</div>\s*</div>\s*<div>\s*<div class=\"channel__data\">\s*<span class=\"channel__name\">\s*([^\<]+)</span>', re.MULTILINE|re.DOTALL|re.IGNORECASE).findall(data)
+        videos = re.compile(r'<img\s*class=\"videostream__image\"\s*src=(.+?)alt=(?:\"[^\"]+\"|[^\"\s]+)\s*(?:[^\>]+)>\s*<div class=\"videostream__info\">\s*<div class=\"videostream__badge videostream__status videostream__status--duration\">\s*(.+?)\s*</div>\s*</div>\s*</div>\s*</a>\s*<div class=\"videostream__footer\">\s*<a\s*class=\"link\"\s*href=([^\>]+)>\s*<h3 class=\"videostream__title clamp-2\">\s*([^\<]+)</h3>\s*</a>\s*<address class=\"channel\">\s*<a\s*rel=\"author\"\s*class=\"channel__link link ([^\"]+)\"\s*href=([^\>]+)>\s*<div class=\"channel__avatar channel__border\">\s*<div\s*(?:[^>]+)>\s*</div>\s*</div>\s*<div>\s*<div class=\"channel__data\">\s*<span class=\"channel__name clamp-1\">\s*([^\<]+)</span>', re.MULTILINE|re.DOTALL|re.IGNORECASE).findall(data)
         if videos:
             amount = len(videos)
-            for img, title, video_length, link, alt_title, img_id, channel_link, channel_name in videos:
+            for img, video_length, link, title, img_id, channel_link, channel_name in videos:
                 if '<svg' in channel_name:
                     channel_name = channel_name.split('<svg')[0] + " (Verified)"
 
