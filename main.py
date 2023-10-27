@@ -285,7 +285,7 @@ def dir_list_create( data, cat, video_type='video', search = False, play=0 ):
                 add_dir( video_title, BASE_URL + link.strip(), 4, str(img.strip()), str(img.strip()), '', cat, False, True, play, { 'name' : channel_link.strip(), 'subscribe': True }  )
 
     elif video_type == 'following':
-        following = re.compile(r'<a\s*class=\"main-menu-item-channel \"\s*title=\"?(?:[^\"]+)\"?\s*href=([^>]+)>\s*<div class=\"main-menu-item-channel-label-wrapper\">\s*<i class=\'user-image (?:user-image--img user-image--img--id-([^\']+)\')?(?:user-image--letter\' data-letter=([a-zA-Z]))? data-js=user-image>\s*</i>\s*<span class=\"main-menu-item-label main-menu-item-channel-label\">([^<]+)</span>', re.MULTILINE|re.DOTALL|re.IGNORECASE).findall(data)
+        following = re.compile(r'<a\s*class=\"main-menu-item-channel\s*(?:main-menu-item-channel-is-live)?\"\s*title=\"?(?:[^\"]+)\"?\s*href=([^>\s]+)(?:\s*data-js=\"main_menu_live_channel\")?\s*>\s*<div class=\"main-menu-item-channel-label-wrapper\">\s*<i class=\'user-image (?:user-image--img user-image--img--id-([^\s\']+)\s*(?:channel-live)?\')?(?:user-image--letter\s*(?:channel-live)\' data-letter=([a-zA-Z]))? data-js=user-image>\s*</i>\s*<span class=\"main-menu-item-label main-menu-item-channel-label\">([^<]+)</span>', re.MULTILINE|re.DOTALL|re.IGNORECASE).findall(data)
         if following:
             amount = len(following)
             for link, img_id, img_letter, channel_name in following:
