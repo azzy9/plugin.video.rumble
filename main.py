@@ -285,7 +285,7 @@ def dir_list_create( data, cat, video_type='video', search = False, play=0 ):
                 add_dir( video_title, BASE_URL + link.strip(), 4, str(img.strip()), str(img.strip()), '', cat, False, True, play, { 'name' : channel_link.strip(), 'subscribe': True }  )
 
     elif video_type == 'following':
-        following = re.compile(r'<a\s+class=\"main-menu-item-channel\s*(?:main-menu-item-channel-is-live)?\"\s+title=(?:\"[^\"]+\"|[^\s]+)\s+href=([^>]+)>\s*<div class=\"main-menu-item-channel-label-wrapper\">\s*<i class=\'user-image (?:user-image--img user-image--img--id-([^\'\s]+)\s*(?:channel-live)?\')?(?:user-image--letter\' data-letter=([a-zA-Z]))?></i>\s*<span class=\"main-menu-item-label main-menu-item-channel-label\">([^<]+)</span>', re.MULTILINE|re.DOTALL|re.IGNORECASE).findall(data)
+        following = re.compile(r'<a\s*class=\"main-menu-item-channel \"\s*title=\"?(?:[^\"]+)\"?\s*href=([^>]+)>\s*<div class=\"main-menu-item-channel-label-wrapper\">\s*<i class=\'user-image (?:user-image--img user-image--img--id-([^\']+)\')?(?:user-image--letter\' data-letter=([a-zA-Z]))? data-js=user-image>\s*</i>\s*<span class=\"main-menu-item-label main-menu-item-channel-label\">([^<]+)</span>', re.MULTILINE|re.DOTALL|re.IGNORECASE).findall(data)
         if following:
             amount = len(following)
             for link, img_id, img_letter, channel_name in following:
@@ -294,12 +294,12 @@ def dir_list_create( data, cat, video_type='video', search = False, play=0 ):
                     img = str( get_image( data, img_id ) )
                 else:
                     img = MEDIA_DIR + 'letters/' + img_letter + '.png'
-                video_title = '[B]' + channel_name + '[/B]'
+                video_title = '[B]' + channel_name.strip() + '[/B]'
                 #open get url and open player
                 add_dir( video_title, BASE_URL + link.strip(), 3, img, img, '', 'other', True, True, play, { 'name' : link.strip(), 'subscribe': False } )
 
     else:
-        channels = re.compile(r'a class=channel-item--a href=(.+?)>\s*<div class=\"channel-item--img\">\s*<i class=\'user-image user-image--(?:img user-image--img--id-(.+?)|letter)\'(?: data-letter=([A-Z]))?>\s*</i>\s*</div>\s*<h3 class=channel-item--title>(.+?)</h3>\s*<span class=channel-item--subscribers>(.+?) followers</span>',re.DOTALL).findall(data)
+        channels = re.compile(r'a href=(.+?)>\s*<div class=\"channel-item--img\">\s*<i class=\'user-image (?:user-image--img user-image--img--id-([^\']+)\')?(?:user-image--letter\' data-letter=([a-zA-Z]))? data-js=user-image>\s*</i>\s*</div>\s*<h3 class=channel-item--title>(.+?)</h3>\s*<span class=channel-item--subscribers>(.+?) followers</span>',re.DOTALL).findall(data)
         if channels:
             amount = len(channels)
             for link, img_id, img_letter, channel_name, subscribers in channels:
