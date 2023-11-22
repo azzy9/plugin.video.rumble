@@ -619,6 +619,7 @@ def add_dir(name, url, mode, iconimage, fanart, description, cat, folder=True, f
         list_item.setArt({'icon': 'DefaultFolder.png', 'thumb': iconimage})
     else:
         list_item.setArt({'icon': 'DefaultVideo.png', 'thumb': iconimage})
+        xbmcplugin.setContent(PLUGIN_ID, 'videos')
 
     if play == 2 and mode == 4:
         list_item.setProperty('IsPlayable', 'true')
