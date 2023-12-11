@@ -12,7 +12,7 @@ class MD5Ex:
 
     def bit_shift( self, val1, val2, direction = 'r', zero_fill = False ):
 
-        """ bit_shift method to allow zer filled bitshift which is not supported by python """
+        """ bit_shift method to allow zero filled bitshift which is not supported by python """
 
         if direction == 'l':
             return val1 << val2
@@ -63,6 +63,8 @@ class MD5Ex:
 
     def binHashStretch( self, n, h, i ):
 
+        """ binHashStretch method """
+
         e = self.encUTF8(n)
         g = h + e
         o = 32 + len(e) << 3
@@ -85,6 +87,8 @@ class MD5Ex:
         return g
 
     def encUTF8( self, n ):
+
+        """ encUTF8 method """
 
         # return string
         r_str = ''
@@ -166,6 +170,8 @@ class MD5Ex:
 
     def binHexBin( self, n ):
 
+        """ binHexBin method """
+
         t = self.bit_shift( len(n), 5, 'l' )
         f = {}
         r = 0
@@ -209,20 +215,28 @@ class MD5Ex:
 
     def ff( self, n, h, i, r, t, f, e ):
 
+        """ ff method used in binHash """
+
         g = h & i | ~h & r
         return self.fghi(n, h, i, r, t, f, e, g)
 
     def gg( self, n, h, i, r, t, f, e ):
+
+        """ gg method used in binHash """
 
         g = h & r | i & ~r
         return self.fghi(n, h, i, r, t, f, e, g)
 
     def hh( self, n, h, i, r, t, f, e ):
 
+        """ hh method used in binHash """
+
         g = h ^ i ^ r
         return self.fghi(n, h, i, r, t, f, e, g)
 
     def ii( self, n, h, i, r, t, f, e ):
+
+        """ ii method used in binHash """
 
         g = i ^ (h | ~r)
         return self.fghi(n, h, i, r, t, f, e, g)
