@@ -248,6 +248,8 @@ def list_rumble( url, cat ):
         amount = dir_list_create( data, cat, 'cat_video', False, 2 )
     elif cat in { 'channel', 'user', 'top', 'other' }:
         amount = dir_list_create( data, cat, 'video', False, 2 )
+    elif cat in { 'channel_video' }:
+        amount = dir_list_create( data, cat, 'channel_video', False, 2 )
     elif cat == 'following':
         amount = dir_list_create( data, cat, 'following', False, 2 )
 
@@ -272,6 +274,19 @@ def dir_list_create( data, cat, video_type='video', search = False, play=0 ):
                 #open get url and open player
                 add_dir( video_title, BASE_URL + link, 4, str(img), str(img), '', cat, False, True, play, { 'name' : channel_link, 'subscribe': True }  )
 
+    elif video_type == 'channel_video':
+        videos = re.compile(r'<img\s*class=\"thumbnail__image\"\s*draggable=\"false\"\s*src=\"(.+?)\"\s*alt=(?:\"[^\"]+\"|[^\"\s]+)\s*(?:[^\>]+)>\s*<div\s*class=\"videostream__info\">\s*<div\s*class=\"videostream__badge videostream__status videostream__status--duration\"\s*>\s*(.+?)\s*</div>\s*</div>\s*<a class=\"videostream__link link\" draggable=\"false\" href=\"/(?:[^\>]+)\"></a>\s*</div>\s*<div class=\"videostream__footer\">\s*<a\s*class=\"title__link link\"\s*href=\"([^\>]+)\">\s*<h3\s*class=\"thumbnail__title clamp-2\"(?:[^\>]+)>\s*([^\<]+)</h3>\s*</a>', re.MULTILINE|re.DOTALL|re.IGNORECASE).findall(data)
+        if videos:
+            amount = len(videos)
+            for img, video_length, link, title in videos:
+
+                video_title = '[B]' + title.strip()+ '[/B]'
+
+                cat = 'other'
+
+                #open get url and open player
+                add_dir( video_title, BASE_URL + link.strip(), 4, img, img, '', cat, False, True, play, { 'name' : link.strip(), 'subscribe': False } )
+
     elif video_type == 'cat_video':
         videos = re.compile(r'<img\s*class=\"thumbnail__image\"\s*draggable=\"false\"\s*src=\"(.+?)\"\s*alt=(?:\"[^\"]+\"|[^\"\s]+)\s*(?:[^\>]+)>\s*<div\s*class=\"videostream__info\">\s*<div\s*class=\"videostream__badge videostream__status videostream__status--duration\"\s*>\s*(.+?)\s*</div>\s*</div>\s*<a class=\"videostream__link link\" draggable=\"false\" href=\"/(?:[^\>]+)\"></a>\s*</div>\s*<div class=\"videostream__footer\">\s*<a\s*class=\"title__link link\"\s*href=\"([^\>]+)\">\s*<h3\s*class=\"thumbnail__title clamp-2\"(?:[^\>]+)>\s*([^\<]+)</h3>\s*</a>\s*<address class=\"channel\">\s*<a\s*rel=\"author\"\s*class=\"channel__link link ([^\"]+)\"\s*href=([^\>]+)>\s*(?:<span class=\"channel__avatar channel__letter\"\s*(?:[^>]+)>\s*[a-z]\s*</span>|<div class=\"channel__avatar channel__border\">\s*<div\s*(?:[^>]+)>\s*</div>\s*</div>)\s*<div>\s*<div class=\"channel__data\">\s*<span class=\"channel__name clamp-1\"(?:[^\>]+)>\s*([^\<]+)</span>', re.MULTILINE|re.DOTALL|re.IGNORECASE).findall(data)
         if videos:
@@ -295,8 +310,13 @@ def dir_list_create( data, cat, video_type='video', search = False, play=0 ):
                 else:
                     img = MEDIA_DIR + 'letters/' + img_letter + '.png'
                 video_title = '[B]' + channel_name.strip() + '[/B]'
+
+                cat = 'other'
+                if '/user/' not in link:
+                    cat = 'channel_video'
+
                 #open get url and open player
-                add_dir( video_title, BASE_URL + link.strip(), 3, img, img, '', 'other', True, True, play, { 'name' : link.strip(), 'subscribe': False } )
+                add_dir( video_title, BASE_URL + link.strip(), 3, img, img, '', cat, True, True, play, { 'name' : link.strip(), 'subscribe': False } )
 
     else:
         channels = re.compile(r'a href=(.+?)>\s*<div class=\"channel-item--img\">\s*<i class=\'user-image (?:user-image--img user-image--img--id-([^\']+)\')?(?:user-image--letter\' data-letter=([a-zA-Z]))? data-js=user-image>\s*</i>\s*</div>\s*<h3 class=channel-item--title>(.+?)</h3>\s*<span class=channel-item--subscribers>(.+?) followers</span>',re.DOTALL).findall(data)
