@@ -239,6 +239,10 @@ def list_rumble( url, cat ):
 
     data = request_get(url, None, headers)
 
+    # Fix for favorites
+    if cat == 'other' and '/c/' in url:
+        cat = 'channel_video'
+
     if 'search' in url:
         if cat == 'video':
             amount = dir_list_create( data, cat, 'video', True, 1 )
