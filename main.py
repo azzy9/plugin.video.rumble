@@ -239,8 +239,8 @@ def list_rumble( url, cat ):
 
     data = request_get(url, None, headers)
 
-    # Fix for favorites
-    if cat == 'other' and '/c/' in url:
+    # Fix for favorites & search
+    if cat in { 'other', 'channel' } and '/c/' in url:
         cat = 'channel_video'
 
     if 'search' in url:
