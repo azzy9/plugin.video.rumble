@@ -6,6 +6,7 @@
     <category label="Login">
         <setting id="username" label="Username" type="text" default=""/>
         <setting id="password" label="Password" type="text" option="hidden" default=""/>
+        <setting id="loginTest" label="Test Login Details" type="action" action="RunPlugin(plugin://plugin.video.rumble/?mode=13)"/>
         <setting id="resetSession" label="Reset Session" type="action" action="RunPlugin(plugin://plugin.video.rumble/?mode=10)"/>
     </category>
     <category label="Debug">

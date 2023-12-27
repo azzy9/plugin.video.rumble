@@ -575,6 +575,19 @@ def login_session_reset():
     RUMBLE_USER.reset_session_details()
     notify( 'Session has been reset' )
 
+def login_test():
+
+    """ Method that resets session, then tests the login """
+
+    RUMBLE_USER.reset_session_details()
+
+    if RUMBLE_USER.has_login_details():
+        if RUMBLE_USER.login():
+            notify( 'Login Successful - Session has been set' )
+        else:
+            notify( 'Login Failed' )
+    else:
+        notify( 'No details detected - please login save details first before running' )
 
 def subscribe( name, action ):
 
@@ -814,6 +827,8 @@ def main():
         subscribe(name, cat)
     elif mode==12:
         comments_show(url)
+    elif mode==13:
+        login_test()
 
 if __name__ == "__main__":
     main()
