@@ -1,7 +1,7 @@
 """
 MD5Ex class
 Converted from JS to python by Azzy9
-This is a class to generate hashes that is used by the Rumble platform
+This is a class to generate hashes that is used by the Rumble platform to login
 """
 
 class MD5Ex:
@@ -201,7 +201,7 @@ class MD5Ex:
         """
         method that is used by ff,gg,hh,ii
         This was originally duplicated code in each method
-        reduced code by creating a n ew method for it
+        reduced code by creating a new method for it
         """
 
         o = (65535 & n) + (65535 & g) + (65535 & t) + (65535 & e)
@@ -252,7 +252,7 @@ class MD5Ex:
 
         tmp = self.bit_shift( h, 5 )
         n[ tmp ] = n.get( tmp, 0 ) | self.bit_shift( 128, (31 & h), 'l' )
-        tmp = 14 + self.bit_shift( ( h + 64 ), self.bit_shift( 9, 4, 'l' ), 'r', True )
+        tmp = 14 + self.bit_shift( self.bit_shift( ( h + 64 ), 9, 'r', True ), 4, 'l' )
         n[ tmp ] = h
         i = len(n)
         r = 0
