@@ -591,7 +591,7 @@ def login_test():
         else:
             notify( 'Login Failed' )
     else:
-        notify( 'No details detected - please login save details first before running' )
+        notify( 'No details detected - please save login details first before running' )
 
 def subscribe( name, action ):
 
