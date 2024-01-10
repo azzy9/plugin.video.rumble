@@ -157,8 +157,11 @@ def clean_text( text ):
 
     text = text.encode('ascii', 'ignore').decode('ascii').strip()
 
-    if r'&#' in text:
-        # replace common ascii codes, will expand if needed
-        text = text.replace(r'&#34;', '"').replace(r'&#38;', '&').replace(r'&#39;', '’')
+    if r'&' in text:
+        text = text.replace(r'&amp;', '&')
+
+        if r'&#' in text:
+            # replace common ascii codes, will expand if needed
+            text = text.replace(r'&#34;', '"').replace(r'&#38;', '&').replace(r'&#39;', '’')
 
     return text
