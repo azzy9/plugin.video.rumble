@@ -155,7 +155,7 @@ def clean_text( text ):
 
     """ Removes characters that can cause trouble """
 
-    text = text.encode('ascii', 'ignore').decode('ascii').strip()
+    text = text.strip()
 
     if r'&' in text:
         text = text.replace(r'&amp;', '&')
