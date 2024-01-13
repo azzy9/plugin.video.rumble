@@ -155,13 +155,18 @@ def clean_text( text ):
 
     """ Removes characters that can cause trouble """
 
+    if six.PY2:
+        # Python 2 Fix
+        # TODO: Provide a proper fix that doesn't revolve removing characters
+        text = text.encode('ascii', 'ignore').decode('ascii')
+
     text = text.strip()
 
     if r'&' in text:
-        text = text.replace(r'&amp;', '&')
+        text = text.replace(r'&amp;', r'&')
 
         if r'&#' in text:
             # replace common ascii codes, will expand if needed
-            text = text.replace(r'&#34;', '"').replace(r'&#38;', '&').replace(r'&#39;', '’')
+            text = text.replace(r'&#34;', r'"').replace(r'&#38;', r'&').replace(r'&#39;', r"'")
 
     return text
