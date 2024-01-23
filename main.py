@@ -248,9 +248,9 @@ def list_rumble( url, cat ):
             amount = dir_list_create( data, cat, 'video', True, 1 )
         else:
             amount = dir_list_create( data, cat, 'channel', True )
-    elif cat in { 'subscriptions', 'cat_video' }:
+    elif cat in { 'subscriptions', 'cat_video', 'user' }:
         amount = dir_list_create( data, cat, 'cat_video', False, 2 )
-    elif cat in { 'channel', 'user', 'top', 'other' }:
+    elif cat in { 'channel', 'top', 'other' }:
         amount = dir_list_create( data, cat, 'video', False, 2 )
     elif cat in { 'channel_video' }:
         amount = dir_list_create( data, cat, 'channel_video', False, 2 )
@@ -319,7 +319,7 @@ def dir_list_create( data, cat, video_type='video', search = False, play=0 ):
                     img = MEDIA_DIR + 'letters/' + img_letter + '.png'
                 video_title = '[B]' + channel_name.strip() + '[/B]'
 
-                cat = 'other'
+                cat = 'user'
                 if '/user/' not in link:
                     cat = 'channel_video'
 
