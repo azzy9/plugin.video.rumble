@@ -327,7 +327,7 @@ def dir_list_create( data, cat, video_type='video', search = False, play=0 ):
                 add_dir( video_title, BASE_URL + link.strip(), 3, img, img, '', cat, True, True, play, { 'name' : link.strip(), 'subscribe': False } )
 
     else:
-        channels = re.compile(r'a href=(.+?)>\s*<div class=\"channel-item--img\">\s*<i class=\'user-image (?:user-image--img user-image--img--id-([^\']+)\')?(?:user-image--letter\' data-letter=([a-zA-Z]))? data-js=user-image>\s*</i>\s*</div>\s*<h3 class=channel-item--title>(.+?)</h3>\s*<span class=channel-item--subscribers>(.+?) followers</span>',re.DOTALL).findall(data)
+        channels = re.compile(r'a href=(.+?)>\s*<div class=\"channel-item--img\">\s*<i class=\'user-image (?:user-image--img user-image--img--id-([^\']+)\')?(?:user-image--letter\' data-letter=([a-zA-Z]))? data-js=user-image>\s*</i>\s*</div>\s*<h3 class=channel-item--title>(.+?)</h3>\s*<span class=channel-item--subscribers>(.+?) Followers</span>',re.DOTALL).findall(data)
         if channels:
             amount = len(channels)
             for link, img_id, img_letter, channel_name, subscribers in channels:
