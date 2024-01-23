@@ -248,11 +248,11 @@ def list_rumble( url, cat ):
             amount = dir_list_create( data, cat, 'video', True, 1 )
         else:
             amount = dir_list_create( data, cat, 'channel', True )
-    elif cat in { 'subscriptions', 'cat_video', 'user' }:
+    elif cat in { 'subscriptions', 'cat_video' }:
         amount = dir_list_create( data, cat, 'cat_video', False, 2 )
     elif cat in { 'channel', 'top', 'other' }:
         amount = dir_list_create( data, cat, 'video', False, 2 )
-    elif cat in { 'channel_video' }:
+    elif cat in { 'channel_video', 'user' }:
         amount = dir_list_create( data, cat, 'channel_video', False, 2 )
     elif cat == 'following':
         amount = dir_list_create( data, cat, 'following', False, 2 )
