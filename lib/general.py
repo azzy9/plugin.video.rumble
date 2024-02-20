@@ -105,28 +105,6 @@ def notify( message, name=False, iconimage=False, time_shown=5000 ):
 
     xbmc.executebuiltin('Notification(%s, %s, %d, %s)' % (name, message, time_shown, iconimage))
 
-def view_set( name ):
-
-    """ sets view """
-
-    views = {
-        'fanart': 502,
-        'wall': 500,
-        'widelist': 55,
-        'infowall': 54,
-        'shift': 53,
-        'poster': 51,
-        'list': 50,
-    }
-
-    view_num = views.get( name.lower(), 0 )
-
-    if view_num > 0:
-        try:
-            xbmc.executebuiltin('Container.SetViewMode(' + str( view_num ) + ')')
-        except Exception:
-            pass
-
 def get_string( string_id ):
 
     """ gets language string based upon id """
