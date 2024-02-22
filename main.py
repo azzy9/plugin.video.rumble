@@ -123,8 +123,8 @@ def home_menu():
     # Battle Leaderboard
     add_dir( get_string(30052), BASE_URL + '/battle-leaderboard/recorded', 3, MEDIA_DIR + 'leader.png', '', '', 'top' )
 
-    # TODO: replace with getting catergories from https://rumble.com/browse
-    add_dir( get_string(29916), BASE_URL + '/browse', 3, MEDIA_DIR + 'viral.png', '', '', 'cat_list' )
+    # Getting categories
+    add_dir( 'Categories', BASE_URL + '/browse', 3, MEDIA_DIR + 'viral.png', '', '', 'cat_list' )
 
     # TODO: add livestream section from https://rumble.com/browse/live
 
@@ -244,6 +244,8 @@ def list_rumble( url, cat ):
         amount = dir_list_create( data, cat, 'channel_video', False, 2 )
     elif cat == 'following':
         amount = dir_list_create( data, cat, 'following', False, 2 )
+    elif cat == 'cat_list':
+        amount = dir_list_create( data, cat, cat, False )
 
     return amount
 
@@ -322,7 +324,7 @@ def dir_list_create( data, cat, video_type='video', search = False, play=0 ):
                 cat = 'channel_video'
 
                 #open get url and open player
-                add_dir( clean_text( title ), BASE_URL + link.strip(), 3, img, img, '', cat )
+                add_dir( clean_text( title ), BASE_URL + link.strip() + '/videos', 3, img, img, '', cat )
 
     elif video_type == 'following':
         following = re.compile(r'<a\s*class=\"main-menu-item-channel\s*(?:main-menu-item-channel-is-live)?\"\s*title=\"?(?:[^\"]+)\"?\s*href=([^>\s]+)(?:\s*data-js=\"main_menu_live_channel\")?\s*>\s*<div class=\"main-menu-item-channel-label-wrapper\">\s*<i class=\'user-image (?:user-image--img user-image--img--id-([^\s\']+)\s*(?:channel-live)?\')?(?:user-image--letter\s*(?:channel-live)?\' data-letter=([a-zA-Z]))? data-js=user-image>\s*</i>\s*<span class=\"main-menu-item-label main-menu-item-channel-label\">([^<]+)</span>', re.MULTILINE|re.DOTALL|re.IGNORECASE).findall(data)
