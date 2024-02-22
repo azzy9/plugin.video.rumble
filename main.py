@@ -124,22 +124,7 @@ def home_menu():
     add_dir( get_string(30052), BASE_URL + '/battle-leaderboard/recorded', 3, MEDIA_DIR + 'leader.png', '', '', 'top' )
 
     # TODO: replace with getting catergories from https://rumble.com/browse
-    # News
-    add_dir( get_string(29916), BASE_URL + '/category/news/videos', 3, MEDIA_DIR + 'news.png', '', '', 'cat_video' )
-    # Viral
-    add_dir( get_string(30050), BASE_URL + '/category/viral/videos', 3, MEDIA_DIR + 'viral.png', '', '', 'cat_video' )
-    # Podcasts
-    add_dir( get_string(30051), BASE_URL + '/category/podcasts/videos', 3, MEDIA_DIR +'podcast.png','','','cat_video')
-    # Entertainment
-    add_dir( get_string(30053), BASE_URL + '/category/entertainment/videos', 3, MEDIA_DIR + 'entertaiment.png', '', '', 'cat_video' )
-    # Sports
-    add_dir( get_string(19548), BASE_URL + '/category/sports/videos', 3, MEDIA_DIR + 'sports.png', '', '', 'cat_video' )
-    # Science
-    add_dir( get_string(29948), BASE_URL + '/category/science/videos', 3, MEDIA_DIR + 'science.png', '', '', 'cat_video' )
-    # Technology
-    add_dir( get_string(30054), BASE_URL + '/category/technology/videos', 3, MEDIA_DIR + 'technology.png', '', '', 'cat_video' )
-    # Vlogs
-    add_dir( get_string(30055), BASE_URL + '/category/vlogs/videos', 3, MEDIA_DIR + 'vlog.png', '', '', 'cat_video' )
+    add_dir( get_string(29916), BASE_URL + '/browse', 3, MEDIA_DIR + 'viral.png', '', '', 'cat_list' )
 
     # TODO: add livestream section from https://rumble.com/browse/live
 
@@ -180,7 +165,7 @@ def pagination( url, page, cat, search=False ):
         elif cat in {'channel', 'cat_video', 'user', 'other', 'subscriptions' }:
             page_url = url + "?page=" + str( page )
 
-        if cat in { 'following', 'top' }:
+        if cat in { 'following', 'top', 'cat_list' }:
             paginated = False
 
         amount = list_rumble( page_url, cat )
@@ -328,6 +313,17 @@ def dir_list_create( data, cat, video_type='video', search = False, play=0 ):
         
         return amount
 
+    elif video_type == 'cat_list':
+        cat_list = re.compile(r'<a\s*class=\"category__link link\"\s*href=\"([^\"]+)\"\s*>\s*<img\s*class=\"category__image\"\s*src=\"([^\"]+)\"\s*alt=(?:[^\>]+)>\s*<strong class=\"category__title\">([^\<]+)</strong>', re.DOTALL|re.IGNORECASE).findall(data)
+        if cat_list:
+            amount = len(cat_list)
+            for link, img, title in cat_list:
+
+                cat = 'channel_video'
+
+                #open get url and open player
+                add_dir( clean_text( title ), BASE_URL + link.strip(), 3, img, img, '', cat )
+
     elif video_type == 'following':
         following = re.compile(r'<a\s*class=\"main-menu-item-channel\s*(?:main-menu-item-channel-is-live)?\"\s*title=\"?(?:[^\"]+)\"?\s*href=([^>\s]+)(?:\s*data-js=\"main_menu_live_channel\")?\s*>\s*<div class=\"main-menu-item-channel-label-wrapper\">\s*<i class=\'user-image (?:user-image--img user-image--img--id-([^\s\']+)\s*(?:channel-live)?\')?(?:user-image--letter\s*(?:channel-live)?\' data-letter=([a-zA-Z]))? data-js=user-image>\s*</i>\s*<span class=\"main-menu-item-label main-menu-item-channel-label\">([^<]+)</span>', re.MULTILINE|re.DOTALL|re.IGNORECASE).findall(data)
         if following:
@@ -348,6 +344,7 @@ def dir_list_create( data, cat, video_type='video', search = False, play=0 ):
                 add_dir( video_title, BASE_URL + link.strip(), 3, img, img, '', cat, True, True, play, { 'name' : link.strip(), 'subscribe': False } )
 
     else:
+
         channels = re.compile(r'a href=(.+?)>\s*<div class=\"channel-item--img\">\s*<i class=\'user-image (?:user-image--img user-image--img--id-([^\']+)\')?(?:user-image--letter\' data-letter=([a-zA-Z]))? data-js=user-image>\s*</i>\s*</div>\s*<h3 class=channel-item--title>(.+?)</h3>\s*<span class=channel-item--subscribers>(.+?) Followers</span>',re.DOTALL).findall(data)
         if channels:
             amount = len(channels)
