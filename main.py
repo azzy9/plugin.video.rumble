@@ -123,10 +123,11 @@ def home_menu():
     # Battle Leaderboard
     add_dir( get_string(30052), BASE_URL + '/battle-leaderboard/recorded', 3, MEDIA_DIR + 'leader.png', '', '', 'top' )
 
-    # Getting categories
+    # Categories
     add_dir( 'Categories', BASE_URL + '/browse', 3, MEDIA_DIR + 'viral.png', '', '', 'cat_list' )
 
-    # TODO: add livestream section from https://rumble.com/browse/live
+    # Live Streams
+    add_dir( 'Live Streams', BASE_URL + '/browse/live', 3, MEDIA_DIR + 'viral.png', '', '', 'live_stream' )
 
     # Settings
     add_dir( get_string(5), '', 8, MEDIA_DIR + 'settings.png', '', '', '' )
@@ -236,7 +237,7 @@ def list_rumble( url, cat ):
             amount = dir_list_create( data, cat, 'video', True, 1 )
         else:
             amount = dir_list_create( data, cat, 'channel', True )
-    elif cat in { 'subscriptions', 'cat_video' }:
+    elif cat in { 'subscriptions', 'cat_video', 'live_stream' }:
         amount = dir_list_create( data, cat, cat, False, 2 )
     elif cat in { 'channel', 'top', 'other' }:
         amount = dir_list_create( data, cat, 'video', False, 2 )
@@ -282,9 +283,13 @@ def dir_list_create( data, cat, video_type='video', search = False, play=0 ):
                 #open get url and open player
                 add_dir( video_title, BASE_URL + link.strip(), 4, img, img, '', cat, False, True, play, { 'name' : link.strip(), 'subscribe': False } )
 
-    elif video_type in { 'cat_video', 'subscriptions' }:
+    elif video_type in { 'cat_video', 'subscriptions', 'live_stream' }:
 
-        videos = re.compile(r'<ol\s*class="thumbnail__grid">(.*)</ol>', re.DOTALL|re.IGNORECASE).findall(data)
+        if video_type == 'live_stream':
+            videos = data.split('<div class="thumbnail__grid" role="list">')
+            videos.pop(0)
+        else:
+            videos = re.compile(r'<ol\s*class=\"thumbnail__grid\">(.*)</ol>', re.DOTALL|re.IGNORECASE).findall(data)
 
         if videos:
             videos = videos[0].split('"videostream thumbnail__grid-')
