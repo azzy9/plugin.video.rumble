@@ -110,40 +110,40 @@ def home_menu():
     """ Creates home menu """
 
     # Search
-    add_dir( get_string(137), '', 1, MEDIA_DIR + 'search.png', '', '' ,'' )
+    add_dir( get_string(137), '', 1, { 'thumb': MEDIA_DIR + 'search.png' }, '' ,'' )
     # Favorites
-    add_dir( get_string(1036), '', 7, MEDIA_DIR + 'favorite.png', '', '', '' )
+    add_dir( get_string(1036), '', 7, { 'thumb': MEDIA_DIR + 'favorite.png' }, '', '' )
 
     if RUMBLE_USER.has_login_details():
         # subscriptions
-        add_dir( 'Subscriptions', BASE_URL + '/subscriptions', 3, MEDIA_DIR + 'favorite.png', '', '', 'subscriptions' )
+        add_dir( 'Subscriptions', BASE_URL + '/subscriptions', 3, { 'thumb': MEDIA_DIR + 'favorite.png' }, '', 'subscriptions' )
         # subscriptions
-        add_dir( 'Following', BASE_URL + '/', 3, MEDIA_DIR + 'favorite.png', '', '', 'following' )
+        add_dir( 'Following', BASE_URL + '/', 3, { 'thumb': MEDIA_DIR + 'favorite.png' }, '', 'following' )
 
     # Battle Leaderboard
-    add_dir( get_string(30052), BASE_URL + '/battle-leaderboard/recorded', 3, MEDIA_DIR + 'leader.png', '', '', 'top' )
+    add_dir( get_string(30052), BASE_URL + '/battle-leaderboard/recorded', 3, { 'thumb': MEDIA_DIR + 'leader.png' }, '', 'top' )
 
     # Categories
-    add_dir( 'Categories', BASE_URL + '/browse', 3, MEDIA_DIR + 'viral.png', '', '', 'cat_list' )
+    add_dir( 'Categories', BASE_URL + '/browse', 3, { 'thumb': MEDIA_DIR + 'viral.png' }, '', 'cat_list' )
 
     # Live Streams
-    add_dir( 'Live Streams', BASE_URL + '/browse/live', 3, MEDIA_DIR + 'viral.png', '', '', 'live_stream' )
+    add_dir( 'Live Streams', BASE_URL + '/browse/live', 3, { 'thumb': MEDIA_DIR + 'viral.png' }, '', 'live_stream' )
 
     # Settings
-    add_dir( get_string(5), '', 8, MEDIA_DIR + 'settings.png', '', '', '' )
+    add_dir( get_string(5), '', 8, { 'thumb': MEDIA_DIR + 'settings.png' }, '', '' )
 
-    xbmcplugin.endOfDirectory(PLUGIN_ID, cacheToDisc=False)
+    xbmcplugin.endOfDirectory( PLUGIN_ID, cacheToDisc=False )
 
 def search_menu():
 
     """ Creates search menu """
 
     # Search Video
-    add_dir( get_string(30100), BASE_URL + '/search/video?q=', 2, MEDIA_DIR + 'search.png', '', '', 'video' )
+    add_dir( get_string(30100), BASE_URL + '/search/video?q=', 2, { 'thumb': MEDIA_DIR + 'search.png' }, '', 'video' )
     # Search Channel
-    add_dir( get_string(30101), BASE_URL + '/search/channel?q=', 2, MEDIA_DIR + 'search.png', '', '', 'channel' )
+    add_dir( get_string(30101), BASE_URL + '/search/channel?q=', 2, { 'thumb': MEDIA_DIR + 'search.png' }, '', 'channel' )
     # Search User
-    add_dir( get_string(30102), BASE_URL + '/search/channel?q=', 2, MEDIA_DIR + 'search.png', '', '', 'user' )
+    add_dir( get_string(30102), BASE_URL + '/search/channel?q=', 2, { 'thumb': MEDIA_DIR + 'search.png' }, '', 'user' )
 
     xbmcplugin.endOfDirectory(PLUGIN_ID)
 
@@ -266,8 +266,10 @@ def dir_list_create( data, cat, video_type='video', search = False, play=0 ):
                     channel_name = channel_name.split('<svg')[0] + " (Verified)"
 
                 video_title = '[B]' + clean_text( title ) + '[/B]\n[COLOR gold]' + channel_name + '[/COLOR] - [COLOR lime]' + get_date_formatted( DATE_FORMAT, year, month, day ) + '[/COLOR]'
+                images = { 'thumb': str(img), 'fanart': str(img) }
+
                 #open get url and open player
-                add_dir( video_title, BASE_URL + link, 4, str(img), str(img), '', cat, False, True, play, { 'name' : channel_link, 'subscribe': True }  )
+                add_dir( video_title, BASE_URL + link, 4, images, '', cat, False, True, play, { 'name' : channel_link, 'subscribe': True }  )
 
     elif video_type == 'channel_video':
 
@@ -279,9 +281,10 @@ def dir_list_create( data, cat, video_type='video', search = False, play=0 ):
                 video_title = '[B]' + clean_text( title ) + '[/B]'
 
                 cat = 'other'
+                images = { 'thumb': str(img), 'fanart': str(img) }
 
                 #open get url and open player
-                add_dir( video_title, BASE_URL + link.strip(), 4, img, img, '', cat, False, True, play, { 'name' : link.strip(), 'subscribe': False } )
+                add_dir( video_title, BASE_URL + link.strip(), 4, images, '', cat, False, True, play, { 'name' : link.strip(), 'subscribe': False } )
 
     elif video_type in { 'cat_video', 'subscriptions', 'live_stream' }:
 
@@ -315,8 +318,10 @@ def dir_list_create( data, cat, video_type='video', search = False, play=0 ):
                         video_title += " (Verified)"
                     video_title += '[/COLOR]'
 
+                images = { 'thumb': str(img[0]), 'fanart': str(img[0]) }
+
                 #open get url and open player
-                add_dir( video_title, BASE_URL + link[0], 4, str( img[0] ), str( img[0] ), '', cat, False, True, play, { 'name' : channel_link[0], 'subscribe': True }  )
+                add_dir( video_title, BASE_URL + link[0], 4, images, '', cat, False, True, play, { 'name' : channel_link[0], 'subscribe': True }  )
         
         return amount
 
@@ -327,9 +332,10 @@ def dir_list_create( data, cat, video_type='video', search = False, play=0 ):
             for link, img, title in cat_list:
 
                 cat = 'channel_video'
+                images = { 'thumb': str(img), 'fanart': str(img) }
 
                 #open get url and open player
-                add_dir( clean_text( title ), BASE_URL + link.strip() + '/videos', 3, img, img, '', cat )
+                add_dir( clean_text( title ), BASE_URL + link.strip() + '/videos', 3, images, '', cat )
 
     elif video_type == 'following':
         following = re.compile(r'<a\s*class=\"main-menu-item-channel\s*(?:main-menu-item-channel-is-live)?\"\s*title=\"?(?:[^\"]+)\"?\s*href=([^>\s]+)(?:\s*data-js=\"main_menu_live_channel\")?\s*>\s*<div class=\"main-menu-item-channel-label-wrapper\">\s*<i class=\'user-image (?:user-image--img user-image--img--id-([^\s\']+)\s*(?:channel-live)?\')?(?:user-image--letter\s*(?:channel-live)?\' data-letter=([a-zA-Z]))? data-js=user-image>\s*</i>\s*<span class=\"main-menu-item-label main-menu-item-channel-label\">([^<]+)</span>', re.MULTILINE|re.DOTALL|re.IGNORECASE).findall(data)
@@ -346,9 +352,10 @@ def dir_list_create( data, cat, video_type='video', search = False, play=0 ):
                 cat = 'user'
                 if '/user/' not in link:
                     cat = 'channel_video'
+                images = { 'thumb': str(img), 'fanart': str(img) }
 
                 #open get url and open player
-                add_dir( video_title, BASE_URL + link.strip(), 3, img, img, '', cat, True, True, play, { 'name' : link.strip(), 'subscribe': False } )
+                add_dir( video_title, BASE_URL + link.strip(), 3, images, '', cat, True, True, play, { 'name' : link.strip(), 'subscribe': False } )
 
     else:
 
@@ -372,9 +379,11 @@ def dir_list_create( data, cat, video_type='video', search = False, play=0 ):
                     img = str( get_image( data, img_id ) )
                 else:
                     img = MEDIA_DIR + 'letters/' + img_letter + '.png'
+                images = { 'thumb': str(img), 'fanart': str(img) }
+
                 video_title = '[B]' + channel_name + '[/B]\n[COLOR palegreen]' + subscribers + '[/COLOR] [COLOR yellow]' + get_string(30156) + '[/COLOR]'
                 #open get url and open player
-                add_dir( video_title, BASE_URL + link, 3, img, img, '', cat, True, True, play, { 'name' : link, 'subscribe': True } )
+                add_dir( video_title, BASE_URL + link, 3, images, '', cat, True, True, play, { 'name' : link, 'subscribe': True } )
 
     return amount
 
@@ -449,7 +458,7 @@ def resolver( url ):
     return media_url
 
 
-def play_video( name, url, iconimage, play=2 ):
+def play_video( name, url, thumb, play=2 ):
 
     """ method to play video """
 
@@ -463,7 +472,7 @@ def play_video( name, url, iconimage, play=2 ):
             url = url.replace('https://', 'http://', 1)
 
         list_item = xbmcgui.ListItem(name, path=url)
-        list_item.setArt({'icon': iconimage, 'thumb': iconimage})
+        list_item.setArt({'icon': thumb, 'thumb': thumb})
 
         if KODI_VERSION > 19.8:
             vidtag = list_item.getVideoInfoTag()
@@ -508,14 +517,13 @@ def favorites_show():
                 name = i[0]
                 url = i[1]
                 mode = i[2]
-                iconimage = i[3]
-                fan_art = i[4]
+                images = { 'thumb': str(i[3]), 'fanart': str(i[4]) } 
                 description = i[5]
                 cat = i[6]
                 folder = ( i[7] == 'True' )
                 play = i[8]
-
-                add_dir( name, url, mode, str(iconimage), str(fan_art), str(description), cat, folder, True, int(play) )
+        
+                add_dir( name, url, mode, images, str(description), cat, folder, True, int(play) )
 
             xbmcplugin.endOfDirectory(PLUGIN_ID)
         else:
@@ -526,17 +534,17 @@ def favorites_show():
         xbmcplugin.endOfDirectory(PLUGIN_ID)
 
 
-def favorite_add(name, url, fav_mode, iconimage, fanart, description, cat, folder, play):
+def favorite_add(name, url, fav_mode, thumb, fanart, description, cat, folder, play):
 
     """ add favorite from name """
 
     data = favorites_load()
-    data.append((name, url, fav_mode, iconimage, fanart, description, cat, folder, play))
+    data.append((name, url, fav_mode, thumb, fanart, description, cat, folder, play))
     fav_file = open( favorites, 'w' )
     fav_file.write(json.dumps(data))
     fav_file.close()
 
-    notify( get_string(30152), name, iconimage )
+    notify( get_string(30152), name, thumb )
 
 
 def favorite_remove( name ):
@@ -659,16 +667,21 @@ def subscribe( name, action ):
     return False
 
 
-def add_dir(name, url, mode, iconimage, fanart, description, cat, folder=True, fav_context=False, play=0, subscribe_context=False):
+def add_dir( name, url, mode, images = {}, description = '', cat = '', folder=True, fav_context=False, play=0, subscribe_context=False ):
 
     """ Adds directory items """
+
+    art_dict = {
+        'thumb': images.get( 'thumb', '' ),
+        'fanart': images.get( 'fanart', HOME_DIR + 'fanart.jpg' ),
+    }
 
     link_params = {
         'url': url,
         'mode': str( mode ),
         'name': name,
-        'fanart': fanart,
-        'iconimage': iconimage,
+        'thumb': art_dict[ 'thumb' ],
+        'fanart': art_dict[ 'fanart' ],
         'description': description,
         'cat': cat,
     }
@@ -682,9 +695,9 @@ def add_dir(name, url, mode, iconimage, fanart, description, cat, folder=True, f
 
     list_item = xbmcgui.ListItem( name )
     if folder:
-        list_item.setArt({'icon': 'DefaultFolder.png', 'thumb': iconimage})
+        list_item.setArt({'icon': 'DefaultFolder.png', 'thumb': art_dict[ 'thumb' ]})
     else:
-        list_item.setArt({'icon': 'DefaultVideo.png', 'thumb': iconimage})
+        list_item.setArt({'icon': 'DefaultVideo.png', 'thumb': art_dict[ 'thumb' ]})
         xbmcplugin.setContent(PLUGIN_ID, 'videos')
 
     if play == 2 and mode == 4:
@@ -699,10 +712,7 @@ def add_dir(name, url, mode, iconimage, fanart, description, cat, folder=True, f
     else:
         list_item.setInfo(type='Video', infoLabels={'Title': name, 'Plot': description})
 
-    if fanart > '':
-        list_item.setProperty('fanart_image', fanart)
-    else:
-        list_item.setProperty('fanart_image', HOME_DIR + 'fanart.jpg')
+    list_item.setProperty( 'fanart_image', art_dict[ 'fanart' ] )
 
     if RUMBLE_USER.has_login_details():
 
@@ -734,8 +744,8 @@ def add_dir(name, url, mode, iconimage, fanart, description, cat, folder=True, f
                     'url': url,
                     'mode': '5',
                     'name': name,
-                    'fanart': fanart,
-                    'iconimage': iconimage,
+                    'thumb': art_dict[ 'thumb' ],
+                    'fanart': art_dict[ 'fanart' ],
                     'description': description,
                     'cat': cat,
                     'folder': str(folder),
@@ -789,9 +799,9 @@ def main():
     if name:
         name = urllib.parse.unquote_plus(name)
 
-    iconimage=params.get( 'iconimage', None )
-    if iconimage:
-        iconimage=urllib.parse.unquote_plus(iconimage)
+    thumb=params.get( 'thumb', None )
+    if thumb:
+        thumb=urllib.parse.unquote_plus(thumb)
 
     fanart=params.get( 'fanart', None )
     if fanart:
@@ -834,14 +844,14 @@ def main():
         else:
             pagination(url, page, cat)
     elif mode==4:
-        play_video(name, url, iconimage, play)
+        play_video(name, url, thumb, play)
     elif mode in [5,6]:
         if '\\ ' in name:
             name = name.split('\\ ')[1]
         if '  - ' in name:
             name = name.split('  - ')[0]
         if mode == 5:
-            favorite_add( name, url, fav_mode, iconimage, fanart, description, cat, str(folder), str(play) )
+            favorite_add( name, url, fav_mode, thumb, fanart, description, cat, str(folder), str(play) )
         else:
             favorite_remove( name )
     elif mode==7:
