@@ -110,27 +110,27 @@ def home_menu():
     """ Creates home menu """
 
     # Search
-    add_dir( get_string(137), '', 1, { 'thumb': MEDIA_DIR + 'search.png' }, '' ,'' )
+    add_dir( get_string(137), '', 1, { 'thumb': 'search.png' }, '' ,'' )
     # Favorites
-    add_dir( get_string(1036), '', 7, { 'thumb': MEDIA_DIR + 'favorite.png' }, '', '' )
+    add_dir( get_string(1036), '', 7, { 'thumb': 'favorite.png' }, '', '' )
 
     if RUMBLE_USER.has_login_details():
         # subscriptions
-        add_dir( 'Subscriptions', BASE_URL + '/subscriptions', 3, { 'thumb': MEDIA_DIR + 'favorite.png' }, '', 'subscriptions' )
+        add_dir( 'Subscriptions', BASE_URL + '/subscriptions', 3, { 'thumb': 'favorite.png' }, '', 'subscriptions' )
         # subscriptions
-        add_dir( 'Following', BASE_URL + '/', 3, { 'thumb': MEDIA_DIR + 'favorite.png' }, '', 'following' )
+        add_dir( 'Following', BASE_URL + '/', 3, { 'thumb': 'favorite.png' }, '', 'following' )
 
     # Battle Leaderboard
-    add_dir( get_string(30052), BASE_URL + '/battle-leaderboard/recorded', 3, { 'thumb': MEDIA_DIR + 'leader.png' }, '', 'top' )
+    add_dir( get_string(30052), BASE_URL + '/battle-leaderboard/recorded', 3, { 'thumb': 'leader.png' }, '', 'top' )
 
     # Categories
-    add_dir( 'Categories', BASE_URL + '/browse', 3, { 'thumb': MEDIA_DIR + 'viral.png' }, '', 'cat_list' )
+    add_dir( 'Categories', BASE_URL + '/browse', 3, { 'thumb': 'viral.png' }, '', 'cat_list' )
 
     # Live Streams
-    add_dir( 'Live Streams', BASE_URL + '/browse/live', 3, { 'thumb': MEDIA_DIR + 'viral.png' }, '', 'live_stream' )
+    add_dir( 'Live Streams', BASE_URL + '/browse/live', 3, { 'thumb': 'viral.png' }, '', 'live_stream' )
 
     # Settings
-    add_dir( get_string(5), '', 8, { 'thumb': MEDIA_DIR + 'settings.png' }, '', '' )
+    add_dir( get_string(5), '', 8, { 'thumb': 'settings.png' }, '', '' )
 
     xbmcplugin.endOfDirectory( PLUGIN_ID, cacheToDisc=False )
 
@@ -139,11 +139,11 @@ def search_menu():
     """ Creates search menu """
 
     # Search Video
-    add_dir( get_string(30100), BASE_URL + '/search/video?q=', 2, { 'thumb': MEDIA_DIR + 'search.png' }, '', 'video' )
+    add_dir( get_string(30100), BASE_URL + '/search/video?q=', 2, { 'thumb': 'search.png' }, '', 'video' )
     # Search Channel
-    add_dir( get_string(30101), BASE_URL + '/search/channel?q=', 2, { 'thumb': MEDIA_DIR + 'search.png' }, '', 'channel' )
+    add_dir( get_string(30101), BASE_URL + '/search/channel?q=', 2, { 'thumb': 'search.png' }, '', 'channel' )
     # Search User
-    add_dir( get_string(30102), BASE_URL + '/search/channel?q=', 2, { 'thumb': MEDIA_DIR + 'search.png' }, '', 'user' )
+    add_dir( get_string(30102), BASE_URL + '/search/channel?q=', 2, { 'thumb': 'search.png' }, '', 'user' )
 
     xbmcplugin.endOfDirectory(PLUGIN_ID)
 
@@ -672,9 +672,17 @@ def add_dir( name, url, mode, images = {}, description = '', cat = '', folder=Tr
     """ Adds directory items """
 
     art_dict = {
-        'thumb': images.get( 'thumb', '' ),
+        'thumb': images.get( 'thumb', HOME_DIR + 'icon.png' ),
         'fanart': images.get( 'fanart', HOME_DIR + 'fanart.jpg' ),
     }
+
+    # set default image location to MEDIA_DIR
+    for art_type in art_dict:
+        if art_dict[ art_type ]:
+            if not art_dict[ art_type ].startswith( HOME_DIR ) and \
+                not art_dict[ art_type ].startswith( 'http' ) and \
+                not art_dict[ art_type ].startswith( '\\' ):
+                art_dict[ art_type ] = MEDIA_DIR + art_dict[ art_type ]
 
     link_params = {
         'url': url,
