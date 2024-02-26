@@ -163,7 +163,7 @@ def pagination( url, page, cat, search=False ):
                 page_url = url + search
         elif search and cat == 'video':
             page_url = url + search + "&page=" + str( page )
-        elif cat in {'channel', 'cat_video', 'user', 'other', 'subscriptions' }:
+        elif cat in {'channel', 'cat_video', 'user', 'other', 'subscriptions', 'live_stream' }:
             page_url = url + "?page=" + str( page )
 
         if cat in { 'following', 'top', 'cat_list' }:
@@ -289,10 +289,10 @@ def dir_list_create( data, cat, video_type='video', search = False, play=0 ):
     elif video_type in { 'cat_video', 'subscriptions', 'live_stream' }:
 
         if video_type == 'live_stream':
-            videos = data.split('<div class="thumbnail__grid" role="list">')
-            videos.pop(0)
+            videos_regex = r'<div class="thumbnail__grid" role="list">(.*)<nav class="paginator">'
         else:
-            videos = re.compile(r'<ol\s*class=\"thumbnail__grid\">(.*)</ol>', re.DOTALL|re.IGNORECASE).findall(data)
+            videos_regex = r'<ol\s*class=\"thumbnail__grid\">(.*)</ol>'
+        videos = re.compile(videos_regex, re.DOTALL|re.IGNORECASE).findall(data)
 
         if videos:
             videos = videos[0].split('"videostream thumbnail__grid-')
