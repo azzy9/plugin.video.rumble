@@ -320,6 +320,11 @@ def dir_list_create( data, cat, video_type='video', search = False, play=0 ):
                         video_title += " (Verified)"
                     video_title += '[/COLOR]'
 
+                date_time = re.compile(r'<time\s*class=\"(?:[^\"]+)\"\s*datetime=\"(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})-(\d{2}):(\d{2})\"', re.DOTALL|re.IGNORECASE).findall(video)
+
+                if date_time:
+                    video_title += ' - [COLOR lime]' + get_date_formatted( DATE_FORMAT, date_time[0][0], date_time[0][1], date_time[0][2] ) + '[/COLOR]'
+
                 images = { 'thumb': str(img[0]), 'fanart': str(img[0]) }
 
                 #open get url and open player
