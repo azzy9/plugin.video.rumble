@@ -306,8 +306,10 @@ def dir_list_create( data, cat, video_type='video', search = False, play=0 ):
                 title = re.compile(r'<h3(?:[^\>]+)?>(.*)</h3>', re.DOTALL|re.IGNORECASE).findall(video)
                 link = re.compile(r'<a\sclass="videostream__link link"\sdraggable="false"\shref="([^\"]+)">', re.DOTALL|re.IGNORECASE).findall(video)
                 img = re.compile(r'<img\s*class=\"thumbnail__image\"\s*draggable=\"false\"\s*src=\"([^\"]+)\"', re.DOTALL|re.IGNORECASE).findall(video)
-    
+
                 video_title = '[B]' + clean_text( title[0] ) + '[/B]'
+                if ( 'videostream__status--live' in video ):
+                    video_title += ' [COLOR red](Live)[/COLOR]'
     
                 channel_name = re.compile(r'<span\sclass="channel__name(?:[^\"]+)" title="(?:[^\"]+)">([^\<]+)</span>(\s*<svg class=channel__verified)?', re.DOTALL|re.IGNORECASE).findall(video)
                 channel_link = re.compile(r'<a\s*rel=\"author\"\s*class=\"channel__link\slink\s(?:[^\"]+)\"\s*href=\"([^\"]+)\"\s*>', re.DOTALL|re.IGNORECASE).findall(video)
@@ -322,7 +324,7 @@ def dir_list_create( data, cat, video_type='video', search = False, play=0 ):
 
                 #open get url and open player
                 add_dir( video_title, BASE_URL + link[0], 4, images, '', cat, False, True, play, { 'name' : channel_link[0], 'subscribe': True }  )
-        
+
         return amount
 
     elif video_type == 'cat_list':
