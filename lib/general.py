@@ -134,7 +134,7 @@ def duration_to_secs( duration, fail_return = '' ):
 
             time_element_amount = len( duration.split( ':' ) )
 
-            # ensure time sring is complete
+            # ensure time string is complete
             if time_element_amount == 2:
                 duration = '0:' + duration
 

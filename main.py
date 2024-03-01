@@ -258,7 +258,7 @@ def dir_list_create( data, cat, video_type='video', search = False, play=0 ):
     amount = 0
 
     if video_type == 'video':
-        videos = re.compile(r'a href=([^\>]+)><div class=\"(?:[^\"]+)\"><img\s*class=\"video-item--img\"\s*src=\"([^\"]+)\"\s*alt=\"(?:[^\"]+)\"\s*>(?:<span class=\"video-item--watching\">[^\<]+</span>)?(?:<div class=video-item--overlay-rank>(?:[0-9]+)</div>)?</div><(?:[^\>]+)></span></a><div class=\"video-item--info\"><time class=\"video-item--meta video-item--time\" datetime=(.+?)-(.+?)-(.+?)T(?:.+?) title\=\"(?:[^\"]+)\">(?:[^\<]+)</time><h3 class=video-item--title>(.+?)</h3><address(?:[^\>]+)><a rel=author class=\"(?:[^\=]+)=(.+?)><div class=ellipsis-1>(.+?)</div>', re.MULTILINE|re.DOTALL|re.IGNORECASE).findall(data)
+        videos = re.compile(r'href=\"([^\"]+)\"><div class=\"(?:[^\"]+)\"><img\s*class=\"video-item--img\"\s*src=\"([^\"]+)\"\s*alt=\"(?:[^\"]+)\"\s*>(?:<span class=\"video-item--watching\">[^\<]+</span>)?(?:<div class=video-item--overlay-rank>(?:[0-9]+)</div>)?</div><(?:[^\>]+)></span></a><div class=\"video-item--info\"><time class=\"video-item--meta video-item--time\" datetime=(.+?)-(.+?)-(.+?)T(?:.+?) title\=\"(?:[^\"]+)\">(?:[^\<]+)</time><h3 class=video-item--title>(.+?)</h3><address(?:[^\>]+)><a rel=author class=\"(?:[^\=]+)=(.+?)><div class=ellipsis-1>(.+?)</div>', re.MULTILINE|re.DOTALL|re.IGNORECASE).findall(data)
         if videos:
             amount = len(videos)
             for link, img, year, month, day, title, channel_link, channel_name in videos:
@@ -271,7 +271,7 @@ def dir_list_create( data, cat, video_type='video', search = False, play=0 ):
                 info_labels[ 'year' ] = year
                 video_title = '[B]' + clean_text( title ) + '[/B]\n[COLOR gold]' + channel_name + '[/COLOR] - [COLOR lime]' + get_date_formatted( DATE_FORMAT, year, month, day ) + '[/COLOR]'
                 images = { 'thumb': str(img), 'fanart': str(img) }
-
+   
                 #open get url and open player
                 add_dir( video_title, BASE_URL + link, 4, images, info_labels, cat, False, True, play, { 'name' : channel_link, 'subscribe': True }  )
 
