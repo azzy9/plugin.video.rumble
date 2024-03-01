@@ -262,14 +262,18 @@ def dir_list_create( data, cat, video_type='video', search = False, play=0 ):
         if videos:
             amount = len(videos)
             for link, img, year, month, day, title, channel_link, channel_name in videos:
+
+                info_labels = {}
+
                 if '<svg' in channel_name:
                     channel_name = channel_name.split('<svg')[0] + " (Verified)"
 
+                info_labels[ 'year' ] = year
                 video_title = '[B]' + clean_text( title ) + '[/B]\n[COLOR gold]' + channel_name + '[/COLOR] - [COLOR lime]' + get_date_formatted( DATE_FORMAT, year, month, day ) + '[/COLOR]'
                 images = { 'thumb': str(img), 'fanart': str(img) }
 
                 #open get url and open player
-                add_dir( video_title, BASE_URL + link, 4, images, {}, cat, False, True, play, { 'name' : channel_link, 'subscribe': True }  )
+                add_dir( video_title, BASE_URL + link, 4, images, info_labels, cat, False, True, play, { 'name' : channel_link, 'subscribe': True }  )
 
     elif video_type == 'channel_video':
 
@@ -324,6 +328,7 @@ def dir_list_create( data, cat, video_type='video', search = False, play=0 ):
                 date_time = re.compile(r'<time\s*class=\"(?:[^\"]+)\"\s*datetime=\"(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})-(\d{2}):(\d{2})\"', re.DOTALL|re.IGNORECASE).findall(video)
 
                 if date_time:
+                    info_labels[ 'year' ] = date_time[0][0]
                     video_title += ' - [COLOR lime]' + get_date_formatted( DATE_FORMAT, date_time[0][0], date_time[0][1], date_time[0][2] ) + '[/COLOR]'
 
                 images = { 'thumb': str(img[0]), 'fanart': str(img[0]) }

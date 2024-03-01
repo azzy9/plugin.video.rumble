@@ -179,7 +179,7 @@ def item_set_info( line_item, properties ):
     if KODI_VERSION > 19.8:
         vidtag = line_item.getVideoInfoTag()
         if properties.get( 'year' ):
-            vidtag.setYear( properties.get( 'year' ) )
+            vidtag.setYear( int( properties.get( 'year' ) ) )
         if properties.get( 'episode' ):
             vidtag.setEpisode( properties.get( 'episode' ) )
         if properties.get( 'season' ):
