@@ -19,6 +19,8 @@ ADDON = xbmcaddon.Addon()
 ADDON_ICON = ADDON.getAddonInfo('icon')
 ADDON_NAME = ADDON.getAddonInfo('name')
 
+KODI_VERSION = float(xbmcaddon.Addon('xbmc.addon').getAddonInfo('version')[:4])
+
 #language
 __language__ = ADDON.getLocalizedString
 
@@ -123,6 +125,27 @@ def get_date_formatted( format_id, year, month, day ):
         return day + '/' + month + '/' + year
     return year + '/' + month + '/' + day
 
+def duration_to_secs( duration, fail_return = '' ):
+
+    """ converts video duration to seconds """
+
+    if duration:
+        if ':' in duration:
+
+            time_element_amount = len( duration.split( ':' ) )
+
+            # ensure time sring is complete
+            if time_element_amount == 2:
+                duration = '0:' + duration
+
+            h, m, s = duration.split(':')
+            return str( int(h) * 3600 + int(m) * 60 + int(s) )
+        else:
+            # should only be seconds
+            return duration
+
+    return fail_return
+
 def get_params():
 
     """ gets params from request """
@@ -148,3 +171,35 @@ def clean_text( text ):
             text = text.replace(r'&#34;', r'"').replace(r'&#38;', r'&').replace(r'&#39;', r"'")
 
     return text
+
+def item_set_info( line_item, properties ):
+
+    """ line item set info """
+
+    if KODI_VERSION > 19.8:
+        vidtag = line_item.getVideoInfoTag()
+        if properties.get( 'year' ):
+            vidtag.setYear( properties.get( 'year' ) )
+        if properties.get( 'episode' ):
+            vidtag.setEpisode( properties.get( 'episode' ) )
+        if properties.get( 'season' ):
+            vidtag.setSeason( properties.get( 'season' ) )
+        if properties.get( 'plot' ):
+            vidtag.setPlot( properties.get( 'plot' ) )
+        if properties.get( 'title' ):
+            vidtag.setTitle( properties.get( 'title' ) )
+        if properties.get( 'studio' ):
+            vidtag.setStudios([ properties.get( 'studio' ) ])
+        if properties.get( 'writer' ):
+            vidtag.setWriters([ properties.get( 'writer' ) ])
+        if properties.get( 'duration' ):
+            vidtag.setDuration( int( properties.get( 'duration' ) ) )
+        if properties.get( 'tvshowtitle' ):
+            vidtag.setTvShowTitle( properties.get( 'tvshowtitle' ) )
+        if properties.get( 'mediatype' ):
+            vidtag.setMediaType( properties.get( 'mediatype' ) )
+        if properties.get('premiered'):
+            vidtag.setPremiered( properties.get( 'premiered' ) )
+
+    else:
+        line_item.setInfo('video', properties)

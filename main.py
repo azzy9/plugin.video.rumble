@@ -302,6 +302,7 @@ def dir_list_create( data, cat, video_type='video', search = False, play=0 ):
             for video in videos:
 
                 video_title = ''
+                info_labels = {}
 
                 title = re.compile(r'<h3(?:[^\>]+)?>(.*)</h3>', re.DOTALL|re.IGNORECASE).findall(video)
                 link = re.compile(r'<a\sclass="videostream__link link"\sdraggable="false"\shref="([^\"]+)">', re.DOTALL|re.IGNORECASE).findall(video)
@@ -327,8 +328,13 @@ def dir_list_create( data, cat, video_type='video', search = False, play=0 ):
 
                 images = { 'thumb': str(img[0]), 'fanart': str(img[0]) }
 
+                duration = re.compile(r'videostream__status--duration\"\s*>([^<]+)</div>', re.DOTALL|re.IGNORECASE).findall(video)
+
+                if duration:
+                    info_labels[ 'duration' ] = duration_to_secs( duration[0].strip() )
+
                 #open get url and open player
-                add_dir( video_title, BASE_URL + link[0], 4, images, {}, cat, False, True, play, { 'name' : channel_link[0], 'subscribe': True }  )
+                add_dir( video_title, BASE_URL + link[0], 4, images, info_labels, cat, False, True, play, { 'name' : channel_link[0], 'subscribe': True }  )
 
         return amount
 
@@ -719,13 +725,12 @@ def add_dir( name, url, mode, images = {}, info_labels = {}, cat = '', folder=Tr
         list_item.setProperty('IsPlayable', 'true')
         context_menu.append((get_string(30158), 'Action(Queue)'))
 
-    if KODI_VERSION > 19.8:
-        vidtag = list_item.getVideoInfoTag()
-        vidtag.setMediaType('video')
-        vidtag.setTitle(name)
-        vidtag.setPlot( info_labels.get( 'plot', '' ) )
-    else:
-        list_item.setInfo(type='Video', infoLabels={'Title': name, 'Plot': info_labels.get( 'plot', '' ) })
+    info_labels['title'] = name
+    if play:
+        # adds information context menu
+        info_labels['mediatype'] = 'tvshow'
+
+    item_set_info( list_item, info_labels )
 
     list_item.setProperty( 'fanart_image', art_dict[ 'fanart' ] )
 
