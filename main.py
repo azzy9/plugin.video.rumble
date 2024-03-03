@@ -274,25 +274,10 @@ def dir_list_create( data, cat, video_type='video', search = False, play=0 ):
                 #open get url and open player
                 add_dir( video_title, BASE_URL + link, 4, images, info_labels, cat, False, True, play, { 'name' : channel_link, 'subscribe': True }  )
 
-    elif video_type == 'channel_video':
-
-        videos = re.compile(r'<img\s*class=\"thumbnail__image\"\s*draggable=\"false\"\s*src=\"(.+?)\"\s*alt=(?:\"[^\"]+\"|[^\"\s]+)\s*(?:[^\>]+)>\s*<div\s*class=\"videostream__info\">\s*<div\s*class=\"videostream__badge videostream__status videostream__status--duration\"\s*>\s*(.+?)\s*</div>\s*</div>\s*<a class=\"videostream__link link\" draggable=\"false\" href=\"/(?:[^\>]+)\"></a>\s*</div>\s*<div class=\"videostream__footer\">\s*<a\s*class=\"title__link link\"\s*href=\"([^\>]+)\">\s*<h3\s*class=\"thumbnail__title clamp-2\"(?:[^\>]+)>\s*([^\<]+)</h3>\s*</a>', re.MULTILINE|re.DOTALL|re.IGNORECASE).findall(data)
-        if videos:
-            amount = len(videos)
-            for img, video_length, link, title in videos:
-
-                video_title = '[B]' + clean_text( title ) + '[/B]'
-
-                cat = 'other'
-                images = { 'thumb': str(img), 'fanart': str(img) }
-
-                #open get url and open player
-                add_dir( video_title, BASE_URL + link.strip(), 4, images, {}, cat, False, True, play, { 'name' : link.strip(), 'subscribe': False } )
-
-    elif video_type in { 'cat_video', 'subscriptions', 'live_stream' }:
+    elif video_type in { 'cat_video', 'subscriptions', 'live_stream', 'channel_video' }:
 
         if video_type == 'live_stream':
-            videos_regex = r'<div class="thumbnail__grid" role="list">(.*)<nav class="paginator">'
+            videos_regex = r'<div class=\"thumbnail__grid\"\s*role=\"list\">(.*)<nav class=\"paginator\">'
         else:
             videos_regex = r'<ol\s*class=\"thumbnail__grid\">(.*)</ol>'
         videos = re.compile(videos_regex, re.DOTALL|re.IGNORECASE).findall(data)
@@ -306,6 +291,7 @@ def dir_list_create( data, cat, video_type='video', search = False, play=0 ):
 
                 video_title = ''
                 info_labels = {}
+                subscribe_context = False
 
                 title = re.compile(r'<h3(?:[^\>]+)?>(.*)</h3>', re.DOTALL|re.IGNORECASE).findall(video)
                 link = re.compile(r'<a\sclass="videostream__link link"\sdraggable="false"\shref="([^\"]+)">', re.DOTALL|re.IGNORECASE).findall(video)
@@ -319,10 +305,14 @@ def dir_list_create( data, cat, video_type='video', search = False, play=0 ):
                 channel_link = re.compile(r'<a\s*rel=\"author\"\s*class=\"channel__link\slink\s(?:[^\"]+)\"\s*href=\"([^\"]+)\"\s*>', re.DOTALL|re.IGNORECASE).findall(video)
 
                 if channel_name:
+
                     video_title += '\n[COLOR gold]' + clean_text( channel_name[0][0] )
                     if channel_name[0][1]:
                         video_title += " (Verified)"
                     video_title += '[/COLOR]'
+
+                    if channel_link:
+                        subscribe_context = { 'name' : channel_link[0], 'subscribe': True }
 
                 date_time = re.compile(r'<time\s*class=\"(?:[^\"]+)\"\s*datetime=\"(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})-(\d{2}):(\d{2})\"', re.DOTALL|re.IGNORECASE).findall(video)
 
@@ -338,7 +328,7 @@ def dir_list_create( data, cat, video_type='video', search = False, play=0 ):
                     info_labels[ 'duration' ] = duration_to_secs( duration[0].strip() )
 
                 #open get url and open player
-                add_dir( video_title, BASE_URL + link[0], 4, images, info_labels, cat, False, True, play, { 'name' : channel_link[0], 'subscribe': True }  )
+                add_dir( video_title, BASE_URL + link[0], 4, images, info_labels, cat, False, True, play, subscribe_context  )
 
         return amount
 
