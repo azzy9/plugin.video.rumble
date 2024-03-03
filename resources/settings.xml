@@ -6,11 +6,11 @@
     <category label="Login">
         <setting id="username" label="Username" type="text" default=""/>
         <setting id="password" label="Password" type="text" option="hidden" default=""/>
-        <setting id="loginTest" label="Test Login Details" type="action" action="RunPlugin(plugin://plugin.video.rumble/?mode=13)"/>
         <setting id="resetSession" label="Reset Session" type="action" action="RunPlugin(plugin://plugin.video.rumble/?mode=10)"/>
     </category>
     <category label="Debug">
         <setting id="useHTTP" label="Use HTTP" type="bool" default="False"/>
+        <setting id="loginTest" label="Test Login Details" type="action" action="RunPlugin(plugin://plugin.video.rumble/?mode=13)"/>
         <setting id="importFavorites" label="Import Favorites" type="action" action="RunPlugin(plugin://plugin.video.rumble/?mode=9)"/>
     </category>
 </settings>
