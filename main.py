@@ -34,7 +34,6 @@ HOME_DIR = 'special://home/addons/' + PLUGIN_NAME
 RESOURCE_DIR = HOME_DIR + 'resources/'
 MEDIA_DIR = RESOURCE_DIR + 'media/'
 
-KODI_VERSION = float(xbmcaddon.Addon('xbmc.addon').getAddonInfo('version')[:4])
 DATE_FORMAT = ADDON.getSetting('date_format')
 
 RUMBLE_USER = RumbleUser()
@@ -271,7 +270,7 @@ def dir_list_create( data, cat, video_type='video', search = False, play=0 ):
                 info_labels[ 'year' ] = year
                 video_title = '[B]' + clean_text( title ) + '[/B]\n[COLOR gold]' + channel_name + '[/COLOR] - [COLOR lime]' + get_date_formatted( DATE_FORMAT, year, month, day ) + '[/COLOR]'
                 images = { 'thumb': str(img), 'fanart': str(img) }
-   
+
                 #open get url and open player
                 add_dir( video_title, BASE_URL + link, 4, images, info_labels, cat, False, True, play, { 'name' : channel_link, 'subscribe': True }  )
 
@@ -313,9 +312,9 @@ def dir_list_create( data, cat, video_type='video', search = False, play=0 ):
                 img = re.compile(r'<img\s*class=\"thumbnail__image\"\s*draggable=\"false\"\s*src=\"([^\"]+)\"', re.DOTALL|re.IGNORECASE).findall(video)
 
                 video_title = '[B]' + clean_text( title[0] ) + '[/B]'
-                if ( 'videostream__status--live' in video ):
+                if 'videostream__status--live' in video:
                     video_title += ' [COLOR red](Live)[/COLOR]'
-    
+
                 channel_name = re.compile(r'<span\sclass="channel__name(?:[^\"]+)" title="(?:[^\"]+)">([^\<]+)</span>(\s*<svg class=channel__verified)?', re.DOTALL|re.IGNORECASE).findall(video)
                 channel_link = re.compile(r'<a\s*rel=\"author\"\s*class=\"channel__link\slink\s(?:[^\"]+)\"\s*href=\"([^\"]+)\"\s*>', re.DOTALL|re.IGNORECASE).findall(video)
 
@@ -492,11 +491,9 @@ def play_video( name, url, thumb, play=2 ):
         list_item = xbmcgui.ListItem(name, path=url)
         list_item.setArt({'icon': thumb, 'thumb': thumb})
 
-        if KODI_VERSION > 19.8:
-            vidtag = list_item.getVideoInfoTag()
-            vidtag.setTitle(name)
-        else:
-            list_item.setInfo(type='video', infoLabels={'Title': name, 'plot': ''})
+        info_labels={ 'Title': name, 'plot': '' }
+
+        item_set_info( list_item, info_labels )
 
         if play == 1:
             xbmc.Player().play(item=url, listitem=list_item)
@@ -535,12 +532,12 @@ def favorites_show():
                 name = i[0]
                 url = i[1]
                 mode = i[2]
-                images = { 'thumb': str(i[3]), 'fanart': str(i[4]) } 
+                images = { 'thumb': str(i[3]), 'fanart': str(i[4]) }
                 info_labels = { 'plot': str(i[5]) }
                 cat = i[6]
                 folder = ( i[7] == 'True' )
                 play = i[8]
-        
+
                 add_dir( name, url, mode, images, info_labels, cat, folder, True, int(play) )
 
             xbmcplugin.endOfDirectory(PLUGIN_ID)
