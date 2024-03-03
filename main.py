@@ -120,13 +120,13 @@ def home_menu():
         add_dir( 'Following', BASE_URL + '/', 3, { 'thumb': 'favorite.png' }, {}, 'following' )
 
     # Battle Leaderboard
-    add_dir( get_string(30052), BASE_URL + '/battle-leaderboard/recorded', 3, { 'thumb': 'leader.png' }, {}, 'top' )
+    add_dir( get_string(30050), BASE_URL + '/battle-leaderboard/recorded', 3, { 'thumb': 'leader.png' }, {}, 'top' )
 
     # Categories
-    add_dir( 'Categories', BASE_URL + '/browse', 3, { 'thumb': 'viral.png' }, {}, 'cat_list' )
+    add_dir( get_string(30051), BASE_URL + '/browse', 3, { 'thumb': 'viral.png' }, {}, 'cat_list' )
 
     # Live Streams
-    add_dir( 'Live Streams', BASE_URL + '/browse/live', 3, { 'thumb': 'viral.png' }, {}, 'live_stream' )
+    add_dir( get_string(30052), BASE_URL + '/browse/live', 3, { 'thumb': 'viral.png' }, {}, 'live_stream' )
 
     # Settings
     add_dir( get_string(5), '', 8, { 'thumb': 'settings.png' } )
@@ -615,7 +615,8 @@ def login_session_reset():
     """ Forces a rumble session reset """
 
     RUMBLE_USER.reset_session_details()
-    notify( 'Session has been reset' )
+    # Session Reset
+    notify( get_string(30200) )
 
 def login_test():
 
@@ -625,11 +626,14 @@ def login_test():
 
     if RUMBLE_USER.has_login_details():
         if RUMBLE_USER.login():
-            notify( 'Login Successful - Session has been set' )
+            # Login Success
+            notify( get_string(30201) )
         else:
-            notify( 'Login Failed' )
+            # Login Failed
+            notify( get_string(30202) )
     else:
-        notify( 'No details detected - please save login details first before running' )
+        # No details detected
+        notify( get_string(30203) )
 
 def subscribe( name, action ):
 

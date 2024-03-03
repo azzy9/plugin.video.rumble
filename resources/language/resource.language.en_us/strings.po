@@ -12,27 +12,15 @@ msgstr ""
 
 #main.py Main menu
 msgctxt "#30050"
-msgid "Viral"
-msgstr ""
-
-msgctxt "#30051"
-msgid "Podcast"
-msgstr ""
-
-msgctxt "#30052"
 msgid "Battle Leaderboard"
 msgstr ""
 
-msgctxt "#30053"
-msgid "Entertainment"
+msgctxt "#30051"
+msgid "Categories"
 msgstr ""
 
-msgctxt "#30054"
-msgid "Technology"
-msgstr ""
-
-msgctxt "#30055"
-msgid "Vlogs"
+msgctxt "#30052"
+msgid "Live Streams"
 msgstr ""
 
 #lib\main.py Search menu
@@ -83,4 +71,21 @@ msgstr ""
 
 msgctxt "#30158"
 msgid "Add to queue"
+msgstr ""
+
+#main.py Session
+msgctxt "#30200"
+msgid "Session has been reset"
+msgstr ""
+
+msgctxt "#30201"
+msgid "Login Successful - Session has been set"
+msgstr ""
+
+msgctxt "#30202"
+msgid "Login Failed"
+msgstr ""
+
+msgctxt "#30203"
+msgid "No details detected - please save login details first before running"
 msgstr ""

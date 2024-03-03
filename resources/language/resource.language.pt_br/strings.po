@@ -12,28 +12,16 @@ msgstr "Método de Reprodução"
 
 #main.py Main menu
 msgctxt "#30050"
-msgid "Viral"
-msgstr "Viral"
-
-msgctxt "#30051"
-msgid "Podcast"
-msgstr "Podcast"
-
-msgctxt "#30052"
 msgid "Battle Leaderboard"
 msgstr "Quadro de lideranÃ§a"
 
-msgctxt "#30053"
-msgid "Entertainment"
-msgstr "Entretenimento"
+msgctxt "#30051"
+msgid "Categories"
+msgstr ""
 
-msgctxt "#30054"
-msgid "Technology"
-msgstr "Tecnologia"
-
-msgctxt "#30055"
-msgid "Vlogs"
-msgstr "Vlogs"
+msgctxt "#30052"
+msgid "Live Streams"
+msgstr ""
 
 #lib\main.py Search menu
 msgctxt "#30100"
@@ -81,3 +69,20 @@ msgstr "Digite algo para pesquisar"
 msgctxt "#30158"
 msgid "Add to queue"
 msgstr "Adicionar à fila"
+
+#main.py Session
+msgctxt "#30200"
+msgid "Session has been reset"
+msgstr ""
+
+msgctxt "#30201"
+msgid "Login Successful - Session has been set"
+msgstr ""
+
+msgctxt "#30202"
+msgid "Login Failed"
+msgstr ""
+
+msgctxt "#30203"
+msgid "No details detected - please save login details first before running"
+msgstr ""
