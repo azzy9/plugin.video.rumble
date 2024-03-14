@@ -455,9 +455,15 @@ def resolver( url ):
         # quality select
         if playback_method == '2':
             if len(urls) > 0:
-                selected_index = xbmcgui.Dialog().select(
-                    'Select Quality', [(sourceItem[0] or '?') for sourceItem in urls]
-                )
+
+                if len(urls) == 1:
+                    # if only one available, no point asking
+                    selected_index = 0
+                else:
+                    selected_index = xbmcgui.Dialog().select(
+                        'Select Quality', [(sourceItem[0] or '?') for sourceItem in urls]
+                    )
+
                 if selected_index != -1:
                     media_url = urls[selected_index][1]
 
