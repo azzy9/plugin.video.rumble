@@ -300,6 +300,8 @@ def dir_list_create( data, cat, video_type='video', search = False, play=0 ):
                 video_title = '[B]' + clean_text( title[0] ) + '[/B]'
                 if 'videostream__status--live' in video:
                     video_title += ' [COLOR red](Live)[/COLOR]'
+                if 'videostream__status--upcoming' in video:
+                    video_title += ' [COLOR yellow](Upcoming)[/COLOR]'
 
                 channel_name = re.compile(r'<span\sclass="channel__name(?:[^\"]+)" title="(?:[^\"]+)">([^\<]+)</span>(\s*<svg class=channel__verified)?', re.DOTALL|re.IGNORECASE).findall(video)
                 channel_link = re.compile(r'<a\s*rel=\"author\"\s*class=\"channel__link\slink\s(?:[^\"]+)\"\s*href=\"([^\"]+)\"\s*>', re.DOTALL|re.IGNORECASE).findall(video)
