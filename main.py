@@ -416,12 +416,12 @@ def resolver( url ):
 
     """ Resolves a URL for rumble & returns resolved link to video """
 
-    # playback options - 0: large to small, 1: small to large, 2: quality select
-    playback_method = ADDON.getSetting('playbackMethod')
+    # playback options - 0: high auto, 1: low auto, 2: quality select
+    playback_method = int( ADDON.getSetting('playbackMethod') )
 
     media_url = False
 
-    if playback_method == '2':
+    if playback_method > 0:
         urls = []
 
     video_id = get_video_id( url )
@@ -433,10 +433,6 @@ def resolver( url ):
         data = request_get(BASE_URL + '/embedJS/u3/?request=video&ver=2&v=' + video_id)
         sizes = [ '1080', '720', '480', '360', 'hls' ]
 
-        # reverses array - small to large
-        if playback_method == '1':
-            sizes = sizes[::-1]
-
         for quality in sizes:
 
             # get urls for quality
@@ -446,26 +442,34 @@ def resolver( url ):
             ).findall(data)
 
             if matches:
-                if playback_method == '2':
+                if playback_method > 0:
                     urls.append(( quality, matches[0] ))
                 else:
                     media_url = matches[0]
                     break
 
-        # quality select
-        if playback_method == '2':
-            if len(urls) > 0:
+        # if not automatically selecting highest quality
+        if int( playback_method ) > 0:
 
-                if len(urls) == 1:
-                    # if only one available, no point asking
-                    selected_index = 0
-                else:
+            # m3u8 check
+            if len( urls ) == 1 and '.m3u8' in urls[0][1]:
+                from lib.m3u8 import m3u8
+                m3u8_handler = m3u8()
+                urls = m3u8_handler.process( request_get( urls[0][1] ) )
+
+            # reverses array - small to large
+            if playback_method == 1:
+                urls = urls[::-1]
+                media_url = urls[0][1]
+
+            # quality select
+            elif playback_method == 2:
+                if len(urls) > 0:
                     selected_index = xbmcgui.Dialog().select(
                         'Select Quality', [(sourceItem[0] or '?') for sourceItem in urls]
                     )
-
-                if selected_index != -1:
-                    media_url = urls[selected_index][1]
+                    if selected_index != -1:
+                        media_url = urls[selected_index][1]
 
     if media_url:
         media_url = media_url.replace('\/', '/')
