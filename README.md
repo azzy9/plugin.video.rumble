@@ -8,16 +8,19 @@ To login go to "Settings" -> "Login"<br />
 Then enter your username & password.<br />
 Save the settings.<br />
 
-<b>Subscription functionality</b><br />
+## Subscription functionality
 - See your feeds from subscriptions<br />
 - See your followed channels & users<br />
 - Subscribe to channel & users<br />
 - Unsubscribe to channels & users<br />
 - View video comments<br />
-<br />
-<b>Issues</b><br />
+
+## Issues
 If an issue occurs where the stream freezes after start,<br />
 you can try to enable http streams:<br />
 - Go to settings<br />
 - Debug<br />
 - Use HTTP
+  
+## Install
+This plugin can be installed from the AzzyAddons repo: https://azzyaddons.github.io
