@@ -114,10 +114,12 @@ def home_menu():
     add_dir( get_string(1036), '', 7, { 'thumb': 'favorite.png' } )
 
     if RUMBLE_USER.has_login_details():
-        # subscriptions
+        # Subscriptions
         add_dir( 'Subscriptions', BASE_URL + '/subscriptions', 3, { 'thumb': 'favorite.png' }, {}, 'subscriptions' )
-        # subscriptions
+        # Following
         add_dir( 'Following', BASE_URL + '/', 3, { 'thumb': 'favorite.png' }, {}, 'following' )
+        # Watch Later
+        add_dir( 'Watch Later', BASE_URL + '/playlists/watch-later', 3, { 'thumb': 'favorite.png' }, {}, 'playlist' )
 
     # Battle Leaderboard
     add_dir( get_string(30050), BASE_URL + '/battle-leaderboard/recorded', 3, { 'thumb': 'leader.png' }, {}, 'top' )
@@ -236,7 +238,7 @@ def list_rumble( url, cat ):
             amount = dir_list_create( data, cat, 'video', True, 1 )
         else:
             amount = dir_list_create( data, cat, 'channel', True )
-    elif cat in { 'subscriptions', 'cat_video', 'live_stream' }:
+    elif cat in { 'subscriptions', 'cat_video', 'live_stream', 'playlist' }:
         amount = dir_list_create( data, cat, cat, False, 2 )
     elif cat in { 'channel', 'top', 'other' }:
         amount = dir_list_create( data, cat, 'video', False, 2 )
@@ -274,16 +276,21 @@ def dir_list_create( data, cat, video_type='video', search = False, play=0 ):
                 #open get url and open player
                 add_dir( video_title, BASE_URL + link, 4, images, info_labels, cat, False, True, play, { 'name' : channel_link, 'subscribe': True }  )
 
-    elif video_type in { 'cat_video', 'subscriptions', 'live_stream', 'channel_video' }:
+    elif video_type in { 'cat_video', 'subscriptions', 'live_stream', 'channel_video', 'playlist' }:
 
         if video_type == 'live_stream':
             videos_regex = r'<div class=\"thumbnail__grid\"\s*role=\"list\">(.*)<nav class=\"paginator\">'
+        if video_type == 'playlist':
+            videos_regex = r'<ol\s*class=\"videostream__list\"(?:[^>]+)>(.*)</ol>'
         else:
             videos_regex = r'<ol\s*class=\"thumbnail__grid\">(.*)</ol>'
         videos = re.compile(videos_regex, re.DOTALL|re.IGNORECASE).findall(data)
 
         if videos:
-            videos = videos[0].split('"videostream thumbnail__grid-')
+            if video_type == 'playlist':
+                videos = videos[0].split('"videostream videostream__list-item')
+            else:
+                videos = videos[0].split('"videostream thumbnail__grid-')
 
             videos.pop(0)
             amount = len(videos)
