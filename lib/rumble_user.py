@@ -207,3 +207,29 @@ class RumbleUser:
             return data
 
         return False
+
+    def playlist_add_video( self, video_id, playlist_id = 'watch-later' ):
+
+        """ method to add video to playlist """
+
+        if self.has_session():
+
+            post_content = {
+                'playlist_id': playlist_id,
+                'video_id': video_id,
+            }
+
+            headers = {
+                'Referer': self.base_url,
+                'Content-type': 'application/x-www-form-urlencoded'
+            }
+
+            data = request_get(
+                self.base_url + '/service.php?name=playlist.add_video',
+                post_content,
+                headers
+            )
+
+            return data
+
+        return False
