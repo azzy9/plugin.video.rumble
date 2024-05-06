@@ -13,7 +13,13 @@ Save the settings.<br />
 - See your followed channels & users<br />
 - Subscribe to channel & users<br />
 - Unsubscribe to channels & users<br />
+- View your "Watch later" playlist<br />
+- Add videos to your "Watch later" playlist<br />
+- Delte videos from your "Watch later" playlist<br />
 - View video comments<br />
+
+## Install
+This plugin can be installed from the AzzyAddons repo: https://azzyaddons.github.io
 
 ## Issues
 If an issue occurs where the stream freezes after start,<br />
@@ -21,6 +27,3 @@ you can try to enable http streams:<br />
 - Go to settings<br />
 - Debug<br />
 - Use HTTP
-  
-## Install
-This plugin can be installed from the AzzyAddons repo: https://azzyaddons.github.io
