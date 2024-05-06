@@ -439,13 +439,35 @@ def dir_list_create( data, cat, video_type='video', search = False, play=0 ):
 
 def get_video_id( url ):
 
-    """ gets a video id from a URL, helps in resolving """
+    """
+    gets a video id from a URL
+    helps in resolving
+    """
 
     data = request_get(url)
 
     # gets embed id from embed url
     video_id = re.compile(
         ',\"embedUrl\":\"' + BASE_URL + '/embed/(.*?)\/\",',
+        re.MULTILINE|re.DOTALL|re.IGNORECASE
+    ).findall(data)
+
+    if video_id:
+        return video_id[0]
+    return False
+
+def get_playlist_video_id( url ):
+
+    """
+    gets a playlist video id from a URL
+    helps in adding video to playlist
+    """
+
+    data = request_get(url)
+
+    # gets embed id from embed url
+    video_id = re.compile(
+        'data-id=\"([0-9]+)\"',
         re.MULTILINE|re.DOTALL|re.IGNORECASE
     ).findall(data)
 
@@ -774,9 +796,17 @@ def add_dir( name, url, mode, images = {}, info_labels = {}, cat = '', folder=Tr
         list_item.setProperty('IsPlayable', 'true')
         context_menu.append((get_string(30158), 'Action(Queue)'))
 
-        # if RUMBLE_USER.has_login_details():
-            # add watch later content
-            # context_menu.append(('Add to Watch Later','RunPlugin(%s)' % build_url( {'mode': '11','name': subscribe_context['name'], 'cat': 'unsubscribe'} )))
+        if RUMBLE_USER.has_login_details():
+            # need to get current
+            params=get_params()
+            current_url = params.get( 'url', None )
+
+            if '/playlists/watch-later' in current_url:
+                # delete watch later context
+                context_menu.append(('Delete from Watch Later','RunPlugin(%s)' % build_url( {'mode': '12','url': url, 'cat':'delete'} )))
+            else:
+                # add watch later context
+                context_menu.append(('Add to Watch Later','RunPlugin(%s)' % build_url( {'mode': '12','url': url, 'cat':'add'} )))
 
     info_labels['title'] = name
     if play:
@@ -796,7 +826,7 @@ def add_dir( name, url, mode, images = {}, info_labels = {}, cat = '', folder=Tr
                 context_menu.append(('Unsubscribe to ' + subscribe_context['name'],'RunPlugin(%s)' % build_url( {'mode': '11','name': subscribe_context['name'], 'cat': 'unsubscribe'} )))
 
         if play == 2 and mode == 4:
-            context_menu.append(('Comments','RunPlugin(%s)' % build_url( {'mode': '12','url': url} )))
+            context_menu.append(('Comments','RunPlugin(%s)' % build_url( {'mode': '13','url': url} )))
 
     if fav_context:
 
@@ -834,6 +864,26 @@ def add_dir( name, url, mode, images = {}, info_labels = {}, cat = '', folder=Tr
         list_item.addContextMenuItems(context_menu)
 
     xbmcplugin.addDirectoryItem(handle=PLUGIN_ID, url=link, listitem=list_item, isFolder=folder)
+
+def playlist_manage( url, action="add" ):
+
+    """ Adds to Rumble's Playlist """
+    video_id = get_playlist_video_id( url )
+
+    if video_id:
+        if action == "add":
+            RUMBLE_USER.playlist_add_video( video_id )
+            message = "Added to playlist"
+        else:
+            RUMBLE_USER.playlist_delete_video( video_id )
+            message = "Deleted from playlist"
+    else:
+        if action == "add":
+            message = "Cannot add to playlist"
+        else:
+            message = "Cannot delete from playlist"
+
+    notify( message, "Playlist" )
 
 def comments_show( url ):
 
@@ -938,8 +988,10 @@ def main():
     elif mode==11:
         subscribe(name, cat)
     elif mode==12:
-        comments_show(url)
+        playlist_manage(url, cat)
     elif mode==13:
+        comments_show(url)
+    elif mode==14:
         login_test()
 
 if __name__ == "__main__":

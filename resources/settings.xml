@@ -10,7 +10,7 @@
     </category>
     <category label="Debug">
         <setting id="useHTTP" label="Use HTTP" type="bool" default="False"/>
-        <setting id="loginTest" label="Test Login Details" type="action" action="RunPlugin(plugin://plugin.video.rumble/?mode=13)"/>
+        <setting id="loginTest" label="Test Login Details" type="action" action="RunPlugin(plugin://plugin.video.rumble/?mode=14)"/>
         <setting id="importFavorites" label="Import Favorites" type="action" action="RunPlugin(plugin://plugin.video.rumble/?mode=9)"/>
     </category>
 </settings>
