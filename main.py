@@ -117,7 +117,7 @@ def home_menu():
         # Subscriptions
         add_dir( 'Subscriptions', BASE_URL + '/subscriptions', 3, { 'thumb': 'favorite.png' }, {}, 'subscriptions' )
         # Following
-        add_dir( 'Following', BASE_URL + '/', 3, { 'thumb': 'favorite.png' }, {}, 'following' )
+        add_dir( 'Following', BASE_URL + '/followed-channels', 3, { 'thumb': 'favorite.png' }, {}, 'following' )
         # Watch Later
         add_dir( 'Watch Later', BASE_URL + '/playlists/watch-later', 3, { 'thumb': 'favorite.png' }, {}, 'playlist' )
 
@@ -280,7 +280,7 @@ def dir_list_create( data, cat, video_type='video', search = False, play=0 ):
 
         if video_type == 'live_stream':
             videos_regex = r'<div class=\"thumbnail__grid\"\s*role=\"list\">(.*)<nav class=\"paginator\">'
-        if video_type == 'playlist':
+        elif video_type == 'playlist':
             videos_regex = r'<ol\s*class=\"videostream__list\"(?:[^>]+)>(.*)</ol>'
         else:
             videos_regex = r'<ol\s*class=\"thumbnail__grid\">(.*)</ol>'
@@ -297,6 +297,7 @@ def dir_list_create( data, cat, video_type='video', search = False, play=0 ):
             for video in videos:
 
                 video_title = ''
+                images = {}
                 info_labels = {}
                 subscribe_context = False
 
@@ -304,7 +305,8 @@ def dir_list_create( data, cat, video_type='video', search = False, play=0 ):
                 link = re.compile(r'<a\sclass="videostream__link link"\sdraggable="false"\shref="([^\"]+)">', re.DOTALL|re.IGNORECASE).findall(video)
                 img = re.compile(r'<img\s*class=\"thumbnail__image\"\s*draggable=\"false\"\s*src=\"([^\"]+)\"', re.DOTALL|re.IGNORECASE).findall(video)
 
-                video_title = '[B]' + clean_text( title[0] ) + '[/B]'
+                if title:
+                    video_title = '[B]' + clean_text( title[0] ) + '[/B]'
                 if 'videostream__status--live' in video:
                     video_title += ' [COLOR red](Live)[/COLOR]'
                 if 'videostream__status--upcoming' in video:
@@ -329,7 +331,8 @@ def dir_list_create( data, cat, video_type='video', search = False, play=0 ):
                     info_labels[ 'year' ] = date_time[0][0]
                     video_title += ' - [COLOR lime]' + get_date_formatted( DATE_FORMAT, date_time[0][0], date_time[0][1], date_time[0][2] ) + '[/COLOR]'
 
-                images = { 'thumb': str(img[0]), 'fanart': str(img[0]) }
+                if img:
+                    images = { 'thumb': str(img[0]), 'fanart': str(img[0]) }
 
                 duration = re.compile(r'videostream__status--duration\"\s*>([^<]+)</div>', re.DOTALL|re.IGNORECASE).findall(video)
 
@@ -354,24 +357,55 @@ def dir_list_create( data, cat, video_type='video', search = False, play=0 ):
                 add_dir( clean_text( title ), BASE_URL + link.strip() + '/videos', 3, images, {}, cat )
 
     elif video_type == 'following':
-        following = re.compile(r'<a\s*class=\"main-menu-item-channel\s*(?:main-menu-item-channel-is-live)?\"\s*title=\"?(?:[^\"]+)\"?\s*href=([^>\s]+)(?:\s*data-js=\"main_menu_live_channel\")?\s*>\s*<div class=\"main-menu-item-channel-label-wrapper\">\s*<i class=\'user-image (?:user-image--img user-image--img--id-([^\s\']+)\s*(?:channel-live)?\')?(?:user-image--letter\s*(?:channel-live)?\' data-letter=([a-zA-Z]))? data-js=user-image>\s*</i>\s*<span class=\"main-menu-item-label main-menu-item-channel-label\">([^<]+)</span>', re.MULTILINE|re.DOTALL|re.IGNORECASE).findall(data)
-        if following:
-            amount = len(following)
-            for link, img_id, img_letter, channel_name in following:
 
-                if img_id:
-                    img = str( get_image( data, img_id ) )
-                else:
-                    img = MEDIA_DIR + 'letters/' + img_letter + '.png'
-                video_title = '[B]' + channel_name.strip() + '[/B]'
+        videos_regex = r'<ol\s*class=\"followed-channels__list\">(.*)</ol>'
+        videos = re.compile(videos_regex, re.DOTALL|re.IGNORECASE).findall(data)
+        if videos:
+            videos = videos[0].split('"followed-channel flex items-')
+
+            videos.pop(0)
+            amount = len(videos)
+            for video in videos:
+
+                video_title = ''
+                images = {}
+
+                title = re.compile(r'<span\s*class=\"clamp-2\">([^<]+)<\/span>', re.DOTALL|re.IGNORECASE).findall(video)
+                followers = re.compile(r'<div\s*class=\"followed-channel__followers(?:[^\"]+)\">([^<]+)</div>', re.DOTALL|re.IGNORECASE).findall(video)
+                link = re.compile(r'<a\s*class=\"(?:[^\"]+)\"\s*href=\"([^\"]+)\">', re.DOTALL|re.IGNORECASE).findall(video)
+                img = re.compile(r'<(?:img|span)\s*class=\"channel__avatar([^\"]+)\"\s*(?:src=\"([^\"]+)\")?', re.DOTALL|re.IGNORECASE).findall(video)
+
+                if title:
+                    video_title = '[B]' + clean_text( title[0] ) + '[/B]'
+
+                if '<use href="#channel_verified" />' in video:
+                    video_title += ' [COLOR gold](Verified)[/COLOR]'
+
+                link = link[0] if link else ""
+
+                if img:
+                    if 'channel__letter' in img[0][0]:
+                        if title:
+                            image_url = MEDIA_DIR + 'letters/' + title[0][0].lower() + '.png'
+                        else:
+                            image_url = ''
+                    else:
+                        image_url = img[0][1]
+
+                    images = { 'thumb': str(image_url), 'fanart': str(image_url) }
+
+                    if 'channel__live' in img[0][0]:
+                        video_title += ' [COLOR red](Live)[/COLOR]'
+
+                if followers:
+                    video_title += '\n[COLOR green]' + followers[0].strip() + '[/COLOR]'
 
                 cat = 'user'
                 if '/user/' not in link:
                     cat = 'channel_video'
-                images = { 'thumb': str(img), 'fanart': str(img) }
 
                 #open get url and open player
-                add_dir( video_title, BASE_URL + link.strip(), 3, images, {}, cat, True, True, play, { 'name' : link.strip(), 'subscribe': False } )
+                add_dir( video_title, BASE_URL + link, 3, images, {}, cat, True, True, play, { 'name' : link, 'subscribe': False } )
 
     else:
 
@@ -705,11 +739,11 @@ def add_dir( name, url, mode, images = {}, info_labels = {}, cat = '', folder=Tr
     }
 
     # set default image location to MEDIA_DIR
-    for art_type in art_dict:
-        if art_dict[ art_type ]:
-            if not art_dict[ art_type ].startswith( HOME_DIR ) and \
-                not art_dict[ art_type ].startswith( 'http' ) and \
-                not art_dict[ art_type ].startswith( '\\' ):
+    for art_type, art_loc in art_dict.items():
+        if art_loc:
+            if not art_loc.startswith( HOME_DIR ) and \
+                not art_loc.startswith( 'http' ) and \
+                not art_loc.startswith( '\\' ):
                 art_dict[ art_type ] = MEDIA_DIR + art_dict[ art_type ]
 
     link_params = {
@@ -739,6 +773,10 @@ def add_dir( name, url, mode, images = {}, info_labels = {}, cat = '', folder=Tr
     if play == 2 and mode == 4:
         list_item.setProperty('IsPlayable', 'true')
         context_menu.append((get_string(30158), 'Action(Queue)'))
+
+        # if RUMBLE_USER.has_login_details():
+            # add watch later content
+            # context_menu.append(('Add to Watch Later','RunPlugin(%s)' % build_url( {'mode': '11','name': subscribe_context['name'], 'cat': 'unsubscribe'} )))
 
     info_labels['title'] = name
     if play:
