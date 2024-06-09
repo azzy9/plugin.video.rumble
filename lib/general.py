@@ -39,7 +39,7 @@ def request_get( url, data=None, extra_headers=None ):
         # headers
         my_headers = {
             'Accept-Language': 'en-gb,en;q=0.5',
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36',
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
             'Referer': url,
             'Cache-Control': 'no-cache',
@@ -62,9 +62,9 @@ def request_get( url, data=None, extra_headers=None ):
 
         # make request
         if data:
-            response = reqs.post(url, data=data, headers=my_headers, verify=False, cookies=cookie_dict, timeout=10)
+            response = reqs.post(url, data=data, headers=my_headers, cookies=cookie_dict, timeout=10)
         else:
-            response = reqs.get(url, headers=my_headers, verify=False, cookies=cookie_dict, timeout=10)
+            response = reqs.get(url, headers=my_headers, cookies=cookie_dict, timeout=10)
 
         if response.cookies.get_dict():
             if cookie_dict:
