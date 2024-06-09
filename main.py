@@ -372,7 +372,7 @@ def dir_list_create( data, cat, video_type='video', search = False, play=0 ):
 
                 title = re.compile(r'<span\s*class=\"clamp-2\">([^<]+)<\/span>', re.DOTALL|re.IGNORECASE).findall(video)
                 followers = re.compile(r'<div\s*class=\"followed-channel__followers(?:[^\"]+)\">([^<]+)</div>', re.DOTALL|re.IGNORECASE).findall(video)
-                link = re.compile(r'<a\s*class=\"(?:[^\"]+)\"\s*href=\"([^\"]+)\">', re.DOTALL|re.IGNORECASE).findall(video)
+                link = re.compile(r'<a\s*class=\"(?:[^\"]+)\"\s*href=\"(\/(?:c|user)\/[^\"]+)\"\s*>', re.DOTALL|re.IGNORECASE).findall(video)
                 img = re.compile(r'<(?:img|span)\s*class=\"channel__avatar([^\"]+)\"\s*(?:src=\"([^\"]+)\")?', re.DOTALL|re.IGNORECASE).findall(video)
 
                 if title:
@@ -525,12 +525,20 @@ def resolver( url ):
                 urls = urls[::-1]
                 media_url = urls[0][1]
 
+
             # quality select
             elif playback_method == 2:
+
                 if len(urls) > 0:
-                    selected_index = xbmcgui.Dialog().select(
-                        'Select Quality', [(sourceItem[0] or '?') for sourceItem in urls]
-                    )
+
+                    if len(urls) == 1:
+                        # if only one available, no point asking
+                        selected_index = 0
+                    else:
+                        selected_index = xbmcgui.Dialog().select(
+                            'Select Quality', [(sourceItem[0] or '?') for sourceItem in urls]
+                        )
+
                     if selected_index != -1:
                         media_url = urls[selected_index][1]
 
@@ -576,7 +584,7 @@ def search_items( url, cat ):
     search_str = get_search_string(heading="Search")
 
     if not search_str:
-        return False, 0
+        return
 
     title = urllib.parse.quote_plus(search_str)
 
