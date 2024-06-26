@@ -370,7 +370,7 @@ def dir_list_create( data, cat, video_type='video', search = False, play=0 ):
                 video_title = ''
                 images = {}
 
-                title = re.compile(r'<span\s*class=\"clamp-2\">([^<]+)<\/span>', re.DOTALL|re.IGNORECASE).findall(video)
+                title = re.compile(r'<span\s*class=\"line-clamp-2\">([^<]+)<\/span>', re.DOTALL|re.IGNORECASE).findall(video)
                 followers = re.compile(r'<div\s*class=\"followed-channel__followers(?:[^\"]+)\">([^<]+)</div>', re.DOTALL|re.IGNORECASE).findall(video)
                 link = re.compile(r'<a\s*class=\"(?:[^\"]+)\"\s*href=\"(\/(?:c|user)\/[^\"]+)\"\s*>', re.DOTALL|re.IGNORECASE).findall(video)
                 img = re.compile(r'<(?:img|span)\s*class=\"channel__avatar([^\"]+)\"\s*(?:src=\"([^\"]+)\")?', re.DOTALL|re.IGNORECASE).findall(video)
