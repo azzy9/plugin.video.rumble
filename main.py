@@ -258,6 +258,8 @@ def dir_list_create( data, cat, video_type='video', search = False, play=0 ):
 
     amount = 0
 
+    one_line_titles = ADDON.getSetting('one_line_titles') == 'true'
+
     if video_type == 'video':
         videos = re.compile(r'href=\"([^\"]+)\"><div class=\"(?:[^\"]+)\"><img\s*class=\"video-item--img\"\s*src=\"([^\"]+)\"\s*alt=\"(?:[^\"]+)\"\s*>(?:<span class=\"video-item--watching\">[^\<]+</span>)?(?:<div class=video-item--overlay-rank>(?:[0-9]+)</div>)?</div><(?:[^\>]+)></span></a><div class=\"video-item--info\"><time class=\"video-item--meta video-item--time\" datetime=(.+?)-(.+?)-(.+?)T(?:.+?) title\=\"(?:[^\"]+)\">(?:[^\<]+)</time><h3 class=video-item--title>(.+?)</h3><address(?:[^\>]+)><a rel=author class=\"(?:[^\=]+)=(.+?)><div class=ellipsis-1>(.+?)</div>', re.MULTILINE|re.DOTALL|re.IGNORECASE).findall(data)
         if videos:
@@ -270,7 +272,11 @@ def dir_list_create( data, cat, video_type='video', search = False, play=0 ):
                     channel_name = channel_name.split('<svg')[0] + " (Verified)"
 
                 info_labels[ 'year' ] = year
-                video_title = '[B]' + clean_text( title ) + '[/B]\n[COLOR gold]' + channel_name + '[/COLOR] - [COLOR lime]' + get_date_formatted( DATE_FORMAT, year, month, day ) + '[/COLOR]'
+
+                video_title = '[B]' + clean_text( title ) + '[/B]'
+                video_title += ' - ' if one_line_titles else '\n'
+                video_title += '[COLOR gold]' + channel_name + '[/COLOR] - [COLOR lime]' + get_date_formatted( DATE_FORMAT, year, month, day ) + '[/COLOR]'
+
                 images = { 'thumb': str(img), 'fanart': str(img) }
 
                 #open get url and open player
@@ -317,7 +323,8 @@ def dir_list_create( data, cat, video_type='video', search = False, play=0 ):
 
                 if channel_name:
 
-                    video_title += '\n[COLOR gold]' + clean_text( channel_name[0][0] )
+                    video_title += ' - ' if one_line_titles else '\n'
+                    video_title += '[COLOR gold]' + clean_text( channel_name[0][0] )
                     if channel_name[0][1]:
                         video_title += " (Verified)"
                     video_title += '[/COLOR]'
@@ -398,7 +405,8 @@ def dir_list_create( data, cat, video_type='video', search = False, play=0 ):
                         video_title += ' [COLOR red](Live)[/COLOR]'
 
                 if followers:
-                    video_title += '\n[COLOR green]' + followers[0].strip() + '[/COLOR]'
+                    video_title += ' - ' if one_line_titles else '\n'
+                    video_title += '[COLOR green]' + followers[0].strip() + '[/COLOR]'
 
                 cat = 'user'
                 if '/user/' not in link:
@@ -431,7 +439,10 @@ def dir_list_create( data, cat, video_type='video', search = False, play=0 ):
                     img = MEDIA_DIR + 'letters/' + img_letter + '.png'
                 images = { 'thumb': str(img), 'fanart': str(img) }
 
-                video_title = '[B]' + channel_name + '[/B]\n[COLOR palegreen]' + subscribers + '[/COLOR] [COLOR yellow]' + get_string(30156) + '[/COLOR]'
+                video_title = '[B]' + channel_name + '[/B]'
+                video_title += ' - ' if one_line_titles else '\n'
+                video_title += '[COLOR palegreen]' + subscribers + '[/COLOR] [COLOR yellow]' + get_string(30156) + '[/COLOR]'
+
                 #open get url and open player
                 add_dir( video_title, BASE_URL + link, 3, images, {}, cat, True, True, play, { 'name' : link, 'subscribe': True } )
 

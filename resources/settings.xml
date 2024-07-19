@@ -1,7 +1,8 @@
 <settings>
     <category label="14206">
         <setting id="playbackMethod" label="30000" type="enum" default="0" values="Auto Play Highest Quality|Auto Play Lowest Quality|Select Quality Via Dialog"/>
-        <setting label="Date Format" id="date_format" type="enum" values="Y/M/D|M/D/Y|D/M/Y" default="0" />
+        <setting id="date_format" label="Date Format" type="enum" values="Y/M/D|M/D/Y|D/M/Y" default="0" />
+        <setting id="one_line_titles" label="One Line Titles" type="bool" default="False" />
     </category>
     <category label="Login">
         <setting id="username" label="Username" type="text" default=""/>
