@@ -417,11 +417,18 @@ def dir_list_create( data, cat, video_type='video', search = False, play=0 ):
 
     else:
 
-        channels = re.compile(r'a href=(.+?)>\s*<div class=\"channel-item--img\">\s*<i class=\'user-image (?:user-image--img user-image--img--id-([^\']+)\')?(?:user-image--letter\' data-letter=([a-zA-Z]))? data-js=user-image>\s*</i>\s*</div>\s*<h3 class=channel-item--title>(.+?)</h3>\s*<span class=channel-item--subscribers>(.+?) Followers</span>',re.DOTALL).findall(data)
+        channels_regex = r'<div class="main-and-sidebar">(.*)<nav class="paginator">'
+        channels = re.compile(channels_regex, re.DOTALL|re.IGNORECASE).findall(data)
         if channels:
-            amount = len(channels)
-            for link, img_id, img_letter, channel_name, subscribers in channels:
+            channels = channels[0].split('<article')
 
+            channels.pop(0)
+            amount = len(channels)
+            for channel in channels:
+
+                link = re.compile(r'<a\shref=([^\s]+)\sclass=\"(?:[^\"]+)\">', re.DOTALL|re.IGNORECASE).findall(channel)
+                link = link[0] if link else ""
+                xbmc.log( json.dumps(link), xbmc.LOGWARNING )
                 # split channel and user
                 if search:
                     if cat == 'channel':
@@ -431,17 +438,32 @@ def dir_list_create( data, cat, video_type='video', search = False, play=0 ):
                         if '/user/' not in link:
                             continue
 
-                if '<svg' in channel_name:
-                    channel_name = channel_name.split('<svg')[0] + " (Verified)"
+                images = {}
+
+                channel_name = re.compile(r'<span\sclass=\"block\struncate\">([^<]+)<\/span>', re.DOTALL|re.IGNORECASE).findall(channel)
+                channel_name = channel_name[0] if channel_name else ""
+
+                is_verified = re.compile(r'<title>Verified</title>', re.DOTALL|re.IGNORECASE).findall(channel)
+                is_verified = True if is_verified else False
+
+                followers = re.compile(r'<span\sclass=\"(?:[^\"]+)\">\s+([^&]+)&nbsp;Follower(?:s)?\s+</span>', re.DOTALL|re.IGNORECASE).findall(channel)
+                followers = followers[0] if followers else "0"
+                
+                img_id = re.compile(r'user-image--img--id-([^\s]+)\s', re.DOTALL|re.IGNORECASE).findall(channel)
+                img_id = img_id[0] if img_id else ""
+
                 if img_id:
                     img = str( get_image( data, img_id ) )
                 else:
-                    img = MEDIA_DIR + 'letters/' + img_letter + '.png'
+                    img = MEDIA_DIR + 'letters/' + channel_name[0] + '.png'
+
                 images = { 'thumb': str(img), 'fanart': str(img) }
 
                 video_title = '[B]' + channel_name + '[/B]'
+                if is_verified:
+                    video_title += ' [COLOR gold](Verified)[/COLOR]'
                 video_title += ' - ' if one_line_titles else '\n'
-                video_title += '[COLOR palegreen]' + subscribers + '[/COLOR] [COLOR yellow]' + get_string(30156) + '[/COLOR]'
+                video_title += '[COLOR palegreen]' + followers + '[/COLOR] [COLOR yellow]' + get_string(30156) + '[/COLOR]'
 
                 #open get url and open player
                 add_dir( video_title, BASE_URL + link, 3, images, {}, cat, True, True, play, { 'name' : link, 'subscribe': True } )
