@@ -1,5 +1,6 @@
 """
-Class to handle M3U8 files created by Azzy9
+Class to handle rumble livestream M3U8 files
+created by Azzy9
 """
 
 class m3u8:

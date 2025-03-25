@@ -80,6 +80,15 @@ def request_get( url, data=None, extra_headers=None ):
     except Exception:
         return ''
 
+def sort_sizes(e):
+
+    """ method to use to sort sizes """
+
+    try:
+        return int( e[0] )
+    except ValueError:
+        return e[0]
+
 def build_url(query):
 
     """

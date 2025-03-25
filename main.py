@@ -510,42 +510,55 @@ def get_playlist_video_id( url ):
 
 def resolver( url ):
 
-    """ Resolves a URL for rumble & returns resolved link to video """
+    """ Resolves a URL for rumble & returns resolved resouces """
 
-    # playback options - 0: high auto, 1: low auto, 2: quality select
-    playback_method = int( ADDON.getSetting('playbackMethod') )
-
-    media_url = False
-
-    if playback_method > 0:
-        urls = []
+    urls = []
 
     video_id = get_video_id( url )
 
     if video_id:
 
         # use site api to get video urls
-        # TODO: use as dict / array instead of using regex to get URLs
         data = request_get(BASE_URL + '/embedJS/u3/?request=video&ver=2&v=' + video_id)
-        sizes = [ '1080', '720', '480', '360', 'hls' ]
+        data = json.loads(data)
 
-        for quality in sizes:
+        if data :
+            types = [ 'mp4', 'webm', 'hls' ]
 
-            # get urls for quality
-            matches = re.compile(
-                '"' + quality + '".+?url.+?:"(.*?)"',
-                re.MULTILINE|re.DOTALL|re.IGNORECASE
-            ).findall(data)
+            ua_streams = data.get('ua', False)
 
-            if matches:
-                if playback_method > 0:
-                    urls.append(( quality, matches[0] ))
-                else:
-                    media_url = matches[0]
-                    break
+            if ua_streams:
+                for stream_type in types:
+
+                    streams = ua_streams.get( stream_type, False )
+                    if streams:
+                        for quality, stream in streams.items():
+                            if stream and stream.get( 'url', False ):
+                                urls.append(( quality, stream[ 'url' ] ))
+                        break
+
+            if urls:
+                # sort sizes
+                urls.sort(reverse=True, key=sort_sizes)
+
+    return urls
+
+def video_quality_select( urls ):
+
+    """ Resolves a URL for rumble & returns resolved resouces """
+
+    # playback options - 0: high auto, 1: low auto, 2: quality select
+    playback_method = int( ADDON.getSetting('playbackMethod') )
+
+    media_url = False
+
+    if urls:
+
+        if playback_method == 0:
+            media_url = urls[0][1]
 
         # if not automatically selecting highest quality
-        if int( playback_method ) > 0:
+        elif playback_method > 0:
 
             # m3u8 check
             if len( urls ) == 1 and '.m3u8' in urls[0][1]:
@@ -575,18 +588,14 @@ def resolver( url ):
                     if selected_index != -1:
                         media_url = urls[selected_index][1]
 
-    if media_url:
-        media_url = media_url.replace('\/', '/')
-
     return media_url
-
 
 def play_video( name, url, thumb, play=2 ):
 
     """ method to play video """
 
     # get video link
-    url = resolver(url)
+    url = video_quality_select( resolver(url) )
 
     if url:
 
