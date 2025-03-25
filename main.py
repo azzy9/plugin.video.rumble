@@ -513,6 +513,7 @@ def resolver( url ):
     """ Resolves a URL for rumble & returns resolved resouces """
 
     urls = []
+    subtitles = []
 
     video_id = get_video_id( url )
 
@@ -537,11 +538,20 @@ def resolver( url ):
                                 urls.append(( quality, stream[ 'url' ] ))
                         break
 
+            # get subtitles
+            cc = data.get('cc', False)
+
+            if cc:
+                for lang, subs in cc.items():
+                    path = subs.get( 'path', False )
+                    if path:
+                        subtitles.append( path )
+
             if urls:
                 # sort sizes
                 urls.sort(reverse=True, key=sort_sizes)
 
-    return urls
+    return { 'urls': urls, 'subtitles': subtitles }
 
 def video_quality_select( urls ):
 
@@ -595,7 +605,8 @@ def play_video( name, url, thumb, play=2 ):
     """ method to play video """
 
     # get video link
-    url = video_quality_select( resolver(url) )
+    resolved = resolver(url)
+    url = video_quality_select( resolved[ 'urls' ] )
 
     if url:
 
@@ -605,6 +616,10 @@ def play_video( name, url, thumb, play=2 ):
 
         list_item = xbmcgui.ListItem(name, path=url)
         list_item.setArt({'icon': thumb, 'thumb': thumb})
+
+        # set subtitles
+        if resolved[ 'subtitles' ]:
+            list_item.setSubtitles( resolved[ 'subtitles' ] )
 
         info_labels={ 'Title': name, 'plot': '' }
 
