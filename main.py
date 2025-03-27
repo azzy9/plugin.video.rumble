@@ -622,7 +622,7 @@ def play_video( name, url, thumb, play=2 ):
         list_item.setArt({'icon': thumb, 'thumb': thumb})
 
         # set subtitles if available & enabled
-        if resolved[ 'subtitles' ] and ADDON.getSetting('subtitiles_enabled') == 'true':
+        if resolved[ 'subtitles' ] and ADDON.getSetting('subtitles_enabled') == 'true':
             list_item.setSubtitles( resolved[ 'subtitles' ] )
 
         info_labels={ 'Title': name, 'plot': '' }
