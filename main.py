@@ -21,6 +21,8 @@ try:
 except ImportError:
     import simplejson as json
 
+from datetime import datetime
+
 BASE_URL = 'https://rumble.com'
 PLUGIN_URL = sys.argv[0]
 PLUGIN_ID = int(sys.argv[1])
@@ -337,6 +339,8 @@ def dir_list_create( data, cat, video_type='video', search = False, play=0 ):
                 if date_time:
                     info_labels[ 'year' ] = date_time[0][0]
                     video_title += ' - [COLOR lime]' + get_date_formatted( DATE_FORMAT, date_time[0][0], date_time[0][1], date_time[0][2] ) + '[/COLOR]'
+                elif video_type == 'live_stream':
+                    info_labels[ 'year' ] = datetime.now().year
 
                 if img:
                     images = { 'thumb': str(img[0]), 'fanart': str(img[0]) }
