@@ -549,7 +549,7 @@ def resolver( url ):
                 for lang, subs in cc.items():
                     path = subs.get( 'path', False )
                     if path:
-                        subtitles.append( path )
+                        subtitles.append(( subs.get( 'language', lang ), path ))
 
             if urls:
                 # sort sizes
@@ -604,6 +604,26 @@ def video_quality_select( urls ):
 
     return media_url
 
+def subtitles_select( subtitles_in ):
+
+    subtitles = []
+    selected_index = -1
+
+    if len( subtitles_in ) == 1:
+        subtitles.append( subtitles_in[0][1] )
+    elif ADDON.getSetting('subtitles_select') == 'true':
+        selected_index = xbmcgui.Dialog().select(
+            'Select Subtitle', [(lang[0] or '?') for lang in subtitles_in]
+        )
+
+    if selected_index != -1:
+        subtitles.append( subtitles_in[selected_index][1] )
+    else:
+        for subs in subtitles_in:
+            subtitles.append( subs[1] )
+        
+    return subtitles
+
 def play_video( name, url, thumb, play=2 ):
 
     """ method to play video """
@@ -623,7 +643,9 @@ def play_video( name, url, thumb, play=2 ):
 
         # set subtitles if available & enabled
         if resolved[ 'subtitles' ] and ADDON.getSetting('subtitles_enabled') == 'true':
-            list_item.setSubtitles( resolved[ 'subtitles' ] )
+            resolved[ 'subtitles' ] = subtitles_select( resolved[ 'subtitles' ] )
+            if resolved[ 'subtitles' ]:
+                list_item.setSubtitles( resolved[ 'subtitles' ] )
 
         info_labels={ 'Title': name, 'plot': '' }
 
