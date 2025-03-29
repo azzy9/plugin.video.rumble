@@ -609,9 +609,7 @@ def subtitles_select( subtitles_in ):
     subtitles = []
     selected_index = -1
 
-    if len( subtitles_in ) == 1:
-        subtitles.append( subtitles_in[0][1] )
-    elif ADDON.getSetting('subtitles_select') == 'true':
+    if ADDON.getSetting('subtitles_select') == 'true':
         selected_index = xbmcgui.Dialog().select(
             'Select Subtitle', [(lang[0] or '?') for lang in subtitles_in]
         )
