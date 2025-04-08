@@ -13,7 +13,8 @@ class m3u8:
         try:
             m3u8_data = m3u8_data.rstrip().split('\n')
             if m3u8_data:
-                # don't need first 2 lines
+                # don't need first 3 lines
+                m3u8_data.pop(0)
                 m3u8_data.pop(0)
                 m3u8_data.pop(0)
 
