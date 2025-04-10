@@ -434,58 +434,59 @@ def loginTest():
     test_total = 0
     test_passed = 0
 
+    password = "qnzy78Xc85Qq1u62R5l3jU!&"
+
     login_hash = MD5Ex()
 
     # Test 1
-    test1 = login_hash.hash('testing@')
+    test1 = login_hash.hash(password)
     test_total += 1
 
-    if test1 == '3af656be108831b66909bd531622ac94':
+    if test1 == '870123d16e41cf63b9a877e9a12255c2':
         test_passed+=1
 
     xbmc.log( 'Login Test 1', xbmc.LOGWARNING )
-    xbmc.log( '3af656be108831b66909bd531622ac94', xbmc.LOGWARNING )
+    xbmc.log( '870123d16e41cf63b9a877e9a12255c2', xbmc.LOGWARNING )
     xbmc.log( test1, xbmc.LOGWARNING )
 
     # Test 2
-    test2 = login_hash.hashUTF8('testing@')
+    test2 = login_hash.hashUTF8(password)
     test_total += 1
 
-    if test2 == '3af656be108831b66909bd531622ac94':
+    if test2 == '870123d16e41cf63b9a877e9a12255c2':
         test_passed+=1
 
     xbmc.log( 'Login Test 2', xbmc.LOGWARNING )
-    xbmc.log( '3af656be108831b66909bd531622ac94', xbmc.LOGWARNING )
+    xbmc.log( '870123d16e41cf63b9a877e9a12255c2', xbmc.LOGWARNING )
     xbmc.log( test2, xbmc.LOGWARNING )
 
     # Test 3
-    test3 = login_hash.hashRaw('testing@')
+    test3 = login_hash.hashRaw(password)
     test_total += 1
     xbmc.log( test3, xbmc.LOGWARNING )
-    if test3 == ':öV¾\x10\x881¶i\t½S\x16"¬\x94':
+    if test3 == '\x87\x01#ÑnAÏc¹¨wé¡"UÂ':
         test_passed+=1
 
     # Test 4
-    test4 = login_hash.hashRawUTF8('testing@')
+    test4 = login_hash.hashRawUTF8(password)
     test_total += 1
     xbmc.log( test4, xbmc.LOGWARNING )
-    if test4 == ':öV¾\x10\x881¶i\t½S\x16"¬\x94':
+    if test4 == '\x87\x01#ÑnAÏc¹¨wé¡"UÂ':
         test_passed+=1
 
     # Test 5
-    test5 = login_hash.hashStretch('testing@', 'test', 10)
+    test5 = login_hash.hashStretch(password, 'test', 10)
     test_total += 1
     xbmc.log( test5, xbmc.LOGWARNING )
-    if test5 == '65434987349fa5e980faf6aad2d9904a':
+    if test5 == '1d6b5c4df542239ed9155c5e80f3bd69':
         test_passed+=1
 
     # Test 6
-    password = ''
-    salt = ["","",""]
+    salt = ["asdf","fghgf","fghr"]
     test6 = login_hash.hash(login_hash.hashStretch(password, salt[0], 128) + salt[1]) + ',' + login_hash.hashStretch(password, salt[2], 128) + ',' + salt[1]
     test_total += 1
     xbmc.log( test6, xbmc.LOGWARNING )
-    if test6 == '????????????????????????':
+    if test6 == '660255a3d3d57637c6430cb096b954a7,58bcb68fbbdc72f51cef6a19ab0217fa,fghgf':
         test_passed+=1
 
     notify( str( test_passed ) + '/' + str( test_total ) + ' Tests Passed' )
