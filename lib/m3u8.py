@@ -29,8 +29,6 @@ class m3u8:
 
                     line_amount +=1
 
-                urls = urls[::-1]
-
         except Exception:
             pass
 
