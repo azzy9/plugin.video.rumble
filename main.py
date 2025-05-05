@@ -504,7 +504,7 @@ def get_playlist_video_id( url ):
 
     # gets embed id from embed url
     video_id = re.compile(
-        'data-id=\"([0-9]+)\"',
+        'data-video-id=\"([0-9]+)\"',
         re.MULTILINE|re.DOTALL|re.IGNORECASE
     ).findall(data)
 
