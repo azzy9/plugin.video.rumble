@@ -4,6 +4,8 @@ Converted from JS to python by Azzy9
 This is a class to generate hashes that is used by the Rumble platform to login
 """
 
+import hashlib
+
 class MD5Ex:
 
     """ MD5Ex class to create MD5 hashes """
@@ -35,13 +37,8 @@ class MD5Ex:
 
         """ hash method """
 
-        return self.binHex( self.binHash( self.strBin(n), len(n) << 3))
+        return hashlib.md5(n.encode('utf-8')).hexdigest()
 
-    def hashUTF8( self, n ):
-
-        """ hashUTF8 method """
-
-        return self.hash(self.encUTF8(n))
 
     def hashRaw( self, n ):
 
