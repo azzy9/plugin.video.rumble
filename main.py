@@ -568,17 +568,17 @@ def video_quality_select( urls ):
 
     if urls:
 
+        # m3u8 check
+        if len( urls ) == 1 and '.m3u8' in urls[0][1]:
+            from lib.m3u8 import m3u8
+            m3u8_handler = m3u8()
+            urls = m3u8_handler.process( request_get( urls[0][1] ) )
+
         if playback_method == 0:
             media_url = urls[0][1]
 
         # if not automatically selecting highest quality
         elif playback_method > 0:
-
-            # m3u8 check
-            if len( urls ) == 1 and '.m3u8' in urls[0][1]:
-                from lib.m3u8 import m3u8
-                m3u8_handler = m3u8()
-                urls = m3u8_handler.process( request_get( urls[0][1] ) )
 
             # reverses array - small to large
             if playback_method == 1:
