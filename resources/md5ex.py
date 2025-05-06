@@ -46,12 +46,6 @@ class MD5Ex:
 
         return self.binStr(self.binHash(self.strBin(n), len(n) << 3))
 
-    def hashRawUTF8( self, n ):
-
-        """ hashRawUTF8 method """
-
-        return self.hashRaw(self.encUTF8(n))
-
     def hashStretch( self, n, h, i ):
 
         """ hashStretch method """
