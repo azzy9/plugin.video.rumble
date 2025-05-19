@@ -287,7 +287,7 @@ def dir_list_create( data, cat, video_type='video', search = False, play=0 ):
     elif video_type in { 'cat_video', 'subscriptions', 'live_stream', 'channel_video', 'playlist' }:
 
         if video_type == 'live_stream':
-            videos_regex = r'<div class=\"thumbnail__grid\"\s*role=\"list\">(.*)<nav class=\"paginator\">'
+            videos_regex = r'<div class=\"thumbnail__grid\"\s*role=\"list\">(.*)<nav'
         elif video_type == 'playlist':
             videos_regex = r'<ol\s*class=\"videostream__list\"(?:[^>]+)>(.*)</ol>'
         else:
