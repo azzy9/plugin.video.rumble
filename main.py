@@ -45,6 +45,17 @@ if six.PY2:
 else:
     favorites = xbmcvfs.translatePath(os.path.join(ADDON.getAddonInfo('profile'), 'favorites.dat'))
 
+TEMPLATE_TYPES = {
+    'channel': 'video',
+    'top': 'video',
+    'subscriptions': 'grid',
+    'cat_video': 'grid',
+    'live_stream': 'grid',
+    'playlist': 'grid',
+    'channel_video': 'grid',
+    'user': 'grid',
+    'following': 'following',
+}
 
 def favorites_create():
 
@@ -166,7 +177,7 @@ def pagination( url, page, cat, search=False ):
                 page_url = url + search
         elif search and cat == 'video':
             page_url = url + search + "&page=" + str( page )
-        elif cat in {'channel', 'channel_video', 'cat_video', 'user', 'other', 'subscriptions', 'live_stream' }:
+        elif cat in {'channel', 'channel_video', 'cat_video', 'user', 'subscriptions', 'live_stream' }:
             page_url = url + "?page=" + str( page )
 
         if cat in { 'following', 'top', 'cat_list' }:
@@ -232,7 +243,7 @@ def list_rumble( url, cat ):
     data = request_get(url, None, headers)
 
     # Fix for favorites & search
-    if cat in { 'other', 'channel' } and '/c/' in url:
+    if cat in { 'channel' } and '/c/' in url:
         cat = 'channel_video'
 
     if 'search' in url:
@@ -240,21 +251,15 @@ def list_rumble( url, cat ):
             amount = dir_list_create( data, cat, 'video', True, 1 )
         else:
             amount = dir_list_create( data, cat, 'channel', True )
-    elif cat in { 'subscriptions', 'cat_video', 'live_stream', 'playlist' }:
-        amount = dir_list_create( data, cat, cat, False, 2 )
-    elif cat in { 'channel', 'top', 'other' }:
-        amount = dir_list_create( data, cat, 'video', False, 2 )
-    elif cat in { 'channel_video', 'user' }:
-        amount = dir_list_create( data, cat, 'channel_video', False, 2 )
-    elif cat == 'following':
-        amount = dir_list_create( data, cat, 'following', False, 2 )
     elif cat == 'cat_list':
         amount = dir_list_create( data, cat, cat, False )
+    elif TEMPLATE_TYPES.get( cat, False ):
+        amount = dir_list_create( data, cat, TEMPLATE_TYPES[ cat ], False, 2 )
 
     return amount
 
 
-def dir_list_create( data, cat, video_type='video', search = False, play=0 ):
+def dir_list_create( data, cat, template_type='video', search = False, play=0 ):
 
     """ create and display dir list based upon type """
 
@@ -262,7 +267,7 @@ def dir_list_create( data, cat, video_type='video', search = False, play=0 ):
 
     one_line_titles = ADDON.getSetting('one_line_titles') == 'true'
 
-    if video_type == 'video':
+    if template_type == 'video':
         videos = re.compile(r'href=\"([^\"]+)\"><div class=\"(?:[^\"]+)\"><img\s*class=\"video-item--img\"\s*src=\"([^\"]+)\"\s*alt=\"(?:[^\"]+)\"\s*>(?:<span class=\"video-item--watching\">[^\<]+</span>)?(?:<div class=video-item--overlay-rank>(?:[0-9]+)</div>)?</div><(?:[^\>]+)></span></a><div class=\"video-item--info\"><time class=\"video-item--meta video-item--time\" datetime=(.+?)-(.+?)-(.+?)T(?:.+?) title\=\"(?:[^\"]+)\">(?:[^\<]+)</time><h3 class=video-item--title>(.+?)</h3><address(?:[^\>]+)><a rel=author class=\"(?:[^\=]+)=(.+?)><div class=ellipsis-1>(.+?)</div>', re.MULTILINE|re.DOTALL|re.IGNORECASE).findall(data)
         if videos:
             amount = len(videos)
@@ -284,18 +289,18 @@ def dir_list_create( data, cat, video_type='video', search = False, play=0 ):
                 #open get url and open player
                 add_dir( video_title, BASE_URL + link, 4, images, info_labels, cat, False, True, play, { 'name' : channel_link, 'subscribe': True }  )
 
-    elif video_type in { 'cat_video', 'subscriptions', 'live_stream', 'channel_video', 'playlist' }:
+    elif template_type == 'grid':
 
-        if video_type == 'live_stream':
+        if cat == 'live_stream':
             videos_regex = r'<div class=\"thumbnail__grid\"\s*role=\"list\">(.*)<nav'
-        elif video_type == 'playlist':
+        elif cat == 'playlist':
             videos_regex = r'<ol\s*class=\"videostream__list\"(?:[^>]+)>(.*)</ol>'
         else:
             videos_regex = r'<ol\s*class=\"thumbnail__grid\">(.*)</ol>'
         videos = re.compile(videos_regex, re.DOTALL|re.IGNORECASE).findall(data)
 
         if videos:
-            if video_type == 'playlist':
+            if cat == 'playlist':
                 videos = videos[0].split('"videostream videostream__list-item')
             else:
                 videos = videos[0].split('"videostream thumbnail__grid-')
@@ -339,7 +344,7 @@ def dir_list_create( data, cat, video_type='video', search = False, play=0 ):
                 if date_time:
                     info_labels[ 'year' ] = date_time[0][0]
                     video_title += ' - [COLOR lime]' + get_date_formatted( DATE_FORMAT, date_time[0][0], date_time[0][1], date_time[0][2] ) + '[/COLOR]'
-                elif video_type == 'live_stream':
+                elif template_type == 'live_stream':
                     info_labels[ 'year' ] = datetime.now().year
 
                 if img:
@@ -355,7 +360,7 @@ def dir_list_create( data, cat, video_type='video', search = False, play=0 ):
 
         return amount
 
-    elif video_type == 'cat_list':
+    elif template_type == 'cat_list':
         cat_list = re.compile(r'<a\s*class=\"category__link link\"\s*href=\"([^\"]+)\"\s*>\s*<img\s*class=\"category__image\"\s*src=\"([^\"]+)\"\s*alt=(?:[^\>]+)>\s*<strong class=\"category__title\">([^\<]+)</strong>', re.DOTALL|re.IGNORECASE).findall(data)
         if cat_list:
             amount = len(cat_list)
@@ -367,7 +372,7 @@ def dir_list_create( data, cat, video_type='video', search = False, play=0 ):
                 #open get url and open player
                 add_dir( clean_text( title ), BASE_URL + link.strip() + '/videos', 3, images, {}, cat )
 
-    elif video_type == 'following':
+    elif template_type == 'following':
 
         videos_regex = r'<ol\s*class=\"followed-channels__list\">(.*)</ol>'
         videos = re.compile(videos_regex, re.DOTALL|re.IGNORECASE).findall(data)
@@ -432,7 +437,7 @@ def dir_list_create( data, cat, video_type='video', search = False, play=0 ):
 
                 link = re.compile(r'<a\shref=([^\s]+)\sclass=\"(?:[^\"]+)\">', re.DOTALL|re.IGNORECASE).findall(channel)
                 link = link[0] if link else ""
-                xbmc.log( json.dumps(link), xbmc.LOGWARNING )
+
                 # split channel and user
                 if search:
                     if cat == 'channel':
@@ -445,7 +450,7 @@ def dir_list_create( data, cat, video_type='video', search = False, play=0 ):
                 images = {}
 
                 channel_name = re.compile(r'<span\sclass=\"block\struncate\">([^<]+)<\/span>', re.DOTALL|re.IGNORECASE).findall(channel)
-                channel_name = channel_name[0] if channel_name else ""
+                channel_name = channel_name[0] if channel_name else ''
 
                 is_verified = re.compile(r'<title>Verified</title>', re.DOTALL|re.IGNORECASE).findall(channel)
                 is_verified = True if is_verified else False
@@ -454,7 +459,7 @@ def dir_list_create( data, cat, video_type='video', search = False, play=0 ):
                 followers = followers[0] if followers else "0"
                 
                 img_id = re.compile(r'user-image--img--id-([^\s]+)\s', re.DOTALL|re.IGNORECASE).findall(channel)
-                img_id = img_id[0] if img_id else ""
+                img_id = img_id[0] if img_id else ''
 
                 if img_id:
                     img = str( get_image( data, img_id ) )
