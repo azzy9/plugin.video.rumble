@@ -426,7 +426,7 @@ def dir_list_create( data, cat, template_type='video', search = False, play=0 ):
 
     else:
 
-        channels_regex = r'<div class="main-and-sidebar">(.*)<nav class="paginator">'
+        channels_regex = r'<div class=\"main-and-sidebar\">(.*)</main>'
         channels = re.compile(channels_regex, re.DOTALL|re.IGNORECASE).findall(data)
         if channels:
             channels = channels[0].split('<article')
