@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<addon id="plugin.video.rumble" name="Rumble" version="1.8.4" provider-name="azzy9">
+<addon id="plugin.video.rumble" name="Rumble" version="1.8.4+sg.1" provider-name="azzy9">
 	<requires>
 		<import addon="script.module.simplejson"/>
 		<import addon="script.module.requests"/>
