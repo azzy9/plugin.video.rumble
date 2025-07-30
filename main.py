@@ -315,7 +315,7 @@ def dir_list_create( data, cat, template_type='video', search = False, play=0 ):
                 subscribe_context = False
 
                 title = re.compile(r'<h3(?:[^\>]+)?>(.*)</h3>', re.DOTALL|re.IGNORECASE).findall(video)
-                link = re.compile(r'<a\sclass="videostream__link link"\sdraggable="false"\shref="([^\"]+)">', re.DOTALL|re.IGNORECASE).findall(video)
+                link = re.compile(r'<a\sclass="videostream__link link"\sdraggable="false"\shref="([^\"]+)"\s>', re.DOTALL|re.IGNORECASE).findall(video)
                 img = re.compile(r'<img\s*class=\"thumbnail__image\"\s*draggable=\"false\"\s*src=\"([^\"]+)\"', re.DOTALL|re.IGNORECASE).findall(video)
 
                 if title:
