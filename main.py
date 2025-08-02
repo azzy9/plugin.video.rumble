@@ -435,7 +435,7 @@ def dir_list_create( data, cat, template_type='video', search = False, play=0 ):
             amount = len(channels)
             for channel in channels:
 
-                link = re.compile(r'<a\shref=([^\s]+)\sclass=\"(?:[^\"]+)\">', re.DOTALL|re.IGNORECASE).findall(channel)
+                link = re.compile(r'<a\shref=\"?([^\s]+)\"\sclass=\"(?:[^\"]+)\">', re.DOTALL|re.IGNORECASE).findall(channel)
                 link = link[0] if link else ""
 
                 # split channel and user
