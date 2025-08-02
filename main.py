@@ -455,7 +455,7 @@ def dir_list_create( data, cat, template_type='video', search = False, play=0 ):
                 is_verified = re.compile(r'<title>Verified</title>', re.DOTALL|re.IGNORECASE).findall(channel)
                 is_verified = True if is_verified else False
 
-                followers = re.compile(r'<span\sclass=\"(?:[^\"]+)\">\s+([^&]+)&nbsp;Follower(?:s)?\s+</span>', re.DOTALL|re.IGNORECASE).findall(channel)
+                followers = re.compile(r'<span\sclass=\"(?:[^\"]+)\">\s+([^&<]+)&nbsp;\s*Follower(?:s)?\s+<\/span>', re.DOTALL|re.IGNORECASE).findall(channel)
                 followers = followers[0] if followers else "0"
                 
                 img_id = re.compile(r'user-image--img--id-([^\s]+)\s', re.DOTALL|re.IGNORECASE).findall(channel)
