@@ -37,6 +37,7 @@ RESOURCE_DIR = HOME_DIR + 'resources/'
 MEDIA_DIR = RESOURCE_DIR + 'media/'
 
 DATE_FORMAT = ADDON.getSetting('date_format')
+PLAYBACK_CAP = ADDON.getSetting('playback_cap')
 
 RUMBLE_USER = RumbleUser()
 
@@ -578,6 +579,9 @@ def video_quality_select( urls ):
             from lib.m3u8 import m3u8
             m3u8_handler = m3u8()
             urls = m3u8_handler.process( request_get( urls[0][1] ) )
+
+        if PLAYBACK_CAP != 'Off':
+            urls = [url for url in urls if int(url[0]) <= int( PLAYBACK_CAP ) ]
 
         if playback_method == 0:
             media_url = urls[0][1]

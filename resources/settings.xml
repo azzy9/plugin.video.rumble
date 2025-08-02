@@ -1,6 +1,7 @@
 <settings>
     <category label="14206">
         <setting id="playbackMethod" label="30000" type="enum" default="0" values="Auto Play Highest Quality|Auto Play Lowest Quality|Select Quality Via Dialog"/>
+        <setting id="playback_cap" label="Playback Quality Limit" type="select" values="Off|2160|1080|720" default="Off" />
         <setting id="date_format" label="Date Format" type="enum" values="Y/M/D|M/D/Y|D/M/Y" default="0" />
         <setting id="one_line_titles" label="One Line Titles" type="bool" default="False" />
         <setting id="subtitles_enabled" label="Subtitles Enabled" type="bool" default="False" />
