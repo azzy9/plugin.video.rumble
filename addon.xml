@@ -4,6 +4,7 @@
 		<import addon="script.module.simplejson"/>
 		<import addon="script.module.requests"/>
 		<import addon="script.module.six"/>
+		<import addon="inputstream.adaptive"/>
 	</requires>
 	<extension point="xbmc.python.pluginsource" library="main.py">
 		<provides>video</provides>
