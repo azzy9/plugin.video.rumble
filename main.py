@@ -663,7 +663,7 @@ def play_video( name, url, thumb, play=2 ):
             xbmc.Player().play(item=url, listitem=list_item)
         elif play == 2:
 
-            if '.m3u8' in url:
+            if '.m3u8' in url and ADDON.getSetting('inputstream_disable') == 'false':
 
                 # Disable Kodi's MIME-type request, since we already know what it is.
                 list_item.setContentLookup(False)
@@ -676,7 +676,6 @@ def play_video( name, url, thumb, play=2 ):
 
                 if KODI_VERSION < 22:
                     list_item.setProperty('inputstream.adaptive.manifest_type', 'hls')
-                list_item.setProperty('inputstream.adaptive.original_audio_language', 'en')
 
             xbmcplugin.setResolvedUrl(int(sys.argv[1]), True, list_item)
 
