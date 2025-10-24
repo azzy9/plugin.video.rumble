@@ -154,11 +154,11 @@ def search_menu():
     """ Creates search menu """
 
     # Search Video
-    add_dir( get_string(30100), BASE_URL + '/search/video?q=', 2, { 'thumb': 'search.png' }, {}, 'video' )
+    add_dir( get_string(30100), BASE_URL + '/search/video', 2, { 'thumb': 'search.png' }, {}, 'video' )
     # Search Channel
-    add_dir( get_string(30101), BASE_URL + '/search/channel?q=', 2, { 'thumb': 'search.png' }, {}, 'channel' )
+    add_dir( get_string(30101), BASE_URL + '/search/channel', 2, { 'thumb': 'search.png' }, {}, 'channel' )
     # Search User
-    add_dir( get_string(30102), BASE_URL + '/search/channel?q=', 2, { 'thumb': 'search.png' }, {}, 'user' )
+    add_dir( get_string(30102), BASE_URL + '/search/channel', 2, { 'thumb': 'search.png' }, {}, 'user' )
 
     xbmcplugin.endOfDirectory(PLUGIN_ID)
 
@@ -172,14 +172,22 @@ def pagination( url, page, cat, search=False ):
         page = int(page)
         page_url = url
         paginated = True
+        query_params = {}
 
+        # check what query params need to be added
         if page == 1:
             if search:
-                page_url = url + search
+                query_params['q'] = search
         elif search and cat == 'video':
-            page_url = url + search + "&page=" + str( page )
+            query_params['q'] = search
+            query_params['page'] = str( page )
         elif cat in {'channel', 'channel_video', 'cat_video', 'user', 'subscriptions', 'live_stream' }:
-            page_url = url + "?page=" + str( page )
+            query_params['page'] = str( page )
+
+        # add query params to link
+        if query_params:
+            page_url += '&' if '?' in page_url else '?'
+            page_url += urllib.parse.urlencode(query_params)
 
         if cat in { 'following', 'top', 'cat_list' }:
             paginated = False
@@ -628,7 +636,7 @@ def subtitles_select( subtitles_in ):
     else:
         for subs in subtitles_in:
             subtitles.append( subs[1] )
-        
+
     return subtitles
 
 def play_video( name, url, thumb, play=2 ):
