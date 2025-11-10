@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import sys
+import ssl
 import requests
 
 import xbmc
@@ -28,6 +29,31 @@ __language__ = ADDON.getLocalizedString
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 
+from urllib3.poolmanager import PoolManager
+from requests.adapters import HTTPAdapter
+
+class TLS11HttpAdapter(HTTPAdapter):
+
+    """Transport adapter" that allows us to use TLSv1.1"""
+
+    def init_poolmanager(self, connections, maxsize, block=False):
+        self.poolmanager = PoolManager(
+            num_pools=connections, maxsize=maxsize, block=block, ssl_version=ssl.PROTOCOL_TLSv1_1
+        )
+
+
+class TLS12HttpAdapter(HTTPAdapter):
+
+    """Transport adapter" that allows us to use TLSv1.2"""
+
+    def init_poolmanager(self, connections, maxsize, block=False):
+        self.poolmanager = PoolManager(
+            num_pools=connections, maxsize=maxsize, block=block, ssl_version=ssl.PROTOCOL_TLSv1_2
+        )
+
+rqs = requests.session()
+tls_adapters = [TLS12HttpAdapter(), TLS11HttpAdapter()]
+
 reqs = requests.session()
 
 def request_get( url, data=None, extra_headers=None ):
@@ -39,7 +65,7 @@ def request_get( url, data=None, extra_headers=None ):
         # headers
         my_headers = {
             'Accept-Language': 'en-gb,en;q=0.5',
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/142.0.0.0 Safari/537.36',
             'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
             'Referer': url,
             'Cache-Control': 'no-cache',
@@ -60,11 +86,23 @@ def request_get( url, data=None, extra_headers=None ):
         else:
             cookie_dict = None
 
-        # make request
-        if data:
-            response = reqs.post(url, data=data, headers=my_headers, cookies=cookie_dict, timeout=10)
-        else:
-            response = reqs.get(url, headers=my_headers, cookies=cookie_dict, timeout=10)
+        uri = urllib.parse.urlparse(url)
+        domain = uri.scheme + '://' + uri.netloc
+
+        status = 0
+        i = 0
+        while status != 200 and i < 2:
+            # make request
+            if data:
+                response = reqs.post(url, data=data, headers=my_headers, verify=False, cookies=cookie_dict, timeout=10)
+            else:
+                response = reqs.get(url, headers=my_headers, verify=False, cookies=cookie_dict, timeout=10)
+
+            status = response.status_code
+            if status != 200:
+                if status == 403 and response.headers.get('server', '') == 'cloudflare':
+                    rqs.mount(domain, tls_adapters[i])
+                i += 1
 
         if response.cookies.get_dict():
             if cookie_dict:
