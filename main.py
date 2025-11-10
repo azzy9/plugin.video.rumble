@@ -370,7 +370,7 @@ def dir_list_create( data, cat, template_type='video', search = False, play=0 ):
         return amount
 
     elif template_type == 'cat_list':
-        cat_list = re.compile(r'<a\s*class=\"category__link link\"\s*href=\"([^\"]+)\"\s*>\s*<img\s*class=\"category__image\"\s*src=\"([^\"]+)\"\s*alt=(?:[^\>]+)>\s*<strong class=\"category__title\">([^\<]+)</strong>', re.DOTALL|re.IGNORECASE).findall(data)
+        cat_list = re.compile(r'<a\s*class=\"category__link link\"\s*href=\"([^\"]+)\"\s*>\s*<img\s*class=\"category__image\"\s*src=\"([^\"]+)\"\s*alt=(?:[^\>]+)>\s*<strong class=\"(?:[^\"]+)\">([^\<]+)</strong>', re.DOTALL|re.IGNORECASE).findall(data)
         if cat_list:
             amount = len(cat_list)
             for link, img, title in cat_list:
