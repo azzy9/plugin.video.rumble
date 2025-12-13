@@ -277,7 +277,7 @@ def dir_list_create( data, cat, template_type='video', search = False, play=0 ):
     one_line_titles = ADDON.getSetting('one_line_titles') == 'true'
 
     if template_type == 'video':
-        videos = re.compile(r'href=\"([^\"]+)\"(?:\s*data-event-data=[^\>]+)?><div class=\"(?:[^\"]+)\"><img\s*class=\"video-item--img\"\s*src=\"([^\"]+)\"\s*alt=\"(?:[^\"]+)\"\s*>(?:<span class=\"video-item--watching\">[^\<]+</span>)?(?:<div class=video-item--overlay-rank>(?:[0-9]+)</div>)?</div><(?:[^\>]+)></span></a><div class=\"video-item--info\"><time class=\"video-item--meta video-item--time\" datetime=(.+?)-(.+?)-(.+?)T(?:.+?) title\=\"(?:[^\"]+)\">(?:[^\<]+)</time><h3 class=video-item--title>(.+?)</h3><address(?:[^\>]+)><a rel=author class=\"(?:[^\=]+)=(.+?)><div class=ellipsis-1>(.+?)</div>', re.MULTILINE|re.DOTALL|re.IGNORECASE).findall(data)
+        videos = re.compile(r'href=\"([^\"]+)\"(?:\s*data-event-data=[^\>]+)?><div class=\"(?:[^\"]+)\"><img\s*class=\"video-item--img\s*\"\s*src=\"([^\"]+)\"\s*alt=\"(?:[^\"]+)\"\s*>(?:<span class=\"video-item--watching\">[^\<]+</span>)?(?:<div class=video-item--overlay-rank>(?:[0-9]+)</div>)?</div><(?:[^\>]+)></span></a><div class=\"video-item--info\"><time class=\"video-item--meta video-item--time\" datetime=(.+?)-(.+?)-(.+?)T(?:.+?) title\=\"(?:[^\"]+)\">(?:[^\<]+)</time><h3 class=video-item--title>(.+?)</h3><address(?:[^\>]+)><a rel=author class=\"(?:[^\=]+)=(.+?)><div class=ellipsis-1>(.+?)</div>', re.MULTILINE|re.DOTALL|re.IGNORECASE).findall(data)
         if videos:
             amount = len(videos)
             for link, img, year, month, day, title, channel_link, channel_name in videos:
@@ -325,7 +325,7 @@ def dir_list_create( data, cat, template_type='video', search = False, play=0 ):
 
                 title = re.compile(r'<h3(?:[^\>]+)?>(.*?)</h3>', re.DOTALL|re.IGNORECASE).findall(video)
                 link = re.compile(r'<a\s*class=\"videostream__link\slink\"\s*draggable=\"false\"\shref=\"([^\"]+)\"', re.DOTALL|re.IGNORECASE).findall(video)
-                img = re.compile(r'<img\s*class=\"thumbnail__image\"\s*draggable=\"false\"\s*src=\"([^\"]+)\"', re.DOTALL|re.IGNORECASE).findall(video)
+                img = re.compile(r'<img\s*class=\"thumbnail__image\s*\"\s*draggable=\"false\"\s*src=\"([^\"]+)\"', re.DOTALL|re.IGNORECASE).findall(video)
 
                 if title:
                     video_title = '[B]' + clean_text( title[0] ) + '[/B]'
@@ -370,7 +370,7 @@ def dir_list_create( data, cat, template_type='video', search = False, play=0 ):
         return amount
 
     elif template_type == 'cat_list':
-        cat_list = re.compile(r'<a\s*class=\"category__link link\"\s*href=\"([^\"]+)\"\s*>\s*<img\s*class=\"category__image\"\s*src=\"([^\"]+)\"\s*alt=(?:[^\>]+)>\s*<strong class=\"(?:[^\"]+)\">([^\<]+)</strong>', re.DOTALL|re.IGNORECASE).findall(data)
+        cat_list = re.compile(r'<a\s*class=\"category__link link\"\s*href=\"([^\"]+)\"\s*>\s*<img\s*class=\"category__image\s*\"\s*src=\"([^\"]+)\"\s*alt=(?:[^\>]+)>\s*<strong class=\"(?:[^\"]+)\">([^\<]+)</strong>', re.DOTALL|re.IGNORECASE).findall(data)
         if cat_list:
             amount = len(cat_list)
             for link, img, title in cat_list:
