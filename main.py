@@ -225,7 +225,7 @@ def get_image( data, image_id ):
     """ method to get an image from scraped page's CSS from the image ID """
 
     image_re = re.compile(
-        "i.user-image--img--id-" + str( image_id ) + ".+?{\s*background-image: url(.+?);",
+        "i.user-image--img--id-" + str( image_id ) + r".+?{\s*background-image: url(.+?);",
         re.MULTILINE|re.DOTALL|re.IGNORECASE
     ).findall(data)
 
@@ -499,7 +499,7 @@ def get_video_id( url ):
 
     # gets embed id from embed url
     video_id = re.compile(
-        ',\"embedUrl\":\"' + BASE_URL + '/embed/(.*?)\/\",',
+        ',\"embedUrl\":\"' + BASE_URL + '/embed/(.*?)\\/\",',
         re.MULTILINE|re.DOTALL|re.IGNORECASE
     ).findall(data)
 
