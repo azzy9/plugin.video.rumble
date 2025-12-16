@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+import html
 import sys
 import re
 import os
@@ -398,10 +399,16 @@ def dir_list_create( data, cat, template_type='video', search = False, play=0 ):
                 title = re.compile(r'<span\s*class=\"line-clamp-2\">([^<]+)<\/span>', re.DOTALL|re.IGNORECASE).findall(video)
                 followers = re.compile(r'<div\s*class=\"followed-channel__followers(?:[^\"]+)\">([^<]+)</div>', re.DOTALL|re.IGNORECASE).findall(video)
                 link = re.compile(r'<a\s*class=\"(?:[^\"]+)\"\s*href=\"(\/(?:c|user)\/[^\"]+)\"\s*>', re.DOTALL|re.IGNORECASE).findall(video)
-                img = re.compile(r'<(?:img|span)\s*class=\"channel__avatar([^\"]+)\"\s*(?:src=\"([^\"]+)\")?', re.DOTALL|re.IGNORECASE).findall(video)
+                img = re.compile(r'<(?:img|span)\s*class=\"channel__image([^\"]*)\"\s*(?:src=\"([^\"]+)\")?', re.DOTALL|re.IGNORECASE).findall(video)
+                description = re.compile(r'<div\s*class=\"followed-channel__description(?:[^\"]+)\">\s*<div>([^<]+)</div>\s*</div>', re.DOTALL|re.IGNORECASE).findall(video)
 
                 if title:
                     video_title = '[B]' + clean_text( title[0] ) + '[/B]'
+
+                info_labels = {}
+
+                if description:
+                    info_labels[ 'plot' ] = html.unescape(description[0].strip())
 
                 if '<use href="#channel_verified" />' in video:
                     video_title += ' [COLOR gold](Verified)[/COLOR]'
@@ -431,7 +438,7 @@ def dir_list_create( data, cat, template_type='video', search = False, play=0 ):
                     cat = 'channel_video'
 
                 #open get url and open player
-                add_dir( video_title, BASE_URL + link, 3, images, {}, cat, True, True, play, { 'name' : link, 'subscribe': False } )
+                add_dir( video_title, BASE_URL + link, 3, images, info_labels, cat, True, True, play, { 'name' : link, 'subscribe': False } )
 
     else:
 
