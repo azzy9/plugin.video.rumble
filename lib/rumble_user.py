@@ -155,7 +155,7 @@ class RumbleUser:
                 comment_data = json.loads(data)
                 if comment_data.get('html'):
                     return re.compile(
-                        r"<a\sclass=\"comments-meta-author\"\shref=\"([^\"]+)\">([^\<]+)</a>(?:[\s|\n||\\n|\\t]+)<a\sclass='comments-meta-post-time'\shref='#comment-([0-9]+)' title='([A-Z][^\,]+),\s([A-Z][^\s]+)\s([0-9]+),\s([0-9]+)\s([0-9]{2}):([0-9]{2})\s(AM|PM)\s-(?:[0-9]+)'>([^\<]+)</a>(?:[\s|\n||\\n|\\t]+)</div>(?:[\s|\n||\\n|\\t]+)<p class=\"comment-text\">([^\<]+)</p>",
+                        r"<a\sclass=\"comments-meta-author[^\"]*\"\shref=\"([^\"]+)\">([^\<]+)</a>(?:[\s|\n||\\n|\\t]+)<a\sclass='comments-meta-post-time[^']*'\shref='#comment-([0-9]+)' title='([A-Z][^\,]+),\s([A-Z][^\s]+)\s([0-9]+),\s([0-9]+)\s([0-9]{2}):([0-9]{2})\s(AM|PM)\s-(?:[0-9]+)'>([^\<]+)</a>(?:[\s|\n||\\n|\\t]+)</div>(?:[\s|\n||\\n|\\t]+)<p class=\"comment-text[^\"]*\">([^\<]+)</p>",
                         re.MULTILINE|re.DOTALL|re.IGNORECASE
                     ).findall(comment_data.get('html',''))
         return {}
