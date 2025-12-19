@@ -18,4 +18,9 @@
         <setting id="importFavorites" label="Import Favorites" type="action" action="RunPlugin(plugin://plugin.video.rumble/?mode=9)"/>
         <setting id="inputstream_disable" label="Inputstream Disable" type="bool" default="False" />
     </category>
+    <category label="Cloudflare Bypass">
+        <setting id="bypassCloudflare" label="Enabled" type="bool" default="False"/>
+		<setting id="flareSolverrUrl" label="Flaresolverr URL" type="text" default="http://localhost:8191/v1"/>
+		<setting id="flareSolverrTimeout" label="Flaresolverr Timeout (s)" type="number" default="60"/>
+    </category>
 </settings>

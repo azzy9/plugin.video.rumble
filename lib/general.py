@@ -5,6 +5,7 @@ import requests
 
 import xbmc
 import xbmcaddon
+import xbmcgui
 
 import six
 from six.moves import urllib
@@ -56,6 +57,52 @@ tls_adapters = [TLS12HttpAdapter(), TLS11HttpAdapter()]
 
 reqs = requests.session()
 
+def bypass_cloudflare(url, data):
+    if ADDON.getSettingBool('bypassCloudflare'):
+        xbmc.log("Bypassing Cloudflare challenge")
+        try:
+            # get stored cookie string
+            cookies = ADDON.getSetting('cookies')
+
+            # split cookies into dictionary
+            if cookies:
+                cookie_dict = json.loads( cookies )
+            else:
+                cookie_dict = None
+
+            timeout = ADDON.getSettingInt('flareSolverrTimeout')
+
+            flaresolverr_data = { 'url': url, 'maxTimeout': 1000*timeout }
+            if data:
+                flaresolverr_data['cmd'] = 'request.post'
+                flaresolverr_data['postData'] = data
+            else:
+                flaresolverr_data['cmd'] = 'request.get'
+
+            response = reqs.post(ADDON.getSetting('flareSolverrUrl'), json=flaresolverr_data, verify=False, timeout=timeout)
+            response.raise_for_status()
+
+            js = response.json()
+
+            cookies = {}
+            for cookie in js['solution']['cookies']:
+                cookies[cookie['name']] = cookie['value']
+
+            if cookie_dict:
+                cookie_dict.update( cookies )
+            else:
+                cookie_dict = cookies
+
+            ADDON.setSetting('cookies', json.dumps(cookie_dict))
+
+            return js['solution']['response']
+        except Exception as e:
+            dialog = xbmcgui.Dialog()
+            dialog.notification("Cloudflare bypass failed", str(e), icon=xbmcgui.NOTIFICATION_ERROR)
+            xbmc.log("Cloudflare bypass failed: " + str(e))
+
+    return None
+
 def request_get( url, data=None, extra_headers=None ):
 
     """ makes a request """
@@ -91,6 +138,7 @@ def request_get( url, data=None, extra_headers=None ):
 
         status = 0
         i = 0
+        try_to_bypass_cloudflare = True
         while status != 200 and i < 2:
             # make request
             if data:
@@ -101,6 +149,12 @@ def request_get( url, data=None, extra_headers=None ):
             status = response.status_code
             if status != 200:
                 if status == 403 and response.headers.get('server', '') == 'cloudflare':
+                    if try_to_bypass_cloudflare:
+                        result = bypass_cloudflare(url, data)
+                        if result:
+                            return result
+                        try_to_bypass_cloudflare = False # Only attempt to bypass once
+
                     rqs.mount(domain, tls_adapters[i])
                 i += 1
 
