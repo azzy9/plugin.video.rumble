@@ -11,6 +11,12 @@
     <top>0</top>
   </coordinates>
   <controls>
+	  <control type="image">
+		  <width>1280</width>
+		  <height>720</height>
+		  <texture>comment-background.png</texture>
+		  <aspectratio>stretch</aspectratio>
+	  </control>
 	  <control type="list" id="1">
 		  <description>Comment list</description>
 		  <left>0</left>

@@ -8,11 +8,11 @@ from lib.rumble_user import RumbleUser
 
 RUMBLE_USER = RumbleUser()
 
-class CommentWindow(xbmcgui.WindowXML):
+class CommentWindow(xbmcgui.WindowXMLDialog):
 
     def __init__(self, *args, **kwargs):
         self.video_id = kwargs['video_id']
-        xbmcgui.WindowXML.__init__(self, args, kwargs)
+        xbmcgui.WindowXMLDialog.__init__(self, *args, **kwargs)
 
     def onInit(self):
         self.refresh()
