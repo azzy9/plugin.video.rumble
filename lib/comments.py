@@ -1,3 +1,4 @@
+import html
 import xbmc
 import xbmcgui
 
@@ -40,9 +41,9 @@ class CommentWindow(xbmcgui.WindowXMLDialog):
                 ccl.addItem(
                     self.create_list_item(
                         comment_id,
-                        comment_author_name,
+                        html.unescape(comment_author_name),
                         comment_post_time_ago,
-                        comment
+                        html.unescape(comment).replace('\n', '  ')
                     )
                 )
         else:
