@@ -940,7 +940,7 @@ def add_dir( name, url, mode, images = {}, info_labels = {}, cat = '', folder=Tr
     info_labels['title'] = name
     if play:
         # adds information context menu
-        info_labels['mediatype'] = 'tvshow'
+        info_labels['mediatype'] = 'episode'
 
     item_set_info( list_item, info_labels )
 
@@ -1125,3 +1125,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
