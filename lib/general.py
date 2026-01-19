@@ -195,6 +195,14 @@ def build_url(query):
         for k, v in query.items()
     }))
 
+def strip_query_params( url ):
+
+    """ checks if there is any query params, then remove """
+
+    if url and '?' in url:
+        url = url.split('?')[0]
+
+    return url
 
 def notify( message, name=False, iconimage=False, time_shown=5000 ):
 
@@ -241,9 +249,9 @@ def duration_to_secs( duration, fail_return = '' ):
 
             h, m, s = duration.split(':')
             return str( int(h) * 3600 + int(m) * 60 + int(s) )
-        else:
-            # should only be seconds
-            return duration
+
+        # should only be seconds
+        return duration
 
     return fail_return
 

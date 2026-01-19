@@ -285,6 +285,8 @@ def dir_list_create( data, cat, template_type='video', search = False, play=0 ):
 
                 info_labels = {}
 
+                channel_link = strip_query_params( channel_link )
+
                 if '<svg' in channel_name:
                     channel_name = channel_name.split('<svg')[0] + " (Verified)"
 
@@ -347,7 +349,8 @@ def dir_list_create( data, cat, template_type='video', search = False, play=0 ):
                     video_title += '[/COLOR]'
 
                     if channel_link:
-                        subscribe_context = { 'name' : channel_link[0], 'subscribe': True }
+                        channel_link = strip_query_params( channel_link[0] )
+                        subscribe_context = { 'name' : channel_link, 'subscribe': True }
 
                 date_time = re.compile(r'<time\s*class=\"(?:[^\"]+)\"\s*datetime=\"(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2}):(\d{2})-(\d{2}):(\d{2})\"', re.DOTALL|re.IGNORECASE).findall(video)
 
