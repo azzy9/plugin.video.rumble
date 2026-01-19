@@ -949,16 +949,19 @@ def add_dir( name, url, mode, images = {}, info_labels = {}, cat = '', folder=Tr
 
     list_item.setProperty( 'fanart_image', art_dict[ 'fanart' ] )
 
+    if subscribe_context and play == 2 and cat != 'channel_video':
+        context_menu.append(('Go to ' + subscribe_context['name'],'ActivateWindow(Videos, %s, return)' % build_url( {'mode': '3', 'url': BASE_URL + subscribe_context['name'], 'cat': 'channel'} )))
+
     if RUMBLE_USER.has_login_details():
 
         if subscribe_context:
             if subscribe_context['subscribe']:
-                context_menu.append(('Subscribe to ' + subscribe_context['name'],'RunPlugin(%s)' % build_url( {'mode': '11','name': subscribe_context['name'], 'cat': 'subscribe'} )))
+                context_menu.append(('Subscribe to ' + subscribe_context['name'],'RunPlugin(%s)' % build_url( {'mode': '11', 'name': subscribe_context['name'], 'cat': 'subscribe'} )))
             else:
-                context_menu.append(('Unsubscribe to ' + subscribe_context['name'],'RunPlugin(%s)' % build_url( {'mode': '11','name': subscribe_context['name'], 'cat': 'unsubscribe'} )))
+                context_menu.append(('Unsubscribe to ' + subscribe_context['name'],'RunPlugin(%s)' % build_url( {'mode': '11', 'name': subscribe_context['name'], 'cat': 'unsubscribe'} )))
 
-        if play == 2 and mode == 4:
-            context_menu.append(('Comments','RunPlugin(%s)' % build_url( {'mode': '13','url': url} )))
+    if play == 2 and mode == 4:
+        context_menu.append(('Comments','RunPlugin(%s)' % build_url( {'mode': '13','url': url} )))
 
     if fav_context:
 
