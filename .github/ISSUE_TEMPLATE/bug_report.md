@@ -12,6 +12,10 @@ Plugin Version:
 Kodi Version:
 Operating System:
 
+**Using FlareSolverr**
+[ ] No
+[ ] Yes
+
 **The Issue**
 A clear and concise description of what you expected to happen.
 
