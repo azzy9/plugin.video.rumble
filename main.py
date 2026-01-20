@@ -301,7 +301,9 @@ def dir_list_create( data, cat, template_type='video', search = False, play=0 ):
                 #open get url and open player
                 add_dir( video_title, BASE_URL + link, 4, images, info_labels, cat, False, True, play, { 'name' : channel_link, 'subscribe': True }  )
 
-    elif template_type == 'grid':
+        return amount
+
+    if template_type == 'grid':
 
         if cat == 'live_stream':
             videos_regex = r'<div class=\"thumbnail__grid\"\s*role=\"list\">(.*)<nav'
@@ -373,7 +375,7 @@ def dir_list_create( data, cat, template_type='video', search = False, play=0 ):
 
         return amount
 
-    elif template_type == 'cat_list':
+    if template_type == 'cat_list':
         cat_list = re.compile(r'<a\s*class=\"category__link link\"\s*href=\"([^\"]+)\"\s*>\s*<img\s*class=\"category__image\s*\"\s*src=\"([^\"]+)\"\s*alt=(?:[^\>]+)>\s*<strong class=\"(?:[^\"]+)\">([^\<]+)</strong>', re.DOTALL|re.IGNORECASE).findall(data)
         if cat_list:
             amount = len(cat_list)
@@ -385,7 +387,9 @@ def dir_list_create( data, cat, template_type='video', search = False, play=0 ):
                 #open get url and open player
                 add_dir( clean_text( title ), BASE_URL + link.strip() + '/videos', 3, images, {}, cat )
 
-    elif template_type == 'following':
+        return amount
+
+    if template_type == 'following':
 
         videos_regex = r'<ol\s*class=\"followed-channels__list\">(.*)</ol>'
         videos = re.compile(videos_regex, re.DOTALL|re.IGNORECASE).findall(data)
@@ -443,58 +447,58 @@ def dir_list_create( data, cat, template_type='video', search = False, play=0 ):
                 #open get url and open player
                 add_dir( video_title, BASE_URL + link, 3, images, info_labels, cat, True, True, play, { 'name' : link, 'subscribe': False } )
 
-    else:
+        return amount
 
-        channels_regex = r'<div class=\"main-and-sidebar\">(.*)</main>'
-        channels = re.compile(channels_regex, re.DOTALL|re.IGNORECASE).findall(data)
-        if channels:
-            channels = channels[0].split('<article')
+    channels_regex = r'<div class=\"main-and-sidebar\">(.*)</main>'
+    channels = re.compile(channels_regex, re.DOTALL|re.IGNORECASE).findall(data)
+    if channels:
+        channels = channels[0].split('<article')
 
-            channels.pop(0)
-            amount = len(channels)
-            for channel in channels:
+        channels.pop(0)
+        amount = len(channels)
+        for channel in channels:
 
-                link = re.compile(r'<a\shref=\"?([^\s]+)\"\sclass=\"(?:[^\"]+)\">', re.DOTALL|re.IGNORECASE).findall(channel)
-                link = link[0] if link else ""
+            link = re.compile(r'<a\shref=\"?([^\s]+)\"\sclass=\"(?:[^\"]+)\">', re.DOTALL|re.IGNORECASE).findall(channel)
+            link = link[0] if link else ""
 
-                # split channel and user
-                if search:
-                    if cat == 'channel':
-                        if '/c/' not in link:
-                            continue
-                    else:
-                        if '/user/' not in link:
-                            continue
-
-                images = {}
-
-                channel_name = re.compile(r'<span\sclass=\"block\struncate\">([^<]+)<\/span>', re.DOTALL|re.IGNORECASE).findall(channel)
-                channel_name = channel_name[0] if channel_name else ''
-
-                is_verified = re.compile(r'<title>Verified</title>', re.DOTALL|re.IGNORECASE).findall(channel)
-                is_verified = True if is_verified else False
-
-                followers = re.compile(r'<span\sclass=\"(?:[^\"]+)\">\s+([^&<]+)&nbsp;\s*Follower(?:s)?\s+<\/span>', re.DOTALL|re.IGNORECASE).findall(channel)
-                followers = followers[0] if followers else "0"
-                
-                img_id = re.compile(r'user-image--img--id-([^\s]+)\s', re.DOTALL|re.IGNORECASE).findall(channel)
-                img_id = img_id[0] if img_id else ''
-
-                if img_id:
-                    img = str( get_image( data, img_id ) )
+            # split channel and user
+            if search:
+                if cat == 'channel':
+                    if '/c/' not in link:
+                        continue
                 else:
-                    img = MEDIA_DIR + 'letters/' + channel_name[0] + '.png'
+                    if '/user/' not in link:
+                        continue
 
-                images = { 'thumb': str(img), 'fanart': str(img) }
+            images = {}
 
-                video_title = '[B]' + channel_name + '[/B]'
-                if is_verified:
-                    video_title += ' [COLOR gold](Verified)[/COLOR]'
-                video_title += ' - ' if one_line_titles else '\n'
-                video_title += '[COLOR palegreen]' + followers + '[/COLOR] [COLOR yellow]' + get_string(30156) + '[/COLOR]'
+            channel_name = re.compile(r'<span\sclass=\"block\struncate\">([^<]+)<\/span>', re.DOTALL|re.IGNORECASE).findall(channel)
+            channel_name = channel_name[0] if channel_name else ''
 
-                #open get url and open player
-                add_dir( video_title, BASE_URL + link, 3, images, {}, cat, True, True, play, { 'name' : link, 'subscribe': True } )
+            is_verified = re.compile(r'<title>Verified</title>', re.DOTALL|re.IGNORECASE).findall(channel)
+            is_verified = True if is_verified else False
+
+            followers = re.compile(r'<span\sclass=\"(?:[^\"]+)\">\s+([^&<]+)&nbsp;\s*Follower(?:s)?\s+<\/span>', re.DOTALL|re.IGNORECASE).findall(channel)
+            followers = followers[0] if followers else "0"
+            
+            img_id = re.compile(r'user-image--img--id-([^\s]+)\s', re.DOTALL|re.IGNORECASE).findall(channel)
+            img_id = img_id[0] if img_id else ''
+
+            if img_id:
+                img = str( get_image( data, img_id ) )
+            else:
+                img = MEDIA_DIR + 'letters/' + channel_name[0] + '.png'
+
+            images = { 'thumb': str(img), 'fanart': str(img) }
+
+            video_title = '[B]' + channel_name + '[/B]'
+            if is_verified:
+                video_title += ' [COLOR gold](Verified)[/COLOR]'
+            video_title += ' - ' if one_line_titles else '\n'
+            video_title += '[COLOR palegreen]' + followers + '[/COLOR] [COLOR yellow]' + get_string(30156) + '[/COLOR]'
+
+            #open get url and open player
+            add_dir( video_title, BASE_URL + link, 3, images, {}, cat, True, True, play, { 'name' : link, 'subscribe': True } )
 
     return amount
 
