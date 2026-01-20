@@ -12,15 +12,15 @@
         <setting id="password" label="Password" type="text" option="hidden" default=""/>
         <setting id="resetSession" label="Reset Session" type="action" action="RunPlugin(plugin://plugin.video.rumble/?mode=10)"/>
     </category>
+    <category label="Cloudflare Bypass">
+        <setting id="bypassCloudflare" label="Enabled" type="bool" default="False"/>
+        <setting id="flareSolverrUrl" label="Flaresolverr URL" type="text" default="http://localhost:8191/v1" visible="eq(-1,true)" />
+        <setting id="flareSolverrTimeout" label="Flaresolverr Timeout (s)" type="number" default="60" visible="eq(-2,true)" />
+    </category>
     <category label="Debug">
         <setting id="useHTTP" label="Use HTTP" type="bool" default="False"/>
         <setting id="loginTest" label="Test Login Details" type="action" action="RunPlugin(plugin://plugin.video.rumble/?mode=14)"/>
         <setting id="importFavorites" label="Import Favorites" type="action" action="RunPlugin(plugin://plugin.video.rumble/?mode=9)"/>
         <setting id="inputstream_disable" label="Inputstream Disable" type="bool" default="False" />
-    </category>
-    <category label="Cloudflare Bypass">
-        <setting id="bypassCloudflare" label="Enabled" type="bool" default="False"/>
-		<setting id="flareSolverrUrl" label="Flaresolverr URL" type="text" default="http://localhost:8191/v1" visible="eq(-1,true)" />
-		<setting id="flareSolverrTimeout" label="Flaresolverr Timeout (s)" type="number" default="60" visible="eq(-2,true)" />
     </category>
 </settings>
