@@ -310,7 +310,7 @@ def dir_list_create( data, cat, template_type='video', search = False, play=0 ):
         elif cat == 'playlist':
             videos_regex = r'<ol\s*class=\"videostream__list\"(?:[^>]+)>(.*)</ol>'
         else:
-            videos_regex = r'<ol\s*class=\"thumbnail__grid\s*\">(.*)</ol>'
+            videos_regex = r'<ol\s*class=\"thumbnail__grid\s*(?:thumbnail__grid--bottom)?\">(.*)</ol>'
         videos = re.compile(videos_regex, re.DOTALL|re.IGNORECASE).findall(data)
 
         if videos:
