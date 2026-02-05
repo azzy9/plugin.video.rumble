@@ -359,7 +359,7 @@ def dir_list_create( data, cat, template_type='video', search = False, play=0 ):
                 if date_time:
                     info_labels[ 'year' ] = date_time[0][0]
                     video_title += ' - [COLOR lime]' + get_date_formatted( DATE_FORMAT, date_time[0][0], date_time[0][1], date_time[0][2] ) + '[/COLOR]'
-                elif template_type == 'live_stream':
+                elif cat == 'live_stream':
                     info_labels[ 'year' ] = datetime.now().year
 
                 if img:
