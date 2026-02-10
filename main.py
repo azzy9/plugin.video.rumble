@@ -547,41 +547,56 @@ def resolver( url ):
     urls = []
     subtitles = []
 
-    video_id = get_video_id( url )
+    # resolve shorts
+    if '/shorts/' in url:
+        html = request_get( url )
+        if html:
+            data = re.compile(r'<script type=\"application/json\">(.*?)</script>', re.DOTALL|re.IGNORECASE).findall(html)
+            if data:
+                data = json.loads(data[0])
+                streams = data[ 'items' ][0][ 'videos' ]
+                if streams:
+                    for stream in streams:
+                        if stream and stream.get( 'url', False ):
+                            urls.append(( str(stream[ 'res' ]), stream[ 'url' ] ))
 
-    if video_id:
+    else:
 
-        # use site api to get video urls
-        data = request_get(BASE_URL + '/embedJS/u3/?request=video&ver=2&v=' + video_id)
-        data = json.loads(data)
+        video_id = get_video_id( url )
 
-        if data :
-            types = [ 'mp4', 'webm', 'hls' ]
+        if video_id:
 
-            ua_streams = data.get('ua', False)
+            # use site api to get video urls
+            data = request_get(BASE_URL + '/embedJS/u3/?request=video&ver=2&v=' + video_id)
+            data = json.loads(data)
 
-            if ua_streams:
-                for stream_type in types:
+            if data :
+                types = [ 'mp4', 'webm', 'hls' ]
 
-                    streams = ua_streams.get( stream_type, False )
-                    if streams:
-                        for quality, stream in streams.items():
-                            if stream and stream.get( 'url', False ):
-                                urls.append(( quality, stream[ 'url' ] ))
-                        break
+                ua_streams = data.get('ua', False)
 
-            # get subtitles
-            cc = data.get('cc', False)
+                if ua_streams:
+                    for stream_type in types:
 
-            if cc:
-                for lang, subs in cc.items():
-                    path = subs.get( 'path', False )
-                    if path:
-                        subtitles.append(( subs.get( 'language', lang ), path ))
+                        streams = ua_streams.get( stream_type, False )
+                        if streams:
+                            for quality, stream in streams.items():
+                                if stream and stream.get( 'url', False ):
+                                    urls.append(( quality, stream[ 'url' ] ))
+                            break
 
-            if urls:
-                # sort sizes
-                urls.sort(reverse=True, key=sort_sizes)
+                # get subtitles
+                cc = data.get('cc', False)
+
+                if cc:
+                    for lang, subs in cc.items():
+                        path = subs.get( 'path', False )
+                        if path:
+                            subtitles.append(( subs.get( 'language', lang ), path ))
+
+    if urls:
+        # sort sizes
+        urls.sort(reverse=True, key=sort_sizes)
 
     return { 'urls': urls, 'subtitles': subtitles }
 
@@ -615,7 +630,6 @@ def video_quality_select( urls ):
             if playback_method == 1:
                 urls = urls[::-1]
                 media_url = urls[0][1]
-
 
             # quality select
             elif playback_method == 2:
@@ -1007,6 +1021,7 @@ def add_dir( name, url, mode, images = {}, info_labels = {}, cat = '', folder=Tr
 def playlist_manage( url, action="add" ):
 
     """ Adds to Rumble's Playlist """
+
     video_id = get_playlist_video_id( url )
 
     if video_id:
