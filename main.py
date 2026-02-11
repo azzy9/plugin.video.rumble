@@ -327,6 +327,7 @@ def dir_list_create( data, cat, template_type='video', search = False, play=0 ):
                 images = {}
                 info_labels = {}
                 subscribe_context = False
+                short = False
 
                 title = re.compile(r'<h3(?:[^\>]+)?>(.*?)</h3>', re.DOTALL|re.IGNORECASE).findall(video)
                 link = re.compile(r'<a\s*class=\"videostream__link\slink\"\s*draggable=\"false\"\shref=\"([^\"]+)\"', re.DOTALL|re.IGNORECASE).findall(video)
@@ -334,6 +335,10 @@ def dir_list_create( data, cat, template_type='video', search = False, play=0 ):
 
                 if title:
                     video_title = '[B]' + clean_text( title[0] ) + '[/B]'
+                if link:
+                    link = link[0]
+                    if '/shorts/' in link:
+                        short = True
                 if 'videostream__status--live' in video:
                     video_title += ' [COLOR red](Live)[/COLOR]'
                 if 'videostream__status--upcoming' in video:
@@ -344,6 +349,8 @@ def dir_list_create( data, cat, template_type='video', search = False, play=0 ):
 
                 if channel_name:
 
+                    if short:
+                        video_title += ' [COLOR white](Short)[/COLOR]'
                     video_title += ' - ' if one_line_titles else '\n'
                     video_title += '[COLOR gold]' + clean_text( channel_name[0][0] )
                     if channel_name[0][1]:
@@ -371,7 +378,7 @@ def dir_list_create( data, cat, template_type='video', search = False, play=0 ):
                     info_labels[ 'duration' ] = duration_to_secs( duration[0].strip() )
 
                 #open get url and open player
-                add_dir( video_title, BASE_URL + link[0], 4, images, info_labels, cat, False, True, play, subscribe_context  )
+                add_dir( video_title, BASE_URL + link, 4, images, info_labels, cat, False, True, play, subscribe_context  )
 
         return amount
 
