@@ -75,7 +75,7 @@ def bypass_cloudflare(url, data):
             flaresolverr_data = { 'url': url, 'maxTimeout': 1000*timeout }
             if data:
                 flaresolverr_data['cmd'] = 'request.post'
-                flaresolverr_data['postData'] = data
+                flaresolverr_data['postData'] = urllib.parse.urlencode(data)
             else:
                 flaresolverr_data['cmd'] = 'request.get'
 
