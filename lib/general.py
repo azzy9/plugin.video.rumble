@@ -52,10 +52,8 @@ class TLS12HttpAdapter(HTTPAdapter):
             num_pools=connections, maxsize=maxsize, block=block, ssl_version=ssl.PROTOCOL_TLSv1_2
         )
 
-rqs = requests.session()
-tls_adapters = [TLS12HttpAdapter(), TLS11HttpAdapter()]
-
 reqs = requests.session()
+tls_adapters = [TLS12HttpAdapter(), TLS11HttpAdapter()]
 
 def bypass_cloudflare(url, data):
     if ADDON.getSettingBool('bypassCloudflare'):
@@ -155,7 +153,7 @@ def request_get( url, data=None, extra_headers=None ):
                             return result
                         try_to_bypass_cloudflare = False # Only attempt to bypass once
 
-                    rqs.mount(domain, tls_adapters[i])
+                    reqs.mount(domain, tls_adapters[i])
                 i += 1
 
         if response.cookies.get_dict():
