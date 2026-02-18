@@ -24,6 +24,7 @@ class RumbleUser:
 
     """ main rumble user class """
 
+    login_url = 'https://auth.rumble.com'
     base_url = 'https://rumble.com'
     username = ''
     password = ''
@@ -91,11 +92,17 @@ class RumbleUser:
         """
 
         if self.has_login_details():
+
+            headers = {
+                'Referer': self.login_url,
+                'Content-type': 'application/x-www-form-urlencoded',
+            }
+
             # gets salts
             data = request_get(
                 self.base_url + '/service.php?name=user.get_salts',
                 {'username': self.username},
-                [('Referer', self.base_url), ('Content-type', 'application/x-www-form-urlencoded')]
+                headers
             )
             if data:
                 salts = json.loads(data)['data']['salts']
@@ -115,11 +122,16 @@ class RumbleUser:
                 + login_hash.hashStretch( self.password, salts[2], 128
             ) + ',' + salts[1]
 
+            headers = {
+                'Referer': self.login_url,
+                'Content-type': 'application/x-www-form-urlencoded',
+            }
+
             # login
             data = request_get(
                 self.base_url + '/service.php?name=user.login',
                 {'username': self.username, 'password_hashes': hashes},
-                [('Referer', self.base_url), ('Content-type', 'application/x-www-form-urlencoded')]
+                headers
             )
 
             if data:
