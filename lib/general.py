@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 import sys
 import ssl
+import re
 import requests
 
 import xbmc
@@ -22,6 +23,8 @@ ADDON_ICON = ADDON.getAddonInfo('icon')
 ADDON_NAME = ADDON.getAddonInfo('name')
 
 KODI_VERSION = float(xbmcaddon.Addon('xbmc.addon').getAddonInfo('version')[:4])
+
+FLARESOLVERR_ENABLED = ADDON.getSettingBool('bypassCloudflare')
 
 #language
 __language__ = ADDON.getLocalizedString
@@ -56,50 +59,78 @@ reqs = requests.session()
 tls_adapters = [TLS12HttpAdapter(), TLS11HttpAdapter()]
 
 def bypass_cloudflare(url, data):
-    if ADDON.getSettingBool('bypassCloudflare'):
-        xbmc.log("Bypassing Cloudflare challenge")
-        try:
-            # get stored cookie string
-            cookies = ADDON.getSetting('cookies')
 
-            # split cookies into dictionary
-            if cookies:
-                cookie_dict = json.loads( cookies )
-            else:
-                cookie_dict = None
+    xbmc.log("Flaresolverr: Bypassing Cloudflare challenge")
 
-            timeout = ADDON.getSettingInt('flareSolverrTimeout')
+    try:
+        # get stored cookie string
+        cookies = ADDON.getSetting('cookies')
 
-            flaresolverr_data = { 'url': url, 'maxTimeout': 1000*timeout }
-            if data:
-                flaresolverr_data['cmd'] = 'request.post'
-                flaresolverr_data['postData'] = urllib.parse.urlencode(data)
-            else:
-                flaresolverr_data['cmd'] = 'request.get'
+        # split cookies into dictionary
+        if cookies:
+            cookie_dict = json.loads( cookies )
+        else:
+            cookie_dict = None
 
-            response = reqs.post(ADDON.getSetting('flareSolverrUrl'), json=flaresolverr_data, verify=False, timeout=timeout)
-            response.raise_for_status()
+        flaresolverr_headers = {"Content-Type": "application/json"}
 
-            js = response.json()
+        timeout = ADDON.getSettingInt('flareSolverrTimeout')
 
-            cookies = {}
-            for cookie in js['solution']['cookies']:
-                cookies[cookie['name']] = cookie['value']
+        flaresolverr_data = {
+            'url': url,
+            'maxTimeout': 1000 * timeout,
+            'disableMedia': True,
+        }
+        
+        if data:
+            flaresolverr_data['cmd'] = 'request.post'
+            flaresolverr_data['postData'] = urllib.parse.urlencode(data)
+        else:
+            flaresolverr_data['cmd'] = 'request.get'
 
-            if cookie_dict:
-                cookie_dict.update( cookies )
-            else:
-                cookie_dict = cookies
+        # add authentication cookie
+        if cookie_dict and cookie_dict.get( 'u_s', False ):
+            flaresolverr_data['cookies'] = [{"name":"u_s","value":cookie_dict[ 'u_s' ]}]
 
-            ADDON.setSetting('cookies', json.dumps(cookie_dict))
+        response = reqs.post(
+            ADDON.getSetting('flareSolverrUrl'),
+            headers=flaresolverr_headers,
+            json=flaresolverr_data,
+            verify=False,
+            timeout=timeout
+        )
+        response.raise_for_status()
 
-            return js['solution']['response']
-        except Exception as e:
-            dialog = xbmcgui.Dialog()
-            dialog.notification("Cloudflare bypass failed", str(e), icon=xbmcgui.NOTIFICATION_ERROR)
-            xbmc.log("Cloudflare bypass failed: " + str(e))
+        js = response.json()
 
-    return None
+        cookies = {}
+        for cookie in js['solution']['cookies']:
+            cookies[cookie['name']] = cookie['value']
+
+        if cookie_dict:
+            cookie_dict.update( cookies )
+        else:
+            cookie_dict = cookies
+
+        # set cloudflare cookies
+        ADDON.setSetting('cookies', json.dumps(cookie_dict))
+        # Set returned user-agent to use with future requests
+        ADDON.setSetting('flareSolverrUserAgent', js['solution']['userAgent'])
+
+        return_response = js['solution']['response']
+
+        if '</pre>' in return_response and 'json-formatter-container' in return_response:
+            json_body = re.compile(r'<pre>(.*)<\/pre>', re.MULTILINE|re.DOTALL|re.IGNORECASE).findall(return_response)
+            if json_body:
+                return_response = json_body[0]
+
+        return return_response
+
+    except Exception as err_str:
+        dialog = xbmcgui.Dialog()
+        dialog.notification("Cloudflare bypass failed", str(err_str), icon=xbmcgui.NOTIFICATION_ERROR)
+        xbmc.log("Flaresolverr: Cloudflare bypass failed - " + str(err_str), xbmc.LOGWARNING)
+    return False
 
 def request_get( url, data=None, extra_headers=None ):
 
@@ -115,12 +146,18 @@ def request_get( url, data=None, extra_headers=None ):
             'Referer': url,
             'Cache-Control': 'no-cache',
             'Pragma': 'no-cache',
-            'DNT': '1'
+            'DNT': '1',
         }
 
         # add extra headers
         if extra_headers:
             my_headers.update(extra_headers)
+
+        # if we need to insert flaresolverr useragent
+        if FLARESOLVERR_ENABLED:
+            flaresolverr_useragent = ADDON.getSetting('flareSolverrUserAgent')
+            if flaresolverr_useragent:
+                my_headers[ 'User-Agent' ] = flaresolverr_useragent
 
         # get stored cookie string
         cookies = ADDON.getSetting('cookies')
@@ -136,7 +173,8 @@ def request_get( url, data=None, extra_headers=None ):
 
         status = 0
         i = 0
-        try_to_bypass_cloudflare = True
+
+        try_to_bypass_cloudflare = FLARESOLVERR_ENABLED
         while status != 200 and i < 2:
             # make request
             if data:
@@ -151,7 +189,9 @@ def request_get( url, data=None, extra_headers=None ):
                         result = bypass_cloudflare(url, data)
                         if result:
                             return result
-                        try_to_bypass_cloudflare = False # Only attempt to bypass once
+
+                        # Only attempt to bypass once
+                        try_to_bypass_cloudflare = False
 
                     reqs.mount(domain, tls_adapters[i])
                 i += 1
