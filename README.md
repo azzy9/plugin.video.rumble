@@ -22,8 +22,14 @@ Save the settings.<br />
 This plugin can be installed from the AzzyAddons repo: https://azzyaddons.github.io
 
 ## Issues
-If an issue occurs where the stream freezes after start,<br />
-you can try to enable http streams:<br />
-- Go to settings<br />
-- Debug<br />
-- Use HTTP
+All though the plugin tries it best to get around the Cloudflare Protection of the site,<br />
+there are times it may be unable to bypass the verification.<br />
+If this is the case, the only way around it is to use Flaresolverr.
+
+You will need to setup Flaresolverr (Guides can be found online)
+
+To enable flaresolverr integration:
+- Go to the plugin settings<br />
+- Cloudflare Bypass<br />
+- Enabled
+- Enter Flaresolverr Details
