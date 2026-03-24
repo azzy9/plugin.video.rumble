@@ -516,7 +516,7 @@ def get_video_id( url ):
     helps in resolving
     """
 
-    data = request_get(url)
+    data = request_get(url, redirects=False)
 
     # gets embed id from embed url
     video_id = re.compile(

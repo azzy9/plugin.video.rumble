@@ -132,7 +132,7 @@ def bypass_cloudflare(url, data):
         xbmc.log("Flaresolverr: Cloudflare bypass failed - " + str(err_str), xbmc.LOGWARNING)
     return False
 
-def request_get( url, data=None, extra_headers=None ):
+def request_get( url, data=None, extra_headers=None, redirects=True ):
 
     """ makes a request """
 
@@ -178,9 +178,9 @@ def request_get( url, data=None, extra_headers=None ):
         while status != 200 and i < 2:
             # make request
             if data:
-                response = reqs.post(url, data=data, headers=my_headers, verify=False, cookies=cookie_dict, timeout=10)
+                response = reqs.post(url, data=data, headers=my_headers, verify=False, cookies=cookie_dict, timeout=10, allow_redirects=redirects)
             else:
-                response = reqs.get(url, headers=my_headers, verify=False, cookies=cookie_dict, timeout=10)
+                response = reqs.get(url, headers=my_headers, verify=False, cookies=cookie_dict, timeout=10, allow_redirects=redirects)
 
             status = response.status_code
             if status != 200:
