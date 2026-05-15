@@ -10,7 +10,7 @@ import re
 
 import xbmcaddon
 
-from lib.general import request_get
+from lib.network import request_get
 from lib.md5ex import MD5Ex
 
 try:

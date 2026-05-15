@@ -14,6 +14,7 @@ import six
 from six.moves import urllib
 
 from lib.general import *
+from lib.network import request_get
 from lib.rumble_user import RumbleUser
 from lib.comments import CommentWindow
 
