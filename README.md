@@ -24,12 +24,12 @@ This plugin can be installed from the AzzyAddons repo: https://azzyaddons.github
 ## Issues
 All though the plugin tries it best to get around the Cloudflare Protection of the site,<br />
 there are times it may be unable to bypass the verification.<br />
-If this is the case, the only way around it is to use Flaresolverr.
+If this is the case, the only way around it is to use a cloudflare bypass tool such as Flaresolverr or Byparr.
 
-You will need to setup Flaresolverr (Guides can be found online)
+You will need to setup Flaresolverr or Byparr (Guides can be found online).
 
-To enable flaresolverr integration:
+To enable Flaresolverr / Byparr integration:
 - Go to the plugin settings<br />
 - Cloudflare Bypass<br />
 - Enabled
-- Enter Flaresolverr Details
+- Enter Flaresolverr / Byparr Details

@@ -12,9 +12,10 @@ Plugin Version:
 Kodi Version:
 Operating System:
 
-**Using FlareSolverr**
-[ ] No
-[ ] Yes
+**Using a CloudFlare Bypass Method**
+[ ] None
+[ ] FlareSolver
+[ ] Byparr
 
 **The Issue**
 A clear and concise description of what you expected to happen.

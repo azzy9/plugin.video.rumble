@@ -17,7 +17,7 @@ except ImportError:
 
 ADDON = xbmcaddon.Addon()
 
-FLARESOLVERR_ENABLED = ADDON.getSettingBool('bypassCloudflare')
+BYPASS_CF_ENABLED = ADDON.getSettingBool('bypassCloudflare')
 
 # Disable urllib3's "InsecureRequestWarning: Unverified HTTPS request is being made" warnings
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
@@ -50,7 +50,12 @@ tls_adapters = [TLS12HttpAdapter(), TLS11HttpAdapter()]
 
 def bypass_cloudflare(url, data):
 
-    xbmc.log("Flaresolverr: Bypassing Cloudflare challenge")
+    """
+    When active, this method will try to bypass cloudflare
+    using either Flaresolverr or Byparr
+    """
+
+    xbmc.log("Bypass Cloudflare: attempting")
 
     try:
         # get stored cookie string
@@ -62,30 +67,30 @@ def bypass_cloudflare(url, data):
         else:
             cookie_dict = None
 
-        flaresolverr_headers = {"Content-Type": "application/json"}
+        bypass_cf_headers = {"Content-Type": "application/json"}
 
         timeout = ADDON.getSettingInt('flareSolverrTimeout')
 
-        flaresolverr_data = {
+        bypass_cf_data = {
             'url': url,
             'maxTimeout': 1000 * timeout,
             'disableMedia': True,
         }
 
         if data:
-            flaresolverr_data['cmd'] = 'request.post'
-            flaresolverr_data['postData'] = urllib.parse.urlencode(data)
+            bypass_cf_data['cmd'] = 'request.post'
+            bypass_cf_data['postData'] = urllib.parse.urlencode(data)
         else:
-            flaresolverr_data['cmd'] = 'request.get'
+            bypass_cf_data['cmd'] = 'request.get'
 
         # add authentication cookie
         if cookie_dict and cookie_dict.get( 'u_s', False ):
-            flaresolverr_data['cookies'] = [{"name":"u_s","value":cookie_dict[ 'u_s' ]}]
+            bypass_cf_data['cookies'] = [{"name":"u_s","value":cookie_dict[ 'u_s' ]}]
 
         response = reqs.post(
             ADDON.getSetting('flareSolverrUrl'),
-            headers=flaresolverr_headers,
-            json=flaresolverr_data,
+            headers=bypass_cf_headers,
+            json=bypass_cf_data,
             verify=False,
             timeout=timeout
         )
@@ -119,7 +124,7 @@ def bypass_cloudflare(url, data):
     except Exception as err_str:
         dialog = xbmcgui.Dialog()
         dialog.notification("Cloudflare bypass failed", str(err_str), icon=xbmcgui.NOTIFICATION_ERROR)
-        xbmc.log("Flaresolverr: Cloudflare bypass failed - " + str(err_str), xbmc.LOGWARNING)
+        xbmc.log("Bypass Cloudflare: failed - " + str(err_str), xbmc.LOGWARNING)
     return False
 
 def request_get( url, data=None, extra_headers=None, redirects=True ):
@@ -144,10 +149,10 @@ def request_get( url, data=None, extra_headers=None, redirects=True ):
             my_headers.update(extra_headers)
 
         # if we need to insert flaresolverr useragent
-        if FLARESOLVERR_ENABLED:
-            flaresolverr_useragent = ADDON.getSetting('flareSolverrUserAgent')
-            if flaresolverr_useragent:
-                my_headers[ 'User-Agent' ] = flaresolverr_useragent
+        if BYPASS_CF_ENABLED:
+            bypass_cf_useragent = ADDON.getSetting('flareSolverrUserAgent')
+            if bypass_cf_useragent:
+                my_headers[ 'User-Agent' ] = bypass_cf_useragent
 
         # get stored cookie string
         cookies = ADDON.getSetting('cookies')
@@ -164,7 +169,7 @@ def request_get( url, data=None, extra_headers=None, redirects=True ):
         status = 0
         i = 0
 
-        try_to_bypass_cloudflare = FLARESOLVERR_ENABLED
+        try_to_bypass_cloudflare = BYPASS_CF_ENABLED
         while status != 200 and i < 2:
             # make request
             if data:
