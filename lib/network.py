@@ -18,6 +18,7 @@ except ImportError:
 ADDON = xbmcaddon.Addon()
 
 BYPASS_CF_ENABLED = ADDON.getSettingBool('bypassCloudflare')
+USE_CLOUDREQUEST = ADDON.getSettingBool('cloudRequest')
 
 # Disable urllib3's "InsecureRequestWarning: Unverified HTTPS request is being made" warnings
 from requests.packages.urllib3.exceptions import InsecureRequestWarning
@@ -45,7 +46,22 @@ class TLS12HttpAdapter(HTTPAdapter):
             num_pools=connections, maxsize=maxsize, block=block, ssl_version=ssl.PROTOCOL_TLSv1_2
         )
 
-reqs = requests.session()
+# if we are not using a bypass tool
+# see if we can use the cloudrequest module
+if BYPASS_CF_ENABLED is False and USE_CLOUDREQUEST:
+    try:
+        import cloudscraper
+        reqs = cloudscraper.create_scraper(
+            browser={'browser': 'chrome', 'platform': 'windows', 'mobile': False},
+            delay=4
+        )
+        xbmc.log( 'Using cloudrequest', xbmc.LOGWARNING )
+    except ImportError:
+        reqs = requests.session()
+        USE_CLOUDREQUEST = False
+else:
+    reqs = requests.session()
+
 tls_adapters = [TLS12HttpAdapter(), TLS11HttpAdapter()]
 
 def bypass_cloudflare(url, data):
@@ -173,9 +189,9 @@ def request_get( url, data=None, extra_headers=None, redirects=True ):
         while status != 200 and i < 2:
             # make request
             if data:
-                response = reqs.post(url, data=data, headers=my_headers, verify=False, cookies=cookie_dict, timeout=10, allow_redirects=redirects)
+                response = reqs.post(url, data=data, headers=my_headers, cookies=cookie_dict, timeout=10, allow_redirects=redirects)
             else:
-                response = reqs.get(url, headers=my_headers, verify=False, cookies=cookie_dict, timeout=10, allow_redirects=redirects)
+                response = reqs.get(url, headers=my_headers, cookies=cookie_dict, timeout=10, allow_redirects=redirects)
 
             status = response.status_code
             if status != 200:

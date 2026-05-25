@@ -13,6 +13,7 @@
         <setting id="resetSession" label="Reset Session" type="action" action="RunPlugin(plugin://plugin.video.rumble/?mode=10)"/>
     </category>
     <category label="Cloudflare Bypass">
+        <setting id="cloudRequest" label="Use CloudRequest" type="bool" default="True"/>
         <setting id="bypassCloudflare" label="Enabled" type="bool" default="False"/>
         <setting id="flareSolverrUrl" label="Flaresolverr URL" type="text" default="http://localhost:8191/v1" visible="eq(-1,true)" />
         <setting id="flareSolverrTimeout" label="Flaresolverr Timeout (s)" type="number" default="60" visible="eq(-2,true)" />
