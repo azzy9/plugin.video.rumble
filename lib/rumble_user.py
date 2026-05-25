@@ -30,6 +30,7 @@ class RumbleUser:
     password = ''
     session = ''
     expiry = ''
+    login_method = 0
 
     def __init__( self ):
 
@@ -45,6 +46,7 @@ class RumbleUser:
         self.password = ADDON.getSetting( 'password' )
         self.session = ADDON.getSetting( 'session' )
         self.expiry = ADDON.getSetting( 'expiry' )
+        self.login_method = int( ADDON.getSetting( 'login_method' ) )
 
         if self.expiry:
             self.expiry = float( self.expiry )
@@ -112,7 +114,17 @@ class RumbleUser:
 
     def login( self ):
 
-        """ method to generate the hashes and login """
+        """ method to decide which login method to use """
+
+        if self.login_method > 0:
+            return self.login_2fa()
+
+        return self.login_legacy()
+
+
+    def login_legacy( self ):
+
+        """ method to generate the hashes and login via the legacy method """
 
         salts = self.get_salts()
         if salts:
@@ -131,6 +143,41 @@ class RumbleUser:
             data = request_get(
                 self.base_url + '/service.php?name=user.login',
                 {'username': self.username, 'password_hashes': hashes},
+                headers
+            )
+
+            if data:
+                session = json.loads(data)['data']['session']
+                if session:
+                    self.session = session
+                    # Expiry is 30 Days
+                    self.expiry = math.floor( time.time() ) + 2592000
+                    self.set_session_details()
+                    return session
+
+        return False
+
+    def login_2fa( self ):
+
+        """ method to generate the hashes and login via the new 2fa method """
+
+        salts = self.get_salts()
+        if salts:
+            login_hash = MD5Ex()
+            hashes = login_hash.hash(
+                login_hash.hashStretch( self.password, salts[0], 128) + salts[1] ) + ',' \
+                + login_hash.hashStretch( self.password, salts[2], 128
+            ) + ',' + salts[1]
+
+            headers = {
+                'Referer': self.login_url,
+                'Content-type': 'application/x-www-form-urlencoded',
+            }
+
+            # login
+            data = request_get(
+                self.base_url + 'service.php?name=user.2fa.first_step&response_type=session',
+                {'legacy_password': 1, 'username': self.username, 'password_hashes': hashes},
                 headers
             )
 
