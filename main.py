@@ -55,8 +55,8 @@ TEMPLATE_TYPES = {
     'cat_video': 'grid',
     'live_stream': 'grid',
     'playlist': 'grid',
-    'channel_video': 'grid',
-    'user': 'grid',
+    'channel_video': 'json',
+    'user': 'json',
     'following': 'following',
 }
 
@@ -380,6 +380,35 @@ def dir_list_create( data, cat, template_type='video', search = False, play=0 ):
 
                 #open get url and open player
                 add_dir( video_title, BASE_URL + link, 4, images, info_labels, cat, False, True, play, subscribe_context  )
+
+        return amount
+
+    if template_type == 'json':
+
+        json_scripts = re.compile(r'<script\s*type=\"application/json\">(.*?)</script>', re.DOTALL|re.IGNORECASE).findall(data)
+        if json_scripts:
+            # one json script per block
+            for json_script in json_scripts:
+                json_script = json.loads( json_script.strip() )
+                if json_script and json_script.get('items'):
+                    for video in json_script.get('items'):
+
+                        # make sure we are dealing with a video
+                        if video.get('object_type', '') == 'video':
+
+                            video_title = video.get('title', '')
+                            link = video.get('url', '')
+                            info_labels = {}
+                            subscribe_context = False
+                            short = False
+
+                            cat = 'channel_video'
+                            images = { 'thumb': str(video.get('thumb', '')), 'fanart': str(video.get('thumb', '')) }
+
+                            amount+=1
+                            #open get url and open player
+                            add_dir( video_title, link, 4, images, info_labels, cat, False, True, play, subscribe_context  )
+
 
         return amount
 
