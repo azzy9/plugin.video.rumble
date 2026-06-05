@@ -138,7 +138,7 @@ def home_menu():
         add_dir( 'Watch Later', BASE_URL + '/playlists/watch-later', 3, { 'thumb': 'favorite.png' }, {}, 'playlist' )
 
     # Battle Leaderboard
-    add_dir( get_string(30050), BASE_URL + '/battle-leaderboard/recorded', 3, { 'thumb': 'leader.png' }, {}, 'top' )
+    add_dir( get_string(30050), BASE_URL + '/battle-leaderboard', 3, { 'thumb': 'leader.png' }, {}, 'top' )
 
     # Categories
     add_dir( get_string(30051), BASE_URL + '/browse', 3, { 'thumb': 'viral.png' }, {}, 'cat_list' )
