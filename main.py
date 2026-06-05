@@ -400,9 +400,40 @@ def dir_list_create( data, cat, template_type='video', search = False, play=0 ):
                             link = video.get('url', '')
                             info_labels = {}
                             subscribe_context = False
-                            short = False
 
-                            cat = 'channel_video'
+                            if video.get('live'):
+                                video_title += ' [COLOR red](Live)[/COLOR]'
+
+                            if video.get('is_short'):
+                                video_title += ' [COLOR white](Short)[/COLOR]'
+
+                            # sort out channel info
+                            if video.get('by') and video['by'].get('type', '') == 'channel':
+
+                                video_title += ' - ' if one_line_titles else '\n'
+
+                                video_title += '[COLOR gold]' + clean_text( video['by'].get('name', '') )
+                                if video['by'].get('verified_badge'):
+                                    video_title += " (Verified)"
+                                video_title += '[/COLOR]'
+
+                                channel_link = video['by'].get('url', '')
+                                if channel_link:
+                                    channel_link = strip_query_params( channel_link )
+                                    subscribe_context = { 'name' : channel_link, 'subscribe': True }
+
+                            # sort out video meta data
+                            upload_date = video.get('upload_date')
+
+                            if upload_date:
+                                upload_date = upload_date.split('T')
+                                upload_date_date = upload_date[0].split('-')
+                                info_labels[ 'year' ] = upload_date_date[0]
+                                video_title += ' - [COLOR lime]' + get_date_formatted( DATE_FORMAT, upload_date_date[0], upload_date_date[1], upload_date_date[2] ) + '[/COLOR]'
+
+
+                            info_labels[ 'duration' ] = video.get('duration', '0')
+
                             images = { 'thumb': str(video.get('thumb', '')), 'fanart': str(video.get('thumb', '')) }
 
                             amount+=1
