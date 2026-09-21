@@ -51,7 +51,7 @@ else:
 TEMPLATE_TYPES = {
     'channel': 'video',
     'top': 'video',
-    'subscriptions': 'grid',
+    'subscriptions': 'subscriptions',
     'cat_video': 'grid',
     'live_stream': 'grid',
     'playlist': 'grid',
@@ -194,7 +194,7 @@ def pagination( url, page, cat, search=False ):
         if cat in { 'following', 'top', 'cat_list' }:
             paginated = False
 
-        amount = list_rumble( page_url, cat )
+        amount = list_rumble( page_url, cat, page )
 
         if paginated and amount > 15 and page < 10:
 
@@ -239,19 +239,22 @@ def get_image( data, image_id ):
     return image
 
 
-def list_rumble( url, cat ):
+def list_rumble( url, cat, page=1 ):
 
     """ Method to get and display items from Rumble """
 
     amount = 0
     headers = None
 
-    if 'subscriptions' in url or cat == 'following':
+    if cat in ['subscriptions', 'following', 'playlist']:
         # make sure there is a session
         # result is stored in a cookie
         RUMBLE_USER.has_session()
 
-    data = request_get(url, None, headers)
+    if cat == 'subscriptions':
+        data = RUMBLE_USER.user_subscription_feed( 24, page )
+    else:
+        data = request_get(url, None, headers)
 
     # Fix for favorites & search
     if cat in { 'channel' } and '/c/' in url:
@@ -514,6 +517,62 @@ def dir_list_create( data, cat, template_type='video', search = False, play=0 ):
 
                 #open get url and open player
                 add_dir( video_title, BASE_URL + link, 3, images, info_labels, cat, True, True, play, { 'name' : link, 'subscribe': False } )
+
+        return amount
+
+    if template_type == 'subscriptions':
+
+        #TODO: combine subscriptions & json into one
+
+        if data:
+            for video in data:
+
+                # make sure we are dealing with a video
+                if video.get('object_type', '') == 'video':
+
+                    video_title = video.get('title', '')
+                    link = video.get('url', '')
+                    info_labels = {}
+                    subscribe_context = False
+
+                    if video.get('live'):
+                        video_title += ' [COLOR red](Live)[/COLOR]'
+
+                    if video.get('is_short'):
+                        video_title += ' [COLOR white](Short)[/COLOR]'
+
+                    # sort out channel info
+                    if video.get('by') and video['by'].get('type', '') == 'channel':
+
+                        video_title += ' - ' if one_line_titles else '\n'
+
+                        video_title += '[COLOR gold]' + clean_text( video['by'].get('name', '') )
+                        if video['by'].get('verified_badge'):
+                            video_title += " (Verified)"
+                        video_title += '[/COLOR]'
+
+                        channel_link = video['by'].get('url', '')
+                        if channel_link:
+                            channel_link = strip_query_params( channel_link )
+                            subscribe_context = { 'name' : channel_link, 'subscribe': True }
+
+                    # sort out video meta data
+                    upload_date = video.get('upload_date')
+
+                    if upload_date:
+                        upload_date = upload_date.split('T')
+                        upload_date_date = upload_date[0].split('-')
+                        info_labels[ 'year' ] = upload_date_date[0]
+                        video_title += ' - [COLOR lime]' + get_date_formatted( DATE_FORMAT, upload_date_date[0], upload_date_date[1], upload_date_date[2] ) + '[/COLOR]'
+
+
+                    info_labels[ 'duration' ] = video.get('duration', '0')
+
+                    images = { 'thumb': str(video.get('thumb', '')), 'fanart': str(video.get('thumb', '')) }
+
+                    amount+=1
+                    #open get url and open player
+                    add_dir( video_title, link, 4, images, info_labels, cat, False, True, play, subscribe_context  )
 
         return amount
 

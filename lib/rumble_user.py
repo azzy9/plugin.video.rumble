@@ -271,3 +271,28 @@ class RumbleUser:
             return data
 
         return False
+
+    def user_subscription_feed( self, limit=24, page=1, options='video.full' ):
+
+        """ method to get user subscription feed """
+
+        if self.has_session():
+
+            headers = {
+                'Referer': self.base_url,
+                'Content-type': 'application/x-www-form-urlencoded'
+            }
+
+            data = request_get(
+                self.base_url + '/service.php?name=user.subscription_feed&api=7&limit=' + \
+                    str( limit ) + '&offset=' + str( (page - 1) * limit ) + '&options+' + options,
+                False,
+                headers
+            )
+
+            if data:
+                video_data = json.loads(data)
+                if video_data:
+                    return video_data.get('data', {}).get('items')
+
+        return False
