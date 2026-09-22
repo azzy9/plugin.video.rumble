@@ -183,7 +183,7 @@ def pagination( url, page, cat, search=False ):
         elif search and cat == 'video':
             query_params['q'] = search
             query_params['page'] = str( page )
-        elif cat in {'channel', 'channel_video', 'cat_video', 'user', 'subscriptions', 'live_stream' }:
+        elif cat in { 'channel', 'channel_video', 'cat_video', 'user', 'subscriptions', 'live_stream' }:
             query_params['page'] = str( page )
 
         # add query params to link
@@ -204,7 +204,7 @@ def pagination( url, page, cat, search=False ):
             name = get_string(30150) + " " + str( page )
             list_item = xbmcgui.ListItem(name)
 
-            link_params = {
+            query_params = {
                 'url': url,
                 'mode': '3',
                 'name': name,
@@ -212,7 +212,7 @@ def pagination( url, page, cat, search=False ):
                 'cat': cat,
             }
 
-            link = build_url( link_params )
+            link = build_url( query_params )
 
             if search and cat == 'video':
                 link = link + "&search=" + urllib.parse.quote_plus(search)
@@ -248,11 +248,12 @@ def list_rumble( url, cat, page=1 ):
 
     if cat in ['subscriptions', 'following', 'playlist']:
         # make sure there is a session
-        # result is stored in a cookie
+        # the result is stored in a cookie
         RUMBLE_USER.has_session()
 
     if cat == 'subscriptions':
         data = RUMBLE_USER.user_subscription_feed( 24, page )
+
     else:
         data = request_get(url, None, headers)
 
@@ -271,7 +272,6 @@ def list_rumble( url, cat, page=1 ):
         amount = dir_list_create( data, cat, TEMPLATE_TYPES[ cat ], False, 2 )
 
     return amount
-
 
 def dir_list_create( data, cat, template_type='video', search = False, play=0 ):
 
@@ -522,7 +522,7 @@ def dir_list_create( data, cat, template_type='video', search = False, play=0 ):
 
     if template_type == 'subscriptions':
 
-        #TODO: combine subscriptions & json into one
+        # TODO: combine subscriptions & json into one
 
         if data:
             for video in data:
@@ -565,13 +565,12 @@ def dir_list_create( data, cat, template_type='video', search = False, play=0 ):
                         info_labels[ 'year' ] = upload_date_date[0]
                         video_title += ' - [COLOR lime]' + get_date_formatted( DATE_FORMAT, upload_date_date[0], upload_date_date[1], upload_date_date[2] ) + '[/COLOR]'
 
-
                     info_labels[ 'duration' ] = video.get('duration', '0')
 
                     images = { 'thumb': str(video.get('thumb', '')), 'fanart': str(video.get('thumb', '')) }
 
                     amount+=1
-                    #open get url and open player
+                    # open get url and open player
                     add_dir( video_title, link, 4, images, info_labels, cat, False, True, play, subscribe_context  )
 
         return amount
@@ -607,7 +606,7 @@ def dir_list_create( data, cat, template_type='video', search = False, play=0 ):
 
             followers = re.compile(r'<span\sclass=\"(?:[^\"]+)\">\s+([^&<]+)&nbsp;\s*Follower(?:s)?\s+<\/span>', re.DOTALL|re.IGNORECASE).findall(channel)
             followers = followers[0] if followers else "0"
-            
+
             img_id = re.compile(r'user-image--img--id-([^\s]+)\s', re.DOTALL|re.IGNORECASE).findall(channel)
             img_id = img_id[0] if img_id else ''
 
@@ -925,10 +924,15 @@ def favorite_remove( name ):
     notify( get_string(30154), name )
 
 
-
 def favorites_import():
 
-    """ Due to plugin name change from original fork, the favorites will need to be imported """
+    """
+    Due to plugin name change from original fork, the favorites will need to be imported.
+
+    Deprecated:
+    It has been long enough since the rumble.matrix version stopped working.
+    This method will eventually be removed.
+    """
 
     if not xbmcgui.Dialog().yesno(
         'Import Favorites',
@@ -938,7 +942,7 @@ def favorites_import():
     ):
         return
 
-    # no point trying to run this as it didn't exist for python 2
+    # no point trying to run this script, as the plugin didn't exist for python 2
     if six.PY2:
         notify( 'Favorites Not Found' )
         return
@@ -946,7 +950,7 @@ def favorites_import():
     # make sure path exists
     favorites_create()
 
-    #load matrix favourites
+    # load matrix favourites
     rumble_matrix_dir = xbmcvfs.translatePath(os.path.join('special://home/userdata/addon_data/plugin.video.rumble.matrix', 'favorites.dat'))
 
     if os.path.exists(rumble_matrix_dir):
@@ -1136,7 +1140,7 @@ def add_dir( name, url, mode, images = {}, info_labels = {}, cat = '', folder=Tr
                     'play': str(play),
                 }
 
-                context_menu.append((get_string(30151),'RunPlugin(%s)' %build_url( fav_params )))
+                context_menu.append((get_string(30151),'RunPlugin(%s)' % build_url( fav_params )))
         except Exception:
             pass
 
@@ -1277,4 +1281,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

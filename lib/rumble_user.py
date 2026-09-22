@@ -153,7 +153,7 @@ class RumbleUser:
 
             headers = {
                 'Referer': self.base_url + video_id,
-                'Content-type': 'application/x-www-form-urlencoded'
+                'Content-type': 'application/x-www-form-urlencoded',
             }
 
             # for some strange reason the first letter needs to be removed
@@ -207,7 +207,7 @@ class RumbleUser:
 
             headers = {
                 'Referer': self.base_url + name,
-                'Content-type': 'application/x-www-form-urlencoded'
+                'Content-type': 'application/x-www-form-urlencoded',
             }
 
             data = request_get(
@@ -233,7 +233,7 @@ class RumbleUser:
 
             headers = {
                 'Referer': self.base_url,
-                'Content-type': 'application/x-www-form-urlencoded'
+                'Content-type': 'application/x-www-form-urlencoded',
             }
 
             data = request_get(
@@ -259,7 +259,7 @@ class RumbleUser:
 
             headers = {
                 'Referer': self.base_url,
-                'Content-type': 'application/x-www-form-urlencoded'
+                'Content-type': 'application/x-www-form-urlencoded',
             }
 
             data = request_get(
@@ -280,7 +280,7 @@ class RumbleUser:
 
             headers = {
                 'Referer': self.base_url,
-                'Content-type': 'application/x-www-form-urlencoded'
+                'Content-type': 'application/x-www-form-urlencoded',
             }
 
             data = request_get(
