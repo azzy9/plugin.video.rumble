@@ -14,6 +14,7 @@ import six
 from six.moves import urllib
 
 from lib.general import *
+from lib.favorites import *
 from lib.network import request_get
 from lib.rumble_user import RumbleUser
 from lib.comments import CommentWindow
@@ -43,11 +44,6 @@ PLAYBACK_CAP = ADDON.getSetting('playback_cap')
 
 RUMBLE_USER = RumbleUser()
 
-if six.PY2:
-    favorites = xbmc.translatePath(os.path.join(ADDON.getAddonInfo('profile'), 'favorites.dat'))
-else:
-    favorites = xbmcvfs.translatePath(os.path.join(ADDON.getAddonInfo('profile'), 'favorites.dat'))
-
 TEMPLATE_TYPES = {
     'channel': 'video',
     'top': 'video',
@@ -59,40 +55,6 @@ TEMPLATE_TYPES = {
     'user': 'json',
     'following': 'following',
 }
-
-def favorites_create():
-
-    """ creates favorite directory if doesn't exist """
-
-    if six.PY2:
-        addon_data_path = xbmc.translatePath(ADDON.getAddonInfo('profile'))
-    else:
-        addon_data_path = xbmcvfs.translatePath(ADDON.getAddonInfo('profile'))
-
-    if os.path.exists(addon_data_path) is False:
-        os.mkdir(addon_data_path)
-
-    xbmc.sleep(1)
-
-
-def favorites_load( return_string = False ):
-
-    """ load favourites from file into variable """
-
-    if os.path.exists( favorites ):
-        fav_str = open( favorites ).read()
-        if return_string:
-            return fav_str
-        if fav_str:
-            return json.loads( fav_str )
-    else:
-        favorites_create()
-
-    # nothing to load, return type necessary
-    if return_string:
-        return ''
-
-    return []
 
 
 def to_unicode( text, encoding='utf-8', errors='strict' ):
@@ -855,9 +817,7 @@ def favorite_add(name, url, fav_mode, thumb, fanart, plot, cat, folder, play):
 
     data = favorites_load()
     data.append((name, url, fav_mode, thumb, fanart, plot, cat, folder, play))
-    fav_file = open( favorites, 'w' )
-    fav_file.write(json.dumps(data))
-    fav_file.close()
+    favorites_save( data )
 
     notify( get_string(30152), name, thumb )
 
@@ -875,9 +835,7 @@ def favorite_remove( name ):
         for index in range(len(data)):
             if data[index][0] == name:
                 del data[index]
-                fav_file = open( favorites, 'w' )
-                fav_file.write(json.dumps(data))
-                fav_file.close()
+                favorites_save( data )
                 break
 
     notify( get_string(30154), name )
@@ -916,9 +874,7 @@ def favorites_import():
         rumble_matrix = open( rumble_matrix_dir ).read()
 
         if rumble_matrix:
-            fav_file = open( favorites, 'w' )
-            fav_file.write(rumble_matrix)
-            fav_file.close()
+            favorites_save( rumble_matrix )
             notify( 'Imported Favorites' )
             return
 
@@ -1073,8 +1029,6 @@ def add_dir( name, url, mode, images = {}, info_labels = {}, cat = '', folder=Tr
 
     if fav_context:
 
-        favorite_str = favorites_load( True )
-
         try:
             name_fav = json.dumps(name)
         except Exception:
@@ -1082,8 +1036,8 @@ def add_dir( name, url, mode, images = {}, info_labels = {}, cat = '', folder=Tr
 
         try:
 
-            # checks fav name via string (I do not like how this is done, so will redo in future)
-            if name_fav in favorite_str:
+            # checks if item is favorited
+            if favorites_exists( name_fav ):
                 context_menu.append((get_string(30153),'RunPlugin(%s)' % build_url( {'mode': '6','name': name} )))
             else:
                 fav_params = {
