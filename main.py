@@ -174,10 +174,10 @@ def pagination( url, page, cat, search=False ):
                 'cat': cat,
             }
 
-            link = build_url( query_params )
-
             if search and cat == 'video':
-                link = link + "&search=" + urllib.parse.quote_plus(search)
+                query_params[ 'search' ] = search
+
+            link = build_url( query_params )
 
             xbmcplugin.addDirectoryItem(PLUGIN_ID, link, list_item, True)
 
