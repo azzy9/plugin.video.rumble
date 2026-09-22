@@ -51,7 +51,7 @@ else:
 TEMPLATE_TYPES = {
     'channel': 'video',
     'top': 'video',
-    'subscriptions': 'subscriptions',
+    'subscriptions': 'json',
     'cat_video': 'grid',
     'live_stream': 'grid',
     'playlist': 'grid',
@@ -269,9 +269,30 @@ def list_rumble( url, cat, page=1 ):
     elif cat == 'cat_list':
         amount = dir_list_create( data, cat, cat, False )
     elif TEMPLATE_TYPES.get( cat, False ):
+        if TEMPLATE_TYPES[ cat ] == 'json' and isinstance(data, six.string_types):
+            # if we need to get json from the HTML
+            data = json_scripts_videos_get( data )
         amount = dir_list_create( data, cat, TEMPLATE_TYPES[ cat ], False, 2 )
 
     return amount
+
+def json_scripts_videos_get( data ):
+
+    """ method to loop through all json scripts in the HTML to get videos """
+
+    videos = []
+    json_scripts = re.compile(r'<script\s*type=\"application/json\">(.*?)</script>', re.DOTALL|re.IGNORECASE).findall(data)
+    if json_scripts:
+        # one json script per block
+        for json_script in json_scripts:
+            json_script = json.loads( json_script.strip() )
+            if json_script and json_script.get('items'):
+                for video in json_script.get('items'):
+
+                    # make sure we are dealing with a video
+                    if video.get('object_type', '') == 'video':
+                        videos.append(video)
+    return videos
 
 def dir_list_create( data, cat, template_type='video', search = False, play=0 ):
 
@@ -386,66 +407,6 @@ def dir_list_create( data, cat, template_type='video', search = False, play=0 ):
 
         return amount
 
-    if template_type == 'json':
-
-        json_scripts = re.compile(r'<script\s*type=\"application/json\">(.*?)</script>', re.DOTALL|re.IGNORECASE).findall(data)
-        if json_scripts:
-            # one json script per block
-            for json_script in json_scripts:
-                json_script = json.loads( json_script.strip() )
-                if json_script and json_script.get('items'):
-                    for video in json_script.get('items'):
-
-                        # make sure we are dealing with a video
-                        if video.get('object_type', '') == 'video':
-
-                            video_title = video.get('title', '')
-                            link = video.get('url', '')
-                            info_labels = {}
-                            subscribe_context = False
-
-                            if video.get('live'):
-                                video_title += ' [COLOR red](Live)[/COLOR]'
-
-                            if video.get('is_short'):
-                                video_title += ' [COLOR white](Short)[/COLOR]'
-
-                            # sort out channel info
-                            if video.get('by') and video['by'].get('type', '') == 'channel':
-
-                                video_title += ' - ' if one_line_titles else '\n'
-
-                                video_title += '[COLOR gold]' + clean_text( video['by'].get('name', '') )
-                                if video['by'].get('verified_badge'):
-                                    video_title += " (Verified)"
-                                video_title += '[/COLOR]'
-
-                                channel_link = video['by'].get('url', '')
-                                if channel_link:
-                                    channel_link = strip_query_params( channel_link )
-                                    subscribe_context = { 'name' : channel_link, 'subscribe': True }
-
-                            # sort out video meta data
-                            upload_date = video.get('upload_date')
-
-                            if upload_date:
-                                upload_date = upload_date.split('T')
-                                upload_date_date = upload_date[0].split('-')
-                                info_labels[ 'year' ] = upload_date_date[0]
-                                video_title += ' - [COLOR lime]' + get_date_formatted( DATE_FORMAT, upload_date_date[0], upload_date_date[1], upload_date_date[2] ) + '[/COLOR]'
-
-
-                            info_labels[ 'duration' ] = video.get('duration', '0')
-
-                            images = { 'thumb': str(video.get('thumb', '')), 'fanart': str(video.get('thumb', '')) }
-
-                            amount+=1
-                            #open get url and open player
-                            add_dir( video_title, link, 4, images, info_labels, cat, False, True, play, subscribe_context  )
-
-
-        return amount
-
     if template_type == 'cat_list':
         cat_list = re.compile(r'<a\s*class=\"category__link link\"\s*href=\"([^\"]+)\"\s*>\s*<img\s*class=\"category__image\s*\"\s*src=\"([^\"]+)\"\s*alt=(?:[^\>]+)>\s*<strong class=\"(?:[^\"]+)\">([^\<]+)</strong>', re.DOTALL|re.IGNORECASE).findall(data)
         if cat_list:
@@ -520,9 +481,7 @@ def dir_list_create( data, cat, template_type='video', search = False, play=0 ):
 
         return amount
 
-    if template_type == 'subscriptions':
-
-        # TODO: combine subscriptions & json into one
+    if template_type == 'json':
 
         if data:
             for video in data:
