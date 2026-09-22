@@ -1,8 +1,5 @@
 import html
-import xbmc
 import xbmcgui
-
-import requests
 
 from lib.general import *
 from lib.rumble_user import RumbleUser
