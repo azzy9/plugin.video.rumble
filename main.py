@@ -271,7 +271,7 @@ def dir_list_create( data, cat, template_type='video', search = False, play=0 ):
 
                 info_labels = {}
 
-                channel_link = strip_query_params( channel_link )
+                channel_link = strip_query_params( channel_link ).strip('"')
 
                 if '<svg' in channel_name:
                     channel_name = channel_name.split('<svg')[0] + " (Verified)"
