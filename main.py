@@ -1025,10 +1025,16 @@ def add_dir( name, url, mode, images = {}, info_labels = {}, cat = '', folder=Tr
     if RUMBLE_USER.has_login_details():
 
         if subscribe_context:
-            if subscribe_context['subscribe']:
-                context_menu.append(('Subscribe to ' + subscribe_context['name'],'RunPlugin(%s)' % build_url( {'mode': '11', 'name': subscribe_context['name'], 'cat': 'subscribe'} )))
-            else:
-                context_menu.append(('Unsubscribe to ' + subscribe_context['name'],'RunPlugin(%s)' % build_url( {'mode': '11', 'name': subscribe_context['name'], 'cat': 'unsubscribe'} )))
+            # add context menu to either subscribe or unsubscribe
+            sub_context_action = 'subscribe' if subscribe_context['subscribe'] else 'unsubscribe'
+            context_menu.append((
+                sub_context_action.capitalize() + ' to ' + subscribe_context['name'],
+                'RunPlugin(%s)' % build_url({
+                    'mode': '11',
+                    'name': subscribe_context['name'],
+                    'cat': sub_context_action
+                })
+            ))
 
     if play == 2 and mode == 4:
         context_menu.append(('Comments','RunPlugin(%s)' % build_url( {'mode': '13','url': url} )))
