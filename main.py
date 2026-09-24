@@ -1022,7 +1022,7 @@ def add_dir( name, url, mode, images = {}, info_labels = {}, cat = '', folder=Tr
 
     if subscribe_context and play == 2 and cat != 'channel_video':
         context_menu.append((
-            'Go to ' + subscribe_context['name'],
+            'Go to ' + url_path_get( subscribe_context['name'] ),
             'ActivateWindow(Videos, %s, return)' % build_url({
                 'mode': '3',
                 'url': BASE_URL + subscribe_context['name'],
@@ -1036,7 +1036,7 @@ def add_dir( name, url, mode, images = {}, info_labels = {}, cat = '', folder=Tr
             # add context menu to either subscribe or unsubscribe
             sub_context_action = 'subscribe' if subscribe_context['subscribe'] else 'unsubscribe'
             context_menu.append((
-                sub_context_action.capitalize() + ' to ' + subscribe_context['name'],
+                sub_context_action.capitalize() + ' to ' + url_path_get( subscribe_context['name'] ),
                 'RunPlugin(%s)' % build_url({
                     'mode': '11',
                     'name': subscribe_context['name'],
