@@ -783,23 +783,31 @@ def favorites_show():
 
     """  Displays favorites """
 
-    data = favorites_load()
+    favorites = favorites_load()
 
     try:
 
-        amount = len(data)
-        if amount > 0:
-            for i in data:
-                name = i[0]
-                url = i[1]
-                mode = i[2]
-                images = { 'thumb': str(i[3]), 'fanart': str(i[4]) }
-                info_labels = { 'plot': str(i[5]) }
-                cat = i[6]
-                folder = ( i[7] == 'True' )
-                play = i[8]
+        if favorites:
+            for fav in favorites:
 
-                add_dir( name, url, mode, images, info_labels, cat, folder, True, int(play) )
+                url = favorites[ fav ].get('url', '')
+                if not url.startswith( BASE_URL ):
+                    url = BASE_URL + url
+
+                add_dir(
+                    favorites[ fav ].get('name', ''),
+                    url,
+                    favorites[ fav ].get('mode', ''),
+                    {
+                        'thumb': str(favorites[ fav ].get('thumb', '')),
+                        'fanart': str(favorites[ fav ].get('fanart', ''))
+                    },
+                    { 'plot': str(favorites[ fav ].get('plot', '')) },
+                    favorites[ fav ].get('cat', ''),
+                    favorites[ fav ].get('folder', False),
+                    True,
+                    int(favorites[ fav ].get('mode', 0))
+                )
 
             xbmcplugin.endOfDirectory(PLUGIN_ID)
         else:
@@ -814,28 +822,28 @@ def favorite_add(name, url, fav_mode, thumb, fanart, plot, cat, folder, play):
 
     """ add favorite from name """
 
-    data = favorites_load()
-    data.append((name, url, fav_mode, thumb, fanart, plot, cat, folder, play))
-    favorites_save( data )
+    data = {
+        'name': name,
+        'url': url,
+        'mode': fav_mode,
+        'thumb': thumb,
+        'fanart': fanart,
+        'plot': str(plot),
+        'cat': cat,
+        'folder': (folder == 'True'),
+        'play': play,
+    }
+
+    favorites_add( data )
 
     notify( get_string(30152), name, thumb )
 
 
-def favorite_remove( name ):
+def favorite_remove( name, url ):
 
     """ remove favorite from name """
 
-    # TODO: remove via something more unique instead
-    # TODO: remove via a method that doesn't require to loop through all favorites
-
-    data = favorites_load()
-
-    if data:
-        for index in range(len(data)):
-            if data[index][0] == name:
-                del data[index]
-                favorites_save( data )
-                break
+    favorites_remove( url )
 
     notify( get_string(30154), name )
 
@@ -1042,15 +1050,13 @@ def add_dir( name, url, mode, images = {}, info_labels = {}, cat = '', folder=Tr
     if fav_context:
 
         try:
-            name_fav = json.dumps(name)
-        except Exception:
-            name_fav = name
-
-        try:
 
             # checks if item is favorited
-            if favorites_exists( name_fav ):
-                context_menu.append((get_string(30153),'RunPlugin(%s)' % build_url( {'mode': '6','name': name} )))
+            if favorites_exists( url ):
+                context_menu.append((
+                    get_string(30153),
+                    'RunPlugin(%s)' % build_url({'mode': '6', 'name': name, 'url': url})
+                ))
             else:
                 fav_params = {
                     'url': url,
@@ -1186,7 +1192,7 @@ def main():
         if mode == 5:
             favorite_add( name, url, fav_mode, thumb, fanart, plot, cat, str(folder), str(play) )
         else:
-            favorite_remove( name )
+            favorite_remove( name, url )
     elif mode==7:
         favorites_show()
     elif mode==8:

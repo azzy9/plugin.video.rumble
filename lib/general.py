@@ -89,6 +89,15 @@ def get_date_formatted( format_id, year, month, day ):
         return day + '/' + month + '/' + year
     return year + '/' + month + '/' + day
 
+def url_path_get( url, domain = 'https://rumble.com' ):
+
+    """ ensures the domain is removed from a URL to get he path """
+
+    if url.startswith( domain ):
+        url = url.replace( domain, '', 1 )
+
+    return url
+
 def duration_to_secs( duration, fail_return = '' ):
 
     """ converts video duration to seconds """

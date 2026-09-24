@@ -5,7 +5,9 @@ import os
 import xbmc
 import xbmcaddon
 
-from lib.general import translate_path
+from collections import OrderedDict
+
+from lib.general import translate_path, url_path_get
 
 try:
     import json
@@ -28,24 +30,47 @@ def favorites_create():
     xbmc.sleep(1)
 
 
-def favorites_load( return_string = False ):
+def favorites_load():
 
     """ load favorites from file into variable """
 
     if os.path.exists( FAVORITES_DIR ):
-        fav_str = open( FAVORITES_DIR ).read()
-        if return_string:
-            return fav_str
-        if fav_str:
-            return json.loads( fav_str )
+        favorites = open( FAVORITES_DIR ).read()
+        if favorites:
+            favorites = json.loads( favorites, object_pairs_hook=OrderedDict )
+            if favorites:
+                favorites = favorites_convert( favorites )
+                return favorites
     else:
         favorites_create()
 
-    # nothing to load, return type necessary
-    if return_string:
-        return ''
+    return OrderedDict({})
 
-    return []
+def favorites_add( data ):
+
+    """ add data and save favorites """
+
+    if 'url' in data:
+        favorites = favorites_load()
+        # if exists, this will update the data
+        favorites[ url_path_get( data[ 'url' ] ) ] = data
+        favorites_save( favorites )
+
+def favorites_remove( url ):
+
+    """ add data and save favorites """
+
+    removed = False
+
+    url = url_path_get( url )
+
+    favorites = favorites_load()
+    if favorites.get( url ):
+        del favorites[url]
+        favorites_save( favorites )
+        removed = True
+
+    return removed
 
 def favorites_save( data ):
 
@@ -60,14 +85,34 @@ def favorites_save( data ):
 
     return True
 
-def favorites_exists( item ):
+def favorites_exists( url ):
 
     """ check if item exists within favorites """
 
-    favorite_str = favorites_load( True )
+    return url_path_get(url) in favorites_load()
 
-    # checks fav name via string
-    # I do not like how this is done,
-    # so will redo in future when favorites are redone
+def favorites_convert( data ):
 
-    return item in favorite_str
+    """ Converts old favorite file format to new """
+
+    if data and isinstance(data, (list, tuple)):
+
+        dict_out = OrderedDict({})
+
+        for record in data:
+            url = url_path_get( record[1] )
+            dict_out[ url ] = {
+                'name': record[0],
+                'url': url,
+                'mode': record[2],
+                'thumb': str(record[3]),
+                'fanart': str(record[4]),
+                'plot': str(record[5]),
+                'cat': record[6],
+                'folder': ( record[7] == 'True' ),
+                'play': record[8],
+            }
+
+        return dict_out
+
+    return data
