@@ -3,6 +3,7 @@ import sys
 
 import xbmc
 import xbmcaddon
+import xbmcvfs
 
 import six
 from six.moves import urllib
@@ -49,6 +50,14 @@ def strip_query_params( url ):
         url = url.split('?')[0]
 
     return url
+
+def translate_path(path):
+
+    """ translate path for both PY2 & PY3 """
+
+    if six.PY2:
+        return xbmc.translatePath( path )
+    return xbmcvfs.translatePath( path )
 
 def notify( message, name=False, iconimage=False, time_shown=5000 ):
 

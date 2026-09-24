@@ -4,9 +4,8 @@ import os
 
 import xbmc
 import xbmcaddon
-import xbmcvfs
 
-import six
+from lib.general import translate_path
 
 try:
     import json
@@ -15,19 +14,13 @@ except ImportError:
 
 ADDON = xbmcaddon.Addon()
 
-if six.PY2:
-    FAVORITES_DIR = xbmc.translatePath(os.path.join(ADDON.getAddonInfo('profile'), 'favorites.dat'))
-else:
-    FAVORITES_DIR = xbmcvfs.translatePath(os.path.join(ADDON.getAddonInfo('profile'), 'favorites.dat'))
+FAVORITES_DIR = translate_path(os.path.join(ADDON.getAddonInfo('profile'), 'favorites.dat'))
 
 def favorites_create():
 
     """ creates favorite directory if doesn't exist """
 
-    if six.PY2:
-        addon_data_path = xbmc.translatePath(ADDON.getAddonInfo('profile'))
-    else:
-        addon_data_path = xbmcvfs.translatePath(ADDON.getAddonInfo('profile'))
+    addon_data_path = translate_path(ADDON.getAddonInfo('profile'))
 
     if os.path.exists(addon_data_path) is False:
         os.mkdir(addon_data_path)

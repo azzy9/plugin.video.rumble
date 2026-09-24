@@ -8,7 +8,6 @@ import xbmc
 import xbmcplugin
 import xbmcgui
 import xbmcaddon
-import xbmcvfs
 
 import six
 from six.moves import urllib
@@ -868,7 +867,7 @@ def favorites_import():
     favorites_create()
 
     # load matrix favourites
-    rumble_matrix_dir = xbmcvfs.translatePath(os.path.join('special://home/userdata/addon_data/plugin.video.rumble.matrix', 'favorites.dat'))
+    rumble_matrix_dir = translate_path(os.path.join('special://home/userdata/addon_data/plugin.video.rumble.matrix', 'favorites.dat'))
 
     if os.path.exists(rumble_matrix_dir):
         rumble_matrix = open( rumble_matrix_dir ).read()
