@@ -10,6 +10,8 @@ import re
 
 import xbmcaddon
 
+from six.moves import urllib
+
 from lib.network import request_get
 from lib.md5ex import MD5Ex
 
@@ -278,14 +280,21 @@ class RumbleUser:
 
         if self.has_session():
 
+            query_params = {
+                'name': 'user.subscription_feed',
+                'api': '7',
+                'limit': str( limit ),
+                'offset': str( (page - 1) * limit ),
+                'options': options,
+            }
+
             headers = {
                 'Referer': self.base_url,
                 'Content-type': 'application/x-www-form-urlencoded',
             }
 
             data = request_get(
-                self.base_url + '/service.php?name=user.subscription_feed&api=7&limit=' + \
-                    str( limit ) + '&offset=' + str( (page - 1) * limit ) + '&options+' + options,
+                self.base_url + '/service.php?' + urllib.parse.urlencode(query_params),
                 False,
                 headers
             )
