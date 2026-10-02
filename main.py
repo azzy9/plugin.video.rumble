@@ -1027,7 +1027,7 @@ def add_dir( name, url, mode, images = {}, info_labels = {}, cat = '', folder=Tr
             'Go to ' + url_path_get( subscribe_context['name'] ),
             'ActivateWindow(Videos, %s, return)' % build_url({
                 'mode': '3',
-                'url': BASE_URL + subscribe_context['name'],
+                'url': BASE_URL + url_path_get( subscribe_context['name'] ),
                 'cat': ('user' if '/user/' in subscribe_context['name'] else 'channel')
             })
         ))
