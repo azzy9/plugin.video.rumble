@@ -97,6 +97,12 @@ def favorites_convert( data ):
 
     if data and isinstance(data, (list, tuple)):
 
+        # create back-up of favorites
+        fav_file = open( FAVORITES_DIR + '.bak', 'w' )
+        fav_file.write(json.dumps(data))
+        fav_file.close()
+
+        # re-arrange list into ordered dict
         dict_out = OrderedDict({})
 
         for record in data:
@@ -112,6 +118,9 @@ def favorites_convert( data ):
                 'folder': ( record[7] == 'True' ),
                 'play': record[8],
             }
+
+        # save converted data
+        favorites_save( dict_out )
 
         return dict_out
 
