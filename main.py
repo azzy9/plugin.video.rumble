@@ -461,8 +461,8 @@ def dir_list_create( data, cat, template_type='video', search = False, play=0 ):
                     if video.get('is_short'):
                         video_title += ' [COLOR white](Short)[/COLOR]'
 
-                    # sort out channel info
-                    if video.get('by') and video['by'].get('type', '') == 'channel':
+                    # sort out channel/user info
+                    if video.get('by') and video['by'].get('type', '') in [ 'channel', 'user' ]:
 
                         video_title += ' - ' if one_line_titles else '\n'
 
@@ -471,10 +471,12 @@ def dir_list_create( data, cat, template_type='video', search = False, play=0 ):
                             video_title += " (Verified)"
                         video_title += '[/COLOR]'
 
-                        channel_link = video['by'].get('url', '')
-                        if channel_link:
-                            channel_link = strip_query_params( channel_link )
-                            subscribe_context = { 'name' : channel_link, 'subscribe': True }
+                        by_link = video['by'].get('url', '')
+                        if by_link:
+                            subscribe_context = {
+                                'name' : strip_query_params( by_link ),
+                                'subscribe': cat != 'subscriptions',
+                            }
 
                     # sort out video meta data
                     upload_date = video.get('upload_date')
