@@ -621,6 +621,7 @@ def resolver( url ):
             if data :
                 types = [ 'mp4', 'webm', 'hls' ]
 
+                max_width = data.get('h', '1080')
                 ua_streams = data.get('ua', False)
 
                 if ua_streams:
@@ -630,6 +631,8 @@ def resolver( url ):
                         if streams:
                             for quality, stream in streams.items():
                                 if stream and stream.get( 'url', False ):
+                                    if quality == 'auto':
+                                        quality = str(max_width)
                                     urls.append(( quality, stream[ 'url' ] ))
                             break
 
