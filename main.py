@@ -792,6 +792,8 @@ def favorites_show():
 
     try:
 
+        xbmcplugin.setContent(PLUGIN_ID, 'videos')
+
         if favorites:
             for fav in favorites:
 
@@ -811,7 +813,7 @@ def favorites_show():
                     favorites[ fav ].get('cat', ''),
                     favorites[ fav ].get('folder', False),
                     True,
-                    int(favorites[ fav ].get('mode', 0))
+                    int(favorites[ fav ].get('play', 2 if str(favorites[ fav ].get('mode', '')) == '4' else 0))
                 )
 
             xbmcplugin.endOfDirectory(PLUGIN_ID)
