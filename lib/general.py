@@ -24,9 +24,9 @@ def sort_sizes(e):
     """ method to use to sort sizes """
 
     try:
-        return int( e[0] )
+        return (0, int( e[0] ))
     except ValueError:
-        return e[0]
+        return (1, e[0] )
 
 def build_url(query):
 
