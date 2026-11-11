@@ -202,5 +202,6 @@ def request_get( url, data=None, extra_headers=None, redirects=True ):
 
         return response.text
 
-    except Exception:
+    except Exception as e:
+        xbmc.log('request_get failed: %s - %s: %s' % (url, type(e).__name__, e), xbmc.LOGWARNING)
         return ''
