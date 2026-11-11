@@ -111,13 +111,13 @@ class MD5Ex:
                 r_str += chr(h)
             else:
                 if h <= 2047:
-                    r_str += chr(192 | self.bit_shift( h, 6, 'r', True ) & 31, 128 | 63 & h)
+                    r_str += chr(192 | self.bit_shift( h, 6, 'r', True ) & 31) + chr(128 | 63 & h)
                 else:
                     if h <= 65535:
-                        r_str += chr(224 | self.bit_shift( h, 12, 'r', True ) & 15, 128 | self.bit_shift( h, 6, 'r', True ) & 63, 128 | 63 & h)
+                        r_str += chr(224 | self.bit_shift( h, 12, 'r', True ) & 15) + chr(128 | self.bit_shift( h, 6, 'r', True ) & 63) + chr(128 | 63 & h)
                     else:
                         if h <= 2097151:
-                            r_str += chr(240 | self.bit_shift( h, 18, 'r', True ) & 7, 128 | self.bit_shift( h, 12, 'r', True ) & 63, 128 | self.bit_shift( h, 6, 'r', True ) & 63, 128 | 63 & h)
+                            r_str += chr(240 | self.bit_shift( h, 18, 'r', True ) & 7) + chr(128 | self.bit_shift( h, 12, 'r', True ) & 63) + chr(128 | self.bit_shift( h, 6, 'r', True ) & 63) + chr(128 | 63 & h)
 
         return r_str
 
